@@ -291,46 +291,7 @@ export default function About() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Bottom banner - responsive sizing and positioning */}
-          <div
-            className="absolute -bottom-[15px] sm:-bottom-[20px] md:-bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-40 w-[180px] sm:w-[220px] md:w-[280px] lg:w-[350px] h-[35px] sm:h-[45px] md:h-[55px] lg:h-[65px]"
-            style={{
-              transform: "rotate(4.65deg)",
-              backgroundColor: "#FFD2BF",
-              borderRadius: "40px",
-              border: "2px sm:border-3px border-black",
-              boxShadow: "2px 2px 0px 0px rgba(0,0,0,1)",
-              padding: "0 8px sm:0 10px",
-            }}
-          >
-            <span
-              className="text-[14px] sm:text-[18px] md:text-[22px] lg:text-[28px] font-black text-black"
-              style={{
-                fontFamily: "'Clash Display', sans-serif",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              @ une_mome
-            </span>
-
-            {/* Mouse cursor - responsive sizing */}
-            <div
-              className="absolute -right-3 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[50px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[40px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
-              style={{
-                transform: "rotate(-5deg)",
-              }}
-            >
-              <Image
-                src="/mouse.svg"
-                alt="Mouse cursor"
-                width={100}
-                height={80}
-                className="w-full h-full"
-              />
-            </div>
-          </div>
+          </div>    
         </div>
       </div>
     </main>

@@ -3,6 +3,7 @@
 import GradientBackground from "@/components/ui/background"
 import Link from "next/link";
 import { useState } from "react"
+import Image from "next/image"
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,6 +11,21 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <GradientBackground />
+      
+      {/* Étoile décorative */}
+      <div
+        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
+        style={{ animationDuration: "6s" }}
+      >
+        <Image
+          src="/stars.svg"
+          alt="Decorative star"
+          width={100}
+          height={100}
+          className="w-full h-full"
+          style={{ filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))" }}
+        />
+      </div>
       
       {/* Portfolio content with neobrutalism design */}
       <div className="relative z-30 flex items-center justify-center min-h-screen py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4">
@@ -104,10 +120,12 @@ export default function Home() {
                     Maelle <br />
                     <div className="flex items-center">
                       Crescence
-                      <img 
+                      <Image 
                         src="/effect.svg" 
+                        width={120}
+                        height={90}
                         alt="Effect illustration" 
-                        className="w-[120px] sm:w-[140px] md:w-[160px] lg:w-[170px] h-[90px] sm:h-[100px] md:h-[110px] lg:h-[120px] ml-3 sm:ml-4 opacity-20"
+                        className="sm:w-[140px] md:w-[160px] lg:w-[170px] sm:h-[100px] md:h-[110px] lg:h-[120px] ml-3 sm:ml-4 opacity-20"
                       />
                     </div>
                   </h1>
@@ -120,12 +138,14 @@ export default function Home() {
                 
                 {/* Buttons - responsive sizing and spacing */}
                 <div className="flex flex-col sm:flex-row sm:space-x-3 md:space-x-4 space-y-3 sm:space-y-0 mt-6 sm:mt-8 md:mt-10">
+                  <Link href="/work">
                   <button className="bg-[#2D2D2D] text-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                     Hire Me
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
+                  </Link>
                   <Link href="/about">
                   <button className="bg-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                     My Story
@@ -139,10 +159,13 @@ export default function Home() {
               
               {/* Character illustration - responsive sizing */}
               <div className="md:col-span-5 flex items-center justify-center order-1 md:order-2 mb-6 md:mb-0">
-                <img 
-                  src="/homme.svg" 
-                  alt="Character illustration" 
-                  className="w-[55%] sm:w-[45%] md:w-[75%] lg:w-[80%] max-w-[400px]" 
+                <Image
+                  src="/homme.svg"
+                  alt="Character illustration"
+                  width={400}
+                  height={400}
+                  className="w-[55%] sm:w-[45%] md:w-[75%] lg:w-[80%] max-w-[400px]"
+                  priority
                 />
               </div>
             </div>
@@ -173,14 +196,14 @@ export default function Home() {
             {/* Mouse cursor - responsive sizing */}
             <div 
               className="absolute -right-3 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[50px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[40px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
-              style={{
-                transform: "rotate(-5deg)",
-              }}
             >
-              <img 
-                src="/mouse.svg" 
-                alt="Mouse cursor" 
-                className="w-full h-full" 
+              <Image
+                src="/mouse.svg"
+                alt="Mouse cursor"
+                width={100}
+                height={80}
+                className="w-full h-full"
+                style={{ transform: "rotate(-5deg)" }}
               />
             </div>
           </div>
