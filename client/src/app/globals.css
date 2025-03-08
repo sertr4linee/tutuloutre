@@ -174,10 +174,29 @@
   }
 }
 
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.shadow-brutal {
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
 /* Add custom font */
 @font-face {
   font-family: 'Clash Display';
-  src: url('/fonts/ClashDisplay-Variable.woff2') format('woff2');
+  src: url('/ClashDisplay-Medium.otf') format('otf');
   font-weight: 200 700;
   font-display: swap;
   font-style: normal;

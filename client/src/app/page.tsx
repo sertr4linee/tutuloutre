@@ -160,10 +160,10 @@ export default function Home() {
               {/* Character illustration - responsive sizing */}
               <div className="md:col-span-5 flex items-center justify-center order-1 md:order-2 mb-6 md:mb-0">
                 <Image
-                  src="/homme.svg"
+                  src="/portrai.svg"
                   alt="Character illustration"
-                  width={400}
-                  height={400}
+                  width={500}
+                  height={500}
                   className="w-[55%] sm:w-[45%] md:w-[75%] lg:w-[80%] max-w-[400px]"
                   priority
                 />

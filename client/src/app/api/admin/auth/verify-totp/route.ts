@@ -26,12 +26,19 @@ export async function POST(req: Request) {
     // Définir le cookie
     const response = NextResponse.json({ success: true })
     
-    response.cookies.set('auth_token', token, {
+    // Ajout de la configuration du domaine pour Vercel
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 // 7 jours
-    })
+      sameSite: 'strict' as const,
+      maxAge: 7 * 24 * 60 * 60, // 7 jours
+      // Utiliser le domaine de production si disponible, sinon utiliser localhost
+      domain: process.env.NODE_ENV === 'production' 
+        ? process.env.NEXT_PUBLIC_DOMAIN || '.vercel.app'
+        : 'localhost'
+    }
+
+    response.cookies.set('auth_token', token, cookieOptions)
 
     return response
   } catch (error) {

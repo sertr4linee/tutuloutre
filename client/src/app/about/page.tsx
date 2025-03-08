@@ -1,12 +1,70 @@
 "use client"
 
 import GradientBackground from "@/components/ui/background"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function About() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [aboutData, setAboutData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/admin/about')
+        if (!res.ok) throw new Error('Failed to fetch data')
+        const data = await res.json()
+        setAboutData(data)
+      } catch (error) {
+        console.error('Error fetching about data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        <GradientBackground />
+        <div className="relative z-30">
+          <div className="relative">
+            {/* Loading box with neobrutalist style */}
+            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+              <div className="flex items-center space-x-4">
+                {/* Animated squares */}
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
+                    style={{
+                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
+            </div>
+          </div>
+        </div>
+        {/* CSS pour l'animation */}
+        <style jsx global>{`
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-15px);
+            }
+          }
+        `}</style>
+      </main>
+    )
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -173,46 +231,48 @@ export default function About() {
                     design.
                   </p>
 
-                  <div className="bg-[#FFE8DD] border-2 border-black p-4 sm:p-5 rounded-lg relative">
-                    <div className="absolute -top-3 -left-3 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs sm:text-sm">
-                      My approach
-                    </div>
-                    <p className="text-base sm:text-lg text-[#3C3C3C] mt-2">
-                      I believe in design that tells stories and creates connections. My process combines strategic
-                      thinking with creative exploration to deliver solutions that are both beautiful and functional.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                    <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
-                      <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Education</h3>
-                      <p className="text-sm sm:text-base text-[#3C3C3C]">
-                        Bachelor of Design
-                        <br />
-                        Eart sup Nice
-                        <br />
-                        2015-2019
+                  {/* My Approach */}
+                  {aboutData?.myApproach && (
+                    <div className="bg-[#FFE8DD] border-2 border-black p-4 sm:p-5 rounded-lg relative">
+                      <div className="absolute -top-3 -left-3 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs sm:text-sm">
+                        My approach
+                      </div>
+                      <p className="text-base sm:text-lg text-[#3C3C3C] mt-2">
+                        {aboutData.myApproach}
                       </p>
                     </div>
+                  )}
 
+                  {/* Education */}
+                  {aboutData?.education && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                      <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
+                        <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Education</h3>
+                        <p className="text-sm sm:text-base text-[#3C3C3C]">
+                          {aboutData.education.degree}<br />
+                          {aboutData.education.school}<br />
+                          {aboutData.education.years}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Skills */}
+                  {aboutData?.skills?.length > 0 && (
                     <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
                       <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Skills</h3>
                       <div className="flex flex-wrap gap-2">
-                        <span className="bg-[#FFD2BF] px-2 py-1 text-xs sm:text-sm rounded-full border border-black">
-                          Illustration
-                        </span>
-                        <span className="bg-[#FFD2BF] px-2 py-1 text-xs sm:text-sm rounded-full border border-black">
-                          UI/UX
-                        </span>
-                        <span className="bg-[#FFD2BF] px-2 py-1 text-xs sm:text-sm rounded-full border border-black">
-                          Branding
-                        </span>
-                        <span className="bg-[#FFD2BF] px-2 py-1 text-xs sm:text-sm rounded-full border border-black">
-                          Typography
-                        </span>
+                        {aboutData.skills.map((skill: string, index: number) => (
+                          <span 
+                            key={index}
+                            className="bg-[#FFD2BF] px-2 py-1 text-xs sm:text-sm rounded-full border border-black"
+                          >
+                            {skill}
+                          </span>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Call to action */}

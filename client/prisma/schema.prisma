@@ -22,4 +22,15 @@ model Session {
   adminId   String
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model About {
+  id          String   @id @default(cuid())
+  myApproach  String   @db.Text
+  degree      String
+  school      String
+  years       String
+  skills      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 } 
