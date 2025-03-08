@@ -1,6 +1,7 @@
 "use client"
 
 import GradientBackground from "@/components/ui/background"
+import Link from "next/link";
 import { useState } from "react"
 
 export default function Home() {
@@ -69,10 +70,10 @@ export default function Home() {
                 text-lg sm:text-base md:text-lg
                 w-full sm:w-auto
               `}>
-                <a href="#about" className="hover:underline">About</a>
-                <a href="#work" className="hover:underline">Work</a>
-                <a href="#services" className="hover:underline">Services</a>
-                <a href="#contact" className="hover:underline">Contact</a>
+                <a href="/about" className="hover:underline">About</a>
+                <a href="/work" className="hover:underline">Work</a>
+                <a href="/services" className="hover:underline">Services</a>
+                <a href="/contact" className="hover:underline">Contact</a>
                 
                 {/* Resume button - responsive sizing */}
                 <div className="relative inline-block mt-4 sm:mt-0">
@@ -125,12 +126,14 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
+                  <Link href="/about">
                   <button className="bg-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                     My Story
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </button>
+                  </Link>
                 </div>
               </div>
               
