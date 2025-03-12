@@ -4,11 +4,14 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import GradientBackground from "@/components/ui/background"
 import Toast from "@/components/ui/toast"
+import BlogEditor from '@/components/ui/blog-editor'
+import BlogBuilder from './blog-builder'
+import AboutEditor from './about-editor'
 
 type Tab = 'projects' | 'blog' | 'messages' | 'settings' | 'about'
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<Tab>('projects')
+  const [activeTab, setActiveTab] = useState<Tab>('blog')
   const router = useRouter()
   const [formData, setFormData] = useState({
     myApproach: "",
@@ -36,17 +39,23 @@ export default function AdminDashboard() {
         const res = await fetch('/api/admin/about')
         if (!res.ok) throw new Error('Failed to fetch data')
         const data = await res.json()
+        
         setFormData({
-          myApproach: data.myApproach || "",
+          myApproach: data?.myApproach ?? "",
           education: {
-            degree: data.education?.degree || "",
-            school: data.education?.school || "",
-            years: data.education?.years || ""
+            degree: data?.education?.degree ?? "",
+            school: data?.education?.school ?? "",
+            years: data?.education?.years ?? ""
           },
-          skills: data.skills || []
+          skills: data?.skills ?? []
         })
       } catch (error) {
         console.error('Error fetching about data:', error)
+        setFormData({
+          myApproach: "",
+          education: { degree: "", school: "", years: "" },
+          skills: []
+        })
       } finally {
         setLoading(false)
       }
@@ -55,12 +64,28 @@ export default function AdminDashboard() {
     fetchAboutData()
   }, [])
 
+  const handleHome = () => {
+    router.push('/')
+  }
+
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/auth/logout', { method: 'POST' })
       router.push('/admin/login')
     } catch (error) {
       console.error('Logout error:', error)
+    }
+  }
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'blog':
+        return <BlogBuilder setToast={setToast} />
+      case 'about':
+        return <AboutEditor setToast={setToast} />
+      // Ajoutez d'autres cas selon vos besoins
+      default:
+        return <div>Sélectionnez un onglet</div>
     }
   }
 
@@ -116,16 +141,6 @@ export default function AdminDashboard() {
               Messages
             </button>
             <button
-              onClick={() => setActiveTab('settings')}
-              className={`w-full text-left px-4 py-3 mb-2 rounded-lg border-2 transition-colors ${
-                activeTab === 'settings' 
-                  ? 'bg-black text-white border-black' 
-                  : 'border-black hover:bg-gray-100'
-              }`}
-            >
-              Paramètres
-            </button>
-            <button
               onClick={() => setActiveTab('about')}
               className={`w-full text-left px-4 py-3 mb-2 rounded-lg border-2 transition-colors ${
                 activeTab === 'about' 
@@ -136,8 +151,9 @@ export default function AdminDashboard() {
               About
             </button>
           </nav>
-
-          {/* Logout button */}
+          <button onClick={handleHome} className="w-full px-4 py-3 border-2 border-black rounded-lg hover:bg-gray-100 transition-colors">
+            Retour à la page d'accueil
+          </button>
           <button
             onClick={handleLogout}
             className="w-full px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
@@ -146,16 +162,10 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
-
-      {/* Main content */}
       <div className="ml-72 p-8">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white border-4 border-black rounded-xl p-8">
-            {activeTab === 'projects' && <ProjectsPanel />}
-            {activeTab === 'blog' && <BlogPanel />}
-            {activeTab === 'messages' && <MessagesPanel />}
-            {activeTab === 'settings' && <SettingsPanel />}
-            {activeTab === 'about' && <AboutPanel formData={formData} setFormData={setFormData} setToast={setToast} />}
+            {renderContent()}
           </div>
         </div>
       </div>
@@ -174,7 +184,6 @@ function ProjectsPanel() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Project cards */}
         <div className="border-4 border-black rounded-xl p-4 bg-white">
           <div className="aspect-video bg-gray-100 rounded-lg mb-4"></div>
           <h3 className="font-bold mb-2">Nom du projet</h3>
@@ -193,38 +202,215 @@ function ProjectsPanel() {
   )
 }
 
-function BlogPanel() {
+interface BlogPanelProps {
+  setToast: React.Dispatch<React.SetStateAction<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>>;
+}
+
+function BlogPanel({ setToast }: BlogPanelProps) {
+  const [currentBlog, setCurrentBlog] = useState<{
+    id?: string;
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    status: 'draft' | 'published';
+  }>({
+    title: '',
+    excerpt: '',
+    content: '',
+    category: '',
+    status: 'draft'
+  });
+
+  const [view, setView] = useState<'list' | 'edit' | 'new'>('list');
+  const [blogs, setBlogs] = useState<Array<typeof currentBlog>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  async function fetchBlogs() {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/blogs');
+      if (!res.ok) throw new Error('Failed to fetch blogs');
+      const data = await res.json();
+      setBlogs(data);
+    } catch (error) {
+      setToast({
+        show: true,
+        message: "Erreur lors du chargement des articles",
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSave(status: 'draft' | 'published') {
+    try {
+      const blogData = { ...currentBlog, status };
+      const res = await fetch('/api/admin/blogs', {
+        method: currentBlog.id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(blogData),
+      });
+
+      if (!res.ok) throw new Error('Failed to save blog');
+      
+      await fetchBlogs();
+      setView('list');
+      setToast({
+        show: true,
+        message: status === 'published' ? 'Article publié avec succès!' : 'Brouillon sauvegardé',
+        type: 'success'
+      });
+    } catch (error) {
+      setToast({
+        show: true,
+        message: "Erreur lors de la sauvegarde",
+        type: 'error'
+      });
+    }
+  }
+
+  if (loading) {
+    return <div className="animate-pulse">Chargement...</div>;
+  }
+
+  if (view === 'list') {
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Articles du Blog</h2>
+          <button
+            onClick={() => {
+              setCurrentBlog({
+                title: '',
+                excerpt: '',
+                content: '',
+                category: '',
+                status: 'draft'
+              });
+              setView('new');
+            }}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Nouvel Article
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {blogs.map((blog) => (
+            <div
+              key={blog.id}
+              className="p-4 border-2 border-black rounded-lg hover:bg-gray-50 cursor-pointer"
+              onClick={() => {
+                setCurrentBlog(blog);
+                setView('edit');
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-lg">{blog.title}</h3>
+                  <p className="text-gray-600">{blog.excerpt}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-sm ${
+                  blog.status === 'published' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {blog.status === 'published' ? 'Publié' : 'Brouillon'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Articles</h2>
-        <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
-          Nouvel Article
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">
+          {view === 'new' ? 'Nouvel Article' : 'Modifier l\'Article'}
+        </h2>
+        <button
+          onClick={() => setView('list')}
+          className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100"
+        >
+          Retour à la liste
         </button>
       </div>
 
       <div className="space-y-4">
-        {/* Blog post items */}
-        <div className="border-4 border-black rounded-xl p-4 bg-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-bold mb-2">Titre de l&apos;arti   cle</h3>
-              <p className="text-gray-600 text-sm mb-2">Publié le 01/03/2024</p>
-              <p className="text-gray-600">Début du contenu de l&apos;article...</p>
-            </div>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-                Éditer
-              </button>
-              <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                Supprimer
-              </button>
-            </div>
-          </div>
+        <div>
+          <label className="block mb-2 font-medium">Titre</label>
+          <input
+            type="text"
+            value={currentBlog.title}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, title: e.target.value })}
+            className="w-full p-3 border-2 border-black rounded-lg"
+            placeholder="Titre de l'article"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium">Catégorie</label>
+          <select
+            value={currentBlog.category}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, category: e.target.value })}
+            className="w-full p-3 border-2 border-black rounded-lg"
+          >
+            <option value="">Sélectionner une catégorie</option>
+            <option value="Branding">Branding</option>
+            <option value="Web Design">Web Design</option>
+            <option value="Illustration">Illustration</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium">Extrait</label>
+          <textarea
+            value={currentBlog.excerpt}
+            onChange={(e) => setCurrentBlog({ ...currentBlog, excerpt: e.target.value })}
+            className="w-full p-3 border-2 border-black rounded-lg"
+            rows={2}
+            placeholder="Bref résumé de l'article"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium">Contenu</label>
+          <BlogEditor
+            content={currentBlog.content}
+            onChange={(content) => setCurrentBlog({ ...currentBlog, content })}
+          />
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={() => handleSave('draft')}
+            className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100"
+          >
+            Enregistrer comme brouillon
+          </button>
+          <button
+            onClick={() => handleSave('published')}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+          >
+            Publier
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function MessagesPanel() {

@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Admin {
-  id            String    @id
+  id             String    @id @default(cuid())
   hashedPassword String
-  totpSecret    String?
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  totpSecret     String?
+  blogs          Blog[]
+  sessions       Session[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Session {
@@ -25,12 +26,33 @@ model Session {
 }
 
 model About {
+  id         String   @id @default(cuid())
+  myApproach String
+  degree     String
+  school     String
+  years      String
+  skills     String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Blog {
   id          String   @id @default(cuid())
-  myApproach  String   @db.Text
-  degree      String
-  school      String
-  years       String
-  skills      String[]
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @db.Text
+  category    String
+  publishDate DateTime @default(now())
+  status      String   @default("draft")
+  coverImage  String?
+  readTime    Int      @default(5)
+  featured    Boolean  @default(false)
+  tags        String[]
+  authorId    String
+  author      Admin    @relation(fields: [authorId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([authorId])
 } 

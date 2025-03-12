@@ -2,8 +2,32 @@ import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import { nanoid } from 'nanoid'
 import { createSession as dbCreateSession, getSession as dbGetSession } from './db'
+import { compare } from 'bcryptjs'
+import { prisma } from './prisma'
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret-key')
+
+export async function loginAdmin(password: string) {
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { id: 'admin' }
+    })
+
+    if (!admin) {
+      throw new Error('Admin not found')
+    }
+
+    const isValid = await compare(password, admin.hashedPassword)
+    if (!isValid) {
+      throw new Error('Invalid password')
+    }
+
+    const token = await createAuthToken(admin.id)
+    return { token }
+  } catch (error) {
+    throw new Error('Authentication failed')
+  }
+}
 
 export async function createSession(adminId: string) {
   const sessionId = nanoid()

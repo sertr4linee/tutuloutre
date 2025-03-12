@@ -4,6 +4,7 @@ import GradientBackground from "@/components/ui/background"
 import Link from "next/link";
 import { useState } from "react"
 import Image from "next/image"
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -194,7 +195,7 @@ export default function Home() {
             </span>
             
             {/* Mouse cursor - responsive sizing */}
-            <div 
+            {/* <div 
               className="absolute -right-3 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[50px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[40px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
             >
               <Image
@@ -205,7 +206,25 @@ export default function Home() {
                 className="w-full h-full"
                 style={{ transform: "rotate(-5deg)" }}
               />
-            </div>
+            </div> */}
+            <motion.div 
+            className="absolute -right-3 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[50px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[40px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
+            animate={{
+              rotate: [-5, 5, -5],
+              y: [0, -5, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut"
+            }}
+          >
+            <img 
+              src="/mouse.svg" 
+              alt="Mouse cursor" 
+              className="w-full h-full" 
+            />
+          </motion.div>
           </div>
         </div>
       </div>

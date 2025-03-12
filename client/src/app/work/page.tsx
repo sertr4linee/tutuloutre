@@ -5,6 +5,17 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 
+interface Blog {
+  id: string
+  title: string
+  excerpt: string
+  category: string
+  publishDate: string
+  coverImage: string | null
+  slug: string
+  status: string
+}
+
 export default function Work() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState("all")
@@ -13,6 +24,7 @@ export default function Work() {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const galleryRef = useRef<HTMLDivElement>(null)
+  const [blogs, setBlogs] = useState<Blog[]>([])
 
   // Handle scroll for parallax effects
   useEffect(() => {
@@ -23,39 +35,29 @@ export default function Work() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Sample blog posts data
-  const blogPosts = [
-    {
-      id: 1,
-      title: "Comment j'ai conçu l'identité visuelle pour Studio Lumière",
-      excerpt:
-        "Une plongée dans mon processus créatif pour développer une identité de marque qui capture l'essence de la photographie contemporaine.",
-      date: "12 Mai 2023",
-      category: "Branding",
-      image: "/placeholder.svg?height=400&width=600",
-      color: "#FFD2BF",
-    },
-    {
-      id: 2,
-      title: "L'importance de la typographie dans le design web moderne",
-      excerpt:
-        "Exploration des tendances typographiques actuelles et comment elles influencent l'expérience utilisateur dans mes projets récents.",
-      date: "3 Avril 2023",
-      category: "Web Design",
-      image: "/placeholder.svg?height=400&width=600",
-      color: "#E9B949",
-    },
-    {
-      id: 3,
-      title: "Créer des illustrations qui racontent une histoire",
-      excerpt:
-        "Comment j'utilise l'illustration pour communiquer des concepts complexes et créer une connexion émotionnelle avec l'audience.",
-      date: "18 Mars 2023",
-      category: "Illustration",
-      image: "/placeholder.svg?height=400&width=600",
-      color: "#F67A45",
-    },
-  ]
+  useEffect(() => {
+    async function fetchBlogs() {
+      try {
+        const res = await fetch('/api/admin/blogs')
+        if (!res.ok) throw new Error('Failed to fetch blogs')
+        const data = await res.json()
+        // Ne garder que les blogs publiés
+        setBlogs(data.filter((blog: Blog) => blog.status === 'published'))
+      } catch (error) {
+        console.error('Error fetching blogs:', error)
+      }
+    }
+
+    fetchBlogs()
+  }, [])
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  }
 
   // Sample photography gallery data
   const photoGallery = [
@@ -332,74 +334,69 @@ export default function Work() {
               {/* Blog posts in a creative layout */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
                 {/* Featured post - larger */}
-                <div className="md:col-span-8 group">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
-                    <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
-                      <div className="relative h-[240px] sm:h-[320px] overflow-hidden">
-                        <img
-                          src={blogPosts[0].image || "/placeholder.svg"}
-                          alt={blogPosts[0].title}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                        />
-                        <div className="absolute top-4 left-4 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs">
-                          {blogPosts[0].category}
+                {blogs[0] && (
+                  <div className="md:col-span-8 group">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
+                      <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
+                        <div className="relative h-[300px] sm:h-[400px] overflow-hidden">
+                          <img
+                            src={blogs[0].coverImage || "/placeholder.svg"}
+                            alt={blogs[0].title}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                          />
+                          <div className="absolute top-4 left-4 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs">
+                            {blogs[0].category}
+                          </div>
                         </div>
-                      </div>
-                      <div className="p-4 sm:p-6">
-                        <span className="text-sm text-[#3C3C3C]">{blogPosts[0].date}</span>
-                        <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-3">{blogPosts[0].title}</h3>
-                        <p className="text-[#3C3C3C] mb-4">{blogPosts[0].excerpt}</p>
-                        <button className="flex items-center font-medium text-[#f67a45] group-hover:underline">
-                          Lire l'article
-                          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M14 5l7 7m0 0l-7 7m7-7H3"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </article>
+                        <div className="p-4 sm:p-6">
+                          <span className="text-sm text-[#3C3C3C]">{formatDate(blogs[0].publishDate)}</span>
+                          <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-3">{blogs[0].title}</h3>
+                          <p className="text-[#3C3C3C] mb-4">{blogs[0].excerpt}</p>
+                          <Link 
+                            href={`/work/blog/${blogs[0].slug}`}
+                            className="flex items-center font-medium text-[#f67a45] group-hover:underline"
+                          >
+                            Lire l'article
+                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </Link>
+                        </div>
+                      </article>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Smaller posts - stacked */}
                 <div className="md:col-span-4 space-y-6">
-                  {blogPosts.slice(1, 3).map((post, index) => (
-                    <div key={post.id} className="group">
+                  {blogs.slice(1, 3).map((blog) => (
+                    <div key={blog.id} className="group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
                         <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
                           <div className="relative h-[140px] overflow-hidden">
                             <img
-                              src={post.image || "/placeholder.svg"}
-                              alt={post.title}
+                              src={blog.coverImage || "/placeholder.svg"}
+                              alt={blog.title}
                               className="w-full h-full object-cover transition-transform group-hover:scale-105"
                             />
-                            <div
-                              className="absolute top-3 left-3 bg-[#FFD2BF] text-black font-bold px-2 py-1 rounded-full border-2 border-black text-xs"
-                              style={{ backgroundColor: post.color }}
-                            >
-                              {post.category}
+                            <div className="absolute top-3 left-3 bg-[#FFD2BF] text-black font-bold px-2 py-1 rounded-full border-2 border-black text-xs">
+                              {blog.category}
                             </div>
                           </div>
                           <div className="p-4">
-                            <span className="text-xs text-[#3C3C3C]">{post.date}</span>
-                            <h3 className="text-lg font-bold mt-1 mb-2">{post.title}</h3>
-                            <button className="flex items-center text-sm font-medium text-[#f67a45] group-hover:underline">
+                            <span className="text-xs text-[#3C3C3C]">{formatDate(blog.publishDate)}</span>
+                            <h3 className="text-lg font-bold mt-1 mb-2">{blog.title}</h3>
+                            <Link 
+                              href={`/work/blog/${blog.slug}`}
+                              className="flex items-center text-sm font-medium text-[#f67a45] group-hover:underline"
+                            >
                               Lire l'article
                               <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                               </svg>
-                            </button>
+                            </Link>
                           </div>
                         </article>
                       </div>
