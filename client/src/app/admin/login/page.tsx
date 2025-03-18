@@ -1,155 +1,91 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import GradientBackground from "@/components/ui/background"
+import { api } from "@/lib/api"
 
 export default function AdminLogin() {
-  const [step, setStep] = useState<'password' | 'qr' | 'totp'>('password')
   const [password, setPassword] = useState("")
-  const [qrCode, setQrCode] = useState("")
-  const [totpCode, setTotpCode] = useState("")
+  const [otp, setOtp] = useState("")
+  const [showOTP, setShowOTP] = useState(false)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  // Première étape : mot de passe
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      const res = await fetch('/api/admin/auth/password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      })
-      
-      if (res.ok) {
-        // Si c'est la première connexion, on passe à l'étape QR
-        // Sinon on passe directement au TOTP
-        const { isFirstLogin } = await res.json()
-        setStep(isFirstLogin ? 'qr' : 'totp')
-      } else {
-        setError("Mot de passe incorrect")
-      }
-    } catch {
-      setError("Une erreur est survenue")
-    }
-  }
+    setError("")
+    setLoading(true)
 
-  // Deuxième étape : scan du QR code (première connexion uniquement)
-  useEffect(() => {
-    if (step === 'qr') {
-      console.log('Fetching QR code...')
-      fetch('/api/admin/auth/setup-2fa')
-        .then(res => res.json())
-        .then(data => {
-          console.log('QR code received:', !!data.qrCode)
-          setQrCode(data.qrCode)
-        })
-        .catch(err => {
-          console.error('Error fetching QR code:', err)
-          setError("Erreur lors de la génération du QR code")
-        })
-    }
-  }, [step])
-
-  // Troisième étape : vérification du code TOTP
-  const handleTotpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
     try {
-      const res = await fetch('/api/admin/auth/verify-totp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: totpCode }),
-      })
-      
-      if (res.ok) {
-        router.push('/admin/dashboard')
+      if (!showOTP) {
+        const res = await api.auth.login(password)
+        console.log('Login response:', res) // Debug
+        if (res.requireOTP) {
+          setShowOTP(true)
+        } else {
+          setError('Réponse invalide du serveur')
+        }
       } else {
-        setError("Code incorrect")
+        const res = await api.auth.verifyOTP(otp)
+        console.log('OTP response:', res) // Debug
+        if (res.token) {
+          document.cookie = `auth_token=${res.token}; path=/; max-age=604800; secure; samesite=lax`
+          router.push('/admin/dashboard')
+        } else {
+          setError('Code OTP invalide')
+        }
       }
-    } catch {
-      setError("Une erreur est survenue")
+    } catch (error) {
+      console.error('Auth error:', error) // Debug
+      setError(showOTP ? 'Erreur de vérification OTP' : 'Erreur d\'authentification')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#f8d7e6] to-[#e67e56]">
-      <GradientBackground />
-      <div className="w-full max-w-md p-8 bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <h1 className="text-3xl font-bold mb-8 text-center">Admin Login</h1>
-        
-        {error && (
-          <div className="bg-red-100 border-2 border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF5]">
+      <div className="w-full max-w-md">
+        <form onSubmit={handleSubmit} className="bg-white p-8 border-4 border-black rounded-xl shadow-brutal">
+          <h1 className="text-2xl font-bold mb-6">Admin Login</h1>
+          
+          {!showOTP ? (
+            <div className="mb-4">
+              <label className="block mb-2">Mot de passe</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 border-2 border-black rounded-lg"
+                required
+              />
+            </div>
+          ) : (
+            <div className="mb-4">
+              <label className="block mb-2">Code OTP</label>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full p-3 border-2 border-black rounded-lg"
+                required
+              />
+            </div>
+          )}
 
-        {step === 'password' && (
-          <form onSubmit={handlePasswordSubmit}>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mot de passe"
-              className="w-full p-3 border-2 border-black rounded mb-4"
-            />
-            <button 
-              type="submit"
-              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800"
-            >
-              Continuer
-            </button>
-          </form>
-        )}
+          {error && (
+            <div className="mb-4 text-red-500">{error}</div>
+          )}
 
-        {step === 'qr' && (
-          <div className="text-center">
-            <p className="mb-4">Scannez ce QR code avec votre application d&apos;authentification</p>
-            {qrCode ? (
-              <div className="mb-4 flex justify-center">
-                <div className="p-4 bg-white rounded-lg border-2 border-black">
-                  <Image
-                    src={qrCode}
-                    alt="QR Code for 2FA"
-                    width={200}
-                    height={200}
-                    priority
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="mb-4 flex justify-center">
-                <div className="animate-pulse w-[200px] h-[200px] bg-gray-200 rounded-lg"></div>
-              </div>
-            )}
-            <button 
-              onClick={() => setStep('totp')}
-              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition-colors"
-            >
-              J&apos;ai scanné le QR code
-            </button>
-          </div>
-        )}
-
-        {step === 'totp' && (
-          <form onSubmit={handleTotpSubmit}>
-            <input
-              type="text"
-              value={totpCode}
-              onChange={(e) => setTotpCode(e.target.value)}
-              placeholder="Code à 6 chiffres"
-              className="w-full p-3 border-2 border-black rounded mb-4"
-              maxLength={6}
-            />
-            <button 
-              type="submit"
-              className="w-full bg-black text-white py-3 rounded hover:bg-gray-800"
-            >
-              Se connecter
-            </button>
-          </form>
-        )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Connexion...' : (showOTP ? 'Vérifier' : 'Se connecter')}
+          </button>
+        </form>
       </div>
     </div>
   )

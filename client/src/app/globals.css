@@ -258,32 +258,3 @@ body {
     scroll-behavior: auto !important;
   }
 }
-
-/* Curseur personnalisé */
-* {
-  cursor: url('/cursorskin.svg') 8 8, auto !important;
-}
-
-/* Curseur pour les éléments cliquables */
-a, button, input[type="submit"], 
-[role="button"], 
-label[for], 
-select, 
-summary,
-.clickable {
-  cursor: url('/cursorskin.svg') 8 8, pointer !important;
-}
-
-/* Curseur pour le texte */
-input[type="text"], 
-input[type="email"], 
-input[type="password"], 
-input[type="number"],
-textarea {
-  cursor: text !important;
-}
-
-/* Curseur pour le redimensionnement */
-textarea {
-  cursor: auto !important;
-}

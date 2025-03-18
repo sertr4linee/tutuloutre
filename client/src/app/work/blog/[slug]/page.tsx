@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import GradientBackground from "@/components/ui/background"
+import Loading from "@/components/ui/loading"
+import Image from "next/image"
 
 interface BlogPost {
   id: string
@@ -56,24 +58,86 @@ export default function BlogPost() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-black"></div>
-      </div>
-    )
+    <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        <GradientBackground />
+        <div className="relative z-30">
+          <div className="relative">
+            {/* Loading box with neobrutalist style */}
+            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+              <div className="flex items-center space-x-4">
+                {/* Animated squares */}
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
+                    style={{
+                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
+            </div>
+          </div>
+        </div>
+        {/* CSS pour l'animation */}
+        <style jsx global>{`
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-15px);
+            }
+          }
+        `}</style>
+      </main>
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Article non trouvé</h1>
-      </div>
+      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        <GradientBackground />
+        <div className="relative z-30">
+          <div className="relative">
+            {/* Loading box with neobrutalist style */}
+            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+              <div className="flex items-center space-x-4">
+                {/* Animated squares */}
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
+                    style={{
+                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
+            </div>
+          </div>
+        </div>
+        {/* CSS pour l'animation */}
+        <style jsx global>{`
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-15px);
+            }
+          }
+        `}</style>
+      </main>
     )
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#FFFBF5]">
-      <GradientBackground />
+    <main className="relative min-h-screen bg-[#FFFBF5]">
+      <div className="fixed inset-0 z-0">
+        <GradientBackground />
+      </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
         <Link href="/work#blog" className="inline-block mb-8">
@@ -108,11 +172,15 @@ export default function BlogPost() {
           {post.coverImage && (
             <div className="relative mb-8">
               <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl"></div>
-              <img
-                src={post.coverImage}
-                alt={post.title}
-                className="relative z-10 w-full h-64 sm:h-96 object-cover rounded-xl border-2 border-black"
-              />
+              <div className="relative z-10 w-full h-64 sm:h-96 border-2 border-black rounded-xl overflow-hidden">
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              </div>
             </div>
           )}
 

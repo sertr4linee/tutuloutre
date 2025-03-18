@@ -16,6 +16,14 @@ interface Blog {
   status: string
 }
 
+interface Album {
+  id: string
+  title: string
+  description?: string
+  category: string
+  coverImage?: string
+}
+
 export default function Work() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState("all")
@@ -25,6 +33,9 @@ export default function Work() {
   const [scrollY, setScrollY] = useState(0)
   const galleryRef = useRef<HTMLDivElement>(null)
   const [blogs, setBlogs] = useState<Blog[]>([])
+  const [albums, setAlbums] = useState<Album[]>([])
+  const [filter, setFilter] = useState('Tous')
+  const categories = ['Tous', 'Urban', 'Portrait', 'Nature', 'Architecture']
 
   // Handle scroll for parallax effects
   useEffect(() => {
@@ -49,6 +60,20 @@ export default function Work() {
     }
 
     fetchBlogs()
+  }, [])
+
+  useEffect(() => {
+    async function fetchAlbums() {
+      try {
+        const res = await fetch('/api/admin/albums')
+        if (!res.ok) throw new Error('Failed to fetch albums')
+        const data = await res.json()
+        setAlbums(data)
+      } catch (error) {
+        console.error('Error fetching albums:', error)
+      }
+    }
+    fetchAlbums()
   }, [])
 
   const formatDate = (date: string) => {
@@ -132,6 +157,10 @@ export default function Work() {
   const toggleProject = (id: number) => {
     setActiveProject(activeProject === id ? null : id)
   }
+
+  const filteredAlbums = albums.filter(album => 
+    filter === 'Tous' ? true : album.category === filter
+  )
 
   return (
     <main className="relative min-h-screen overflow-x-hidden">
@@ -273,9 +302,9 @@ export default function Work() {
             {/* Work page title with decorative element */}
             <div className="mb-8 sm:mb-12">
               <div className="relative">
-                <div className="absolute -top-6 sm:-top-8 left-1 sm:left-2">
+                <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                   <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
-                    Mon portfolio
+                    My work
                   </div>
                 </div>
                 <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] leading-[0.9] font-black text-[#2D2D2D] tracking-tighter font-family-clash">
@@ -340,9 +369,11 @@ export default function Work() {
                       <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
                       <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
                         <div className="relative h-[300px] sm:h-[400px] overflow-hidden">
-                          <img
+                          <Image
                             src={blogs[0].coverImage || "/placeholder.svg"}
                             alt={blogs[0].title}
+                            width={100}
+                            height={100}
                             className="w-full h-full object-cover transition-transform group-hover:scale-105"
                           />
                           <div className="absolute top-4 left-4 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs">
@@ -376,9 +407,11 @@ export default function Work() {
                         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
                         <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
                           <div className="relative h-[140px] overflow-hidden">
-                            <img
+                            <Image
                               src={blog.coverImage || "/placeholder.svg"}
                               alt={blog.title}
+                              width={100}
+                              height={100}
                               className="w-full h-full object-cover transition-transform group-hover:scale-105"
                             />
                             <div className="absolute top-3 left-3 bg-[#FFD2BF] text-black font-bold px-2 py-1 rounded-full border-2 border-black text-xs">
@@ -435,22 +468,18 @@ export default function Work() {
 
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 mt-4">Ma galerie photo</h2>
 
-              {/* Category filters */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                <button
-                  onClick={() => setActiveCategory("all")}
-                  className={`px-3 py-1 border-2 border-black rounded-full text-xs font-medium transition-all ${
-                    activeCategory === "all" ? "bg-[#E9B949] text-black" : "bg-white hover:bg-[#FFE8DD]"
-                  }`}
-                >
-                  Tous
-                </button>
-                {Array.from(new Set(photoGallery.map((photo) => photo.category))).map((category) => (
+              {/* Filtres */}
+              <div className="flex flex-wrap gap-2 mb-8">
+                {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`px-3 py-1 border-2 border-black rounded-full text-xs font-medium transition-all ${
-                      activeCategory === category ? "bg-[#E9B949] text-black" : "bg-white hover:bg-[#FFE8DD]"
+                    onClick={() => setFilter(category)}
+                    className={`px-4 py-2 rounded-full border-2 border-black transition-colors ${
+                      filter === category 
+                        ? 'bg-black text-white' 
+                        : category === 'Tous' 
+                          ? 'bg-[#E9B949]'
+                          : 'bg-white hover:bg-gray-100'
                     }`}
                   >
                     {category}
@@ -458,43 +487,51 @@ export default function Work() {
                 ))}
               </div>
 
-              {/* Interactive masonry gallery */}
-              <div ref={galleryRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {filteredPhotos.map((photo, index) => (
-                  <div
-                    key={photo.id}
-                    className={`relative group cursor-pointer ${index % 5 === 0 ? "sm:col-span-2 md:col-span-2" : ""}`}
-                    onClick={() => openGallery(index)}
+              {/* Grille de photos */}
+              <div className="grid grid-cols-12 gap-6">
+                {filteredAlbums.slice(0, 2).map((album, index) => (
+                  <Link
+                    key={album.id}
+                    href={`/work/gallery/${album.id}`}
+                    className={`relative border-4 border-black rounded-xl overflow-hidden ${
+                      index === 0 ? 'col-span-8 row-span-2' : 'col-span-4'
+                    }`}
                   >
-                    <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
-                    <div className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
-                      <div className="relative aspect-[4/3] overflow-hidden">
-                        <img
-                          src={photo.src || "/placeholder.svg"}
-                          alt={photo.title}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    <div className="relative aspect-[4/3]">
+                      {album.coverImage ? (
+                        <Image
+                          src={album.coverImage}
+                          alt={album.title}
+                          fill
+                          className="object-cover"
                         />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity"></div>
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="bg-white border-2 border-black rounded-full p-2">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                              />
-                            </svg>
-                          </div>
+                      ) : (
+                        <div className="w-full h-full bg-gray-200" />
+                      )}
+                      <div className="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
                         </div>
                       </div>
-                      <div className="p-3">
-                        <h3 className="font-medium">{photo.title}</h3>
-                        <span className="text-xs text-[#3C3C3C]">{photo.category}</span>
-                      </div>
                     </div>
-                  </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t-4 border-black">
+                      <h3 className="text-xl font-bold">{album.title}</h3>
+                      <p className="text-gray-600">{album.category}</p>
+                    </div>
+                  </Link>
                 ))}
+              </div>
+
+              {/* Bouton Voir plus */}
+              <div className="mt-8 text-center">
+                <Link
+                  href="/work/gallery"
+                  className="inline-block px-6 py-3 bg-black text-white rounded-full border-2 border-black hover:bg-gray-800 transition-colors"
+                >
+                  Voir plus de photos
+                </Link>
               </div>
             </div>
           </div>
@@ -531,9 +568,11 @@ export default function Work() {
                             className="h-[200px] md:h-full overflow-hidden"
                             style={{ backgroundColor: `${project.color}30` }}
                           >
-                            <img
+                            <Image
                               src={project.image || "/placeholder.svg"}
                               alt={project.title}
+                              width={100}
+                              height={100}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -658,9 +697,11 @@ export default function Work() {
           <div className="max-w-4xl max-h-[80vh] relative">
             <div className="absolute inset-0 bg-black translate-x-4 translate-y-4 rounded-xl -z-10"></div>
             <div className="border-4 border-black rounded-xl overflow-hidden bg-white">
-              <img
+              <Image
                 src={filteredPhotos[currentPhotoIndex].src || "/placeholder.svg"}
                 alt={filteredPhotos[currentPhotoIndex].title}
+                width={100}
+                height={100}
                 className="max-h-[70vh] object-contain mx-auto"
               />
               <div className="p-4 bg-white">
@@ -680,7 +721,7 @@ export default function Work() {
                   currentPhotoIndex === index ? "border-white" : "border-gray-500"
                 } rounded-md overflow-hidden`}
               >
-                <img src={photo.src || "/placeholder.svg"} alt={photo.title} className="w-full h-full object-cover" />
+                <Image src={photo.src || "/placeholder.svg"} alt={photo.title} width={100} height={100} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>

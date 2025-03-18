@@ -4,7 +4,7 @@ import GradientBackground from "@/components/ui/background"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { motion, useAnimation, useInView } from "framer-motion"
-
+import Image from "next/image"
 export default function Services() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeService, setActiveService] = useState<number | null>(null)
@@ -16,7 +16,6 @@ export default function Services() {
   const intersectionRef = useRef(null)
   const isInView = useInView(intersectionRef, { once: true })
   const mainControls = useAnimation()
-  const cursorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -26,13 +25,14 @@ export default function Services() {
       { threshold: 0.5 },
     )
 
-    if (intersectionRef.current) {
-      observer.observe(intersectionRef.current)
+    const currentRef = intersectionRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
     }
 
     return () => {
-      if (intersectionRef.current) {
-        observer.unobserve(intersectionRef.current)
+      if (currentRef) {
+        observer.unobserve(currentRef)
       }
     }
   }, [])
@@ -42,19 +42,6 @@ export default function Services() {
       mainControls.start("visible")
     }
   }, [isInView, mainControls])
-
-  useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
-      if (cursorRef.current) {
-        cursorRef.current.style.left = `${e.clientX}px`
-        cursorRef.current.style.top = `${e.clientY}px`
-      }
-    }
-    window.addEventListener("mousemove", moveCursor)
-    return () => {
-      window.removeEventListener("mousemove", moveCursor)
-    }
-  }, [])
 
   const services = [
     {
@@ -101,14 +88,14 @@ export default function Services() {
       name: "Sophie Martin",
       company: "TechStart",
       quote: "Maelle a complètement transformé notre image de marque. Son travail est exceptionnel !",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/sophie.svg",
     },
     {
       id: 2,
       name: "Thomas Dubois",
       company: "GreenLeaf",
       quote: "La créativité et le professionnalisme de Maelle ont dépassé toutes nos attentes.",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/thomas.svg",
     },
     {
       id: 3,
@@ -116,7 +103,7 @@ export default function Services() {
       company: "FashionForward",
       quote:
         "Travailler avec Maelle a été une expérience incroyable. Elle a vraiment capturé l'essence de notre marque.",
-      avatar: "/placeholder.svg?height=80&width=80",
+      avatar: "/emma.svg",
     },
   ]
 
@@ -147,13 +134,6 @@ export default function Services() {
     <main className="relative min-h-screen overflow-x-hidden">
       <GradientBackground />
 
-      {/* Custom cursor */}
-      <div 
-        ref={cursorRef} 
-        className="fixed w-8 h-8 rounded-full border-2 border-black bg-white mix-blend-difference pointer-events-none z-50"
-        style={{ transition: 'left 0.1s, top 0.1s' }}
-      ></div>
-
       {/* Floating decorative elements */}
       <motion.div 
         className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px]"
@@ -167,9 +147,11 @@ export default function Services() {
           ease: "easeInOut"
         }}
       >
-        <img 
+        <Image 
           src="/stars.svg" 
           alt="" 
+          width={100}
+          height={100}
           className="w-full h-full"
           style={{ filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))" }}
         />
@@ -187,7 +169,7 @@ export default function Services() {
           ease: "easeInOut"
         }}
       >
-        <img 
+        <Image 
           src="/stars.svg" 
           alt="" 
           className="w-full h-full"
@@ -195,6 +177,8 @@ export default function Services() {
             filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5)) hue-rotate(90deg)",
             opacity: 0.9
           }}
+          width={100}
+          height={100}
         />
       </motion.div>
 
@@ -308,7 +292,7 @@ export default function Services() {
             <div className="mb-8 sm:mb-12">
               <div className="relative">
                 <motion.div 
-                  className="absolute -top-6 sm:-top-8 left-1 sm:left-2"
+                  className="absolute -top-8 sm:-top-10 left-1 sm:left-2"
                   animate={{
                     rotate: [0, -3, 3, -3, 0],
                   }}
@@ -464,9 +448,11 @@ export default function Services() {
                         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
                         <div className="relative border-3 border-black rounded-xl p-6 bg-white">
                           <div className="flex items-center mb-4">
-                            <img 
+                            <Image  
                               src={testimonial.avatar || "/placeholder.svg"} 
                               alt={testimonial.name} 
+                              width={100}
+                              height={100}
                               className="w-12 h-12 rounded-full border-2 border-black mr-4" 
                             />
                             <div>
@@ -520,33 +506,10 @@ export default function Services() {
                   </motion.div>
                 </Link>
               </div>
-            </motion.div>
-
-            {/* Easter Egg */}
-            <div className="mt-16 text-center">
-              <motion.button
-                className="text-sm text-[#3C3C3C] hover:text-[#f67a45]"
-                onClick={revealEasterEgg}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                Psst... cliquez ici pour une surprise !
-              </motion.button>
-              {easterEggFound && (
-                <motion.div
-                  className="mt-4 p-4 bg-[#FFE8DD] border-2 border-black rounded-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  🎉 Bravo ! Vous avez trouvé l'easter egg ! Utilisez le code "CREATIVESURPRISE" pour obtenir 10% de réduction sur votre prochain projet !
-                </motion.div>
-              )}
-            </div>
+            </motion.div>            
           </div>
         </motion.div>
       </div>
     </main>
   )
 }
-

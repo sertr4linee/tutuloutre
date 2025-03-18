@@ -7,8 +7,10 @@ import Toast from "@/components/ui/toast"
 import BlogEditor from '@/components/ui/blog-editor'
 import BlogBuilder from './blog-builder'
 import AboutEditor from './about-editor'
+// import MessageManager from './message-manager'
+import AlbumManager from './album-manager'
 
-type Tab = 'projects' | 'blog' | 'messages' | 'settings' | 'about'
+type Tab = 'projects' | 'blog' | 'messages' | 'settings' | 'about' | 'albums'
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('blog')
@@ -83,6 +85,10 @@ export default function AdminDashboard() {
         return <BlogBuilder setToast={setToast} />
       case 'about':
         return <AboutEditor setToast={setToast} />
+      case 'albums':
+        return <AlbumManager />
+      case 'messages':
+        // return <MessageManager />
       // Ajoutez d'autres cas selon vos besoins
       default:
         return <div>Sélectionnez un onglet</div>
@@ -129,6 +135,16 @@ export default function AdminDashboard() {
               }`}
             >
               Blog
+            </button>
+            <button
+              onClick={() => setActiveTab('albums')}
+              className={`w-full text-left px-4 py-3 mb-2 rounded-lg border-2 transition-colors ${
+                activeTab === 'albums' 
+                  ? 'bg-black text-white border-black' 
+                  : 'border-black hover:bg-gray-100'
+              }`}
+            >
+              Albums
             </button>
             <button
               onClick={() => setActiveTab('messages')}

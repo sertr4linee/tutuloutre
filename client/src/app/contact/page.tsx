@@ -109,9 +109,11 @@ export default function Contact() {
         className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
         style={{ animationDuration: "6s" }}
       >
-        <img
+        <Image
           src="/stars.svg"
           alt=""
+          width={100}
+          height={100}
           className="w-full h-full"
           style={{ filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))" }}
         />
@@ -220,7 +222,7 @@ export default function Contact() {
               {/* Contact page title with decorative element */}
               <div className="mb-2 sm:mb-4">
                 <div className="relative">
-                  <div className="absolute -top-6 sm:-top-8 left-1 sm:left-2">
+                  <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
                       Say hello!
                     </div>
@@ -275,9 +277,11 @@ export default function Contact() {
                   <div className="relative">
                     {/* Decorative elements */}
                     <div className="absolute -top-10 -right-10 w-[80px] h-[80px] opacity-50 hidden md:block">
-                      <img
+                      <Image
                         src="/stars.svg"
                         alt=""
+                        width={100}
+                        height={100}
                         className="w-full h-full animate-spin-slow"
                         style={{
                           filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.9))",

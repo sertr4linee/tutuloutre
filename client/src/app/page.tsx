@@ -110,7 +110,7 @@ export default function Home() {
               <div className="md:col-span-7 order-2 md:order-1">
                 <div className="relative">
                   {/* Hi I am bubble - responsive positioning and sizing */}
-                  <div className="absolute -top-6 sm:-top-8 left-1 sm:left-2">
+                  <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
                       Hi, I am
                     </div>
@@ -219,9 +219,11 @@ export default function Home() {
               ease: "easeInOut"
             }}
           >
-            <img 
+            <Image 
               src="/mouse.svg" 
               alt="Mouse cursor" 
+              width={100}
+              height={80}
               className="w-full h-full" 
             />
           </motion.div>

@@ -174,7 +174,7 @@ export default function About() {
               {/* About page title with decorative element */}
               <div className="md:col-span-12 mb-2 sm:mb-4">
                 <div className="relative">
-                  <div className="absolute -top-6 sm:-top-8 left-1 sm:left-2">
+                  <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
                       About me
                     </div>

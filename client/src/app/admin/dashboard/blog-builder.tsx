@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
+import TiptapImage from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import { Upload } from 'lucide-react'
+import Image from 'next/image'
 
 interface Blog {
   id: string
@@ -42,6 +43,14 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
     tags: []
   })
 
+  const editor = useEditor({
+    extensions: [StarterKit, TiptapImage, Link],
+    content: formData.content,
+    onUpdate: ({ editor }) => {
+      setBlog(prev => ({ ...prev, content: editor.getHTML() }))
+    }
+  })
+
   useEffect(() => {
     fetchBlogs()
   }, [])
@@ -58,14 +67,6 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
       setLoading(false)
     }
   }
-
-  const editor = useEditor({
-    extensions: [StarterKit, Image, Link],
-    content: formData.content,
-    onUpdate: ({ editor }) => {
-      setBlog(prev => ({ ...prev, content: editor.getHTML() }))
-    }
-  })
 
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
@@ -100,22 +101,24 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
     if (!file) return
 
     try {
-      // Créer un slug temporaire si nécessaire
-      const tempSlug = formData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '')
+      // Générer un slug à partir du titre ou utiliser un slug temporaire si pas de titre
+      const slug = formData.title 
+        ? formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        : `temp-${Date.now()}`
 
       const formDataUpload = new FormData()
       formDataUpload.append('file', file)
-      formDataUpload.append('slug', tempSlug)
+      formDataUpload.append('slug', slug)
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formDataUpload
       })
 
-      if (!res.ok) throw new Error('Failed to upload image')
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to upload image')
+      }
       
       const data = await res.json()
       setBlog(prev => ({ ...prev, coverImage: data.url }))
@@ -128,7 +131,7 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
       console.error('Error uploading image:', error)
       setToast({
         show: true,
-        message: 'Erreur lors du téléchargement',
+        message: error instanceof Error ? error.message : 'Erreur lors du téléchargement',
         type: 'error'
       })
     }
@@ -182,9 +185,11 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
         featured: false,
         tags: []
       })
-      editor?.commands.setContent('')
+      if (editor) {
+        editor.commands.setContent('')
+      }
     }
-  }, [mode])
+  }, [mode, editor])
 
   // Charger les données de l'article sélectionné pour l'édition
   useEffect(() => {
@@ -199,9 +204,11 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
         featured: selectedBlog.featured,
         tags: selectedBlog.tags
       })
-      editor?.commands.setContent(selectedBlog.content)
+      if (editor) {
+        editor.commands.setContent(selectedBlog.content)
+      }
     }
-  }, [mode, selectedBlog])
+  }, [mode, selectedBlog, editor])
 
   if (mode === 'list') {
     return (
@@ -295,9 +302,11 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
         <div className="flex items-center gap-4">
           {formData.coverImage ? (
             <div className="relative w-40 h-24">
-              <img
+              <Image
                 src={formData.coverImage}
                 alt="Cover"
+                width={160}
+                height={90}
                 className="w-full h-full object-cover rounded-lg border-2 border-black"
               />
               <button
