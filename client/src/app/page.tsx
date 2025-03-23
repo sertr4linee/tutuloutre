@@ -219,6 +219,7 @@ export default function Home() {
               ease: "easeInOut"
             }}
           >
+            <Link href="/admin/login">here</Link>
             <Image 
               src="/mouse.svg" 
               alt="Mouse cursor" 

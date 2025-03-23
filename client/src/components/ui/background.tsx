@@ -4,25 +4,15 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 export default function GradientBackground() {
-  const [scrollY, setScrollY] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden -z-10">
+    <div className="fixed inset-0 w-full min-h-screen overflow-hidden -z-10">
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full"
         style={{
           backgroundImage: "linear-gradient(to bottom, #f8d7e6 0%, #f4a990 50%, #e67e56 100%)",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          transform: `translateY(${scrollY * 0.5}px)`,
+          backgroundAttachment: "fixed"
         }}
       >
         {/* Subtle noise texture */}

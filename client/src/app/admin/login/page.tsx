@@ -2,88 +2,124 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { api } from "@/lib/api"
+import GradientBackground from "@/components/ui/background"
 
-export default function AdminLogin() {
-  const [password, setPassword] = useState("")
-  const [otp, setOtp] = useState("")
-  const [showOTP, setShowOTP] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+export default function LoginPage() {
   const router = useRouter()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [totp, setTotp] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setLoading(true)
+    setError('')
+    setIsLoading(true)
+
+    if (!username || !password || !totp) {
+      setError('Tous les champs sont requis')
+      setIsLoading(false)
+      return
+    }
 
     try {
-      if (!showOTP) {
-        const res = await api.auth.login(password)
-        console.log('Login response:', res) // Debug
-        if (res.requireOTP) {
-          setShowOTP(true)
-        } else {
-          setError('Réponse invalide du serveur')
-        }
-      } else {
-        const res = await api.auth.verifyOTP(otp)
-        console.log('OTP response:', res) // Debug
-        if (res.token) {
-          document.cookie = `auth_token=${res.token}; path=/; max-age=604800; secure; samesite=lax`
-          router.push('/admin/dashboard')
-        } else {
-          setError('Code OTP invalide')
-        }
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          username: username.trim(), 
+          password: password.trim(), 
+          totp: totp.trim() 
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Une erreur est survenue')
       }
-    } catch (error) {
-      console.error('Auth error:', error) // Debug
-      setError(showOTP ? 'Erreur de vérification OTP' : 'Erreur d\'authentification')
+
+      if (!data.token) {
+        throw new Error('Token manquant dans la réponse')
+      }
+
+      // Stocker le token dans le localStorage
+      localStorage.setItem('adminToken', data.token)
+      
+      // Rediriger vers le dashboard
+      router.push('/admin/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Une erreur est survenue')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFFBF5]">
-      <div className="w-full max-w-md">
-        <form onSubmit={handleSubmit} className="bg-white p-8 border-4 border-black rounded-xl shadow-brutal">
-          <h1 className="text-2xl font-bold mb-6">Admin Login</h1>
-          
-          {!showOTP ? (
-            <div className="mb-4">
-              <label className="block mb-2">Mot de passe</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border-2 border-black rounded-lg"
-                required
-              />
-            </div>
-          ) : (
-            <div className="mb-4">
-              <label className="block mb-2">Code OTP</label>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                className="w-full p-3 border-2 border-black rounded-lg"
-                required
-              />
-            </div>
-          )}
+    <div className="min-h-screen flex items-center justify-center">
+      <GradientBackground />
+      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-center text-foreground">my space</h1>
+        
+        {error && (
+          <div className="p-3 text-sm text-red-500 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
 
-          {error && (
-            <div className="mb-4 text-red-500">{error}</div>
-          )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-foreground">
+              Identifiant
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mt-1 block w-full rounded border border-input bg-background px-3 py-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-foreground">
+              Mot de passe
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full rounded border border-input bg-background px-3 py-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="totp" className="block text-sm font-medium text-foreground">
+              Code d'authentification
+            </label>
+            <input
+              type="text"
+              id="totp"
+              value={totp}
+              onChange={(e) => setTotp(e.target.value)}
+              className="mt-1 block w-full rounded border border-input bg-background px-3 py-2"
+              placeholder="Code à 6 chiffres"
+              required
+            />
+          </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors disabled:opacity-50"
+            disabled={isLoading}
+            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Connexion...' : (showOTP ? 'Vérifier' : 'Se connecter')}
+            {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
       </div>

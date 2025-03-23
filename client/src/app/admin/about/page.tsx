@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { api } from '@/lib/api'
 import { useRouter } from 'next/navigation'
+import { fetchApi } from '@/lib/api'
 
 export default function AdminAbout() {
   const [data, setData] = useState({
@@ -19,13 +19,7 @@ export default function AdminAbout() {
   useEffect(() => {
     const loadAboutData = async () => {
       try {
-        const token = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1")
-        if (!token) {
-          setError('Non authentifié')
-          router.push('/admin/login')
-          return
-        }
-        const aboutData = await api.admin.about.get(token)
+        const aboutData = await fetchApi('/api/admin/about')
         if (aboutData) {
           setData(aboutData)
         }
@@ -38,7 +32,7 @@ export default function AdminAbout() {
     }
 
     loadAboutData()
-  }, [router])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,13 +40,10 @@ export default function AdminAbout() {
     setLoading(true)
 
     try {
-      const token = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1")
-      if (!token) {
-        setError('Non authentifié')
-        router.push('/admin/login')
-        return
-      }
-      await api.admin.about.update(data, token)
+      await fetchApi('/api/admin/about', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      })
       router.push('/admin/dashboard')
     } catch (error) {
       console.error('Error updating about:', error)
