@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react";
+import { updateAbout } from "@/app/actions";
 
 interface AboutEditorProps {
   setToast: (toast: { show: boolean; message: string; type: 'success' | 'error' }) => void;
@@ -19,13 +20,11 @@ export default function AboutEditor({ setToast }: AboutEditorProps) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch('/api/admin/about', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
+      const result = await updateAbout(formData)
       
-      if (!res.ok) throw new Error('Failed to save')
+      if (result.error) {
+        throw new Error(result.error)
+      }
       
       setToast({
         show: true,

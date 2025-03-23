@@ -4,6 +4,7 @@ import GradientBackground from "@/components/ui/background"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { getAbout } from "@/app/actions"
 
 export default function About() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -13,10 +14,11 @@ export default function About() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/api/admin/about')
-        if (!res.ok) throw new Error('Failed to fetch data')
-        const data = await res.json()
-        setAboutData(data)
+        const result = await getAbout()
+        if (result.error) {
+          throw new Error(result.error)
+        }
+        setAboutData(result.data)
       } catch (error) {
         console.error('Error fetching about data:', error)
       } finally {

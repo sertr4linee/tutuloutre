@@ -4,24 +4,28 @@ import GradientBackground from "@/components/ui/background"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { getPublicBlogs, getPublicAlbums } from "@/app/actions"
 
 interface Blog {
   id: string
   title: string
   excerpt: string
+  content: string
   category: string
-  publishDate: string
-  coverImage: string | null
-  slug: string
+  publishDate: string | Date
   status: string
+  slug: string
+  coverImage: string | null
+  featured: boolean
+  tags: string[]
 }
 
 interface Album {
   id: string
   title: string
-  description?: string
+  description: string | null
   category: string
-  coverImage?: string
+  coverImage: string | null
 }
 
 export default function Work() {
@@ -47,41 +51,32 @@ export default function Work() {
   }, [])
 
   useEffect(() => {
-    async function fetchBlogs() {
+    async function fetchData() {
       try {
-        const res = await fetch('/api/admin/blogs')
-        if (!res.ok) throw new Error('Failed to fetch blogs')
-        const data = await res.json()
-        // Ne garder que les blogs publiés
-        setBlogs(data.filter((blog: Blog) => blog.status === 'published'))
+        const blogsResult = await getPublicBlogs()
+        if (blogsResult.data) {
+          setBlogs(blogsResult.data)
+        }
+
+        const albumsResult = await getPublicAlbums()
+        if (albumsResult.data) {
+          setAlbums(albumsResult.data)
+        }
       } catch (error) {
-        console.error('Error fetching blogs:', error)
+        console.error('Error fetching data:', error)
       }
     }
 
-    fetchBlogs()
+    fetchData()
   }, [])
 
-  useEffect(() => {
-    async function fetchAlbums() {
-      try {
-        const res = await fetch('/api/admin/albums')
-        if (!res.ok) throw new Error('Failed to fetch albums')
-        const data = await res.json()
-        setAlbums(data)
-      } catch (error) {
-        console.error('Error fetching albums:', error)
-      }
-    }
-    fetchAlbums()
-  }, [])
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
+  const formatDate = (date: string | Date) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
-    })
+    });
   }
 
   // Sample photography gallery data

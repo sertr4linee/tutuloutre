@@ -7,6 +7,7 @@ import TiptapImage from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import { Upload } from 'lucide-react'
 import Image from 'next/image'
+import { getBlogs, createBlog, updateBlog, deleteBlog } from '@/app/actions'
 
 interface Blog {
   id: string
@@ -15,9 +16,9 @@ interface Blog {
   content: string
   category: string
   publishDate: string
-  status: string
+  status: "draft" | "published"
   slug: string
-  coverImage: string
+  coverImage: string | null
   featured: boolean
   tags: string[]
 }
@@ -57,10 +58,15 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
 
   async function fetchBlogs() {
     try {
-      const res = await fetch('/api/admin/blogs')
-      if (!res.ok) throw new Error('Failed to fetch blogs')
-      const data = await res.json()
-      setBlogs(data)
+      const result = await getBlogs()
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
+      
+      if (result.data) {
+        setBlogs(result.data)
+      }
     } catch (error) {
       console.error('Error fetching blogs:', error)
     } finally {
@@ -68,17 +74,15 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (slug: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
 
     try {
-      const res = await fetch('/api/admin/blogs', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      })
-
-      if (!res.ok) throw new Error('Failed to delete')
+      const result = await deleteBlog(slug)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
 
       setToast({
         show: true,
@@ -139,20 +143,19 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
 
   const handleSave = async (status: 'draft' | 'published') => {
     try {
-      const method = selectedBlog ? 'PUT' : 'POST'
-      const url = '/api/admin/blogs'
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          status,
-          id: selectedBlog?.id
-        })
-      })
+      const blogData = {
+        ...formData,
+        status,
+        slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      }
 
-      if (!response.ok) throw new Error('Erreur lors de la sauvegarde')
+      const result = selectedBlog 
+        ? await updateBlog(selectedBlog.slug, blogData)
+        : await createBlog(blogData)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
 
       setToast({
         show: true,
@@ -252,7 +255,7 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
                     Modifier
                   </button>
                   <button
-                    onClick={() => handleDelete(blog.id)}
+                    onClick={() => handleDelete(blog.slug)}
                     className="px-3 py-1 text-sm border-2 border-red-500 text-red-500 rounded hover:bg-red-50"
                   >
                     Supprimer
@@ -310,7 +313,7 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
                 className="w-full h-full object-cover rounded-lg border-2 border-black"
               />
               <button
-                onClick={() => setBlog(prev => ({ ...prev, coverImage: '' }))}
+                onClick={() => setBlog(prev => ({ ...prev, coverImage: null }))}
                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
               >
                 ×

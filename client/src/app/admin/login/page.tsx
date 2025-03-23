@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import GradientBackground from "@/components/ui/background"
+import { login } from "@/app/actions"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -24,30 +25,22 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          username: username.trim(), 
-          password: password.trim(), 
-          totp: totp.trim() 
-        }),
+      const result = await login({
+        username: username.trim(),
+        password: password.trim(),
+        totp: totp.trim()
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Une erreur est survenue')
+      if (result.error) {
+        throw new Error(result.error)
       }
 
-      if (!data.token) {
+      if (!result.data?.token) {
         throw new Error('Token manquant dans la réponse')
       }
 
       // Stocker le token dans le localStorage
-      localStorage.setItem('adminToken', data.token)
+      localStorage.setItem('adminToken', result.data.token)
       
       // Rediriger vers le dashboard
       router.push('/admin/dashboard')

@@ -19,6 +19,7 @@ model Album {
   id          String   @id @default(cuid())
   title       String
   description String?
+  category    String
   coverImage  String?
   images      Image[]
   createdAt   DateTime @default(now())

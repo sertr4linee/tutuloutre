@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { verify } from 'jsonwebtoken'
 import { headers } from 'next/headers'
 import { validateToken } from './redis'
+import { authenticator } from "otplib";
 
 export async function verifyAuth() {
   try {
@@ -56,4 +57,11 @@ export function withAuth(handler: Function) {
 
     return handler(req, auth.userId, ...args)
   }
+}
+
+export async function verifyTOTP(token: string, secret: string): Promise<boolean> {
+  return authenticator.verify({
+    token,
+    secret,
+  });
 } 

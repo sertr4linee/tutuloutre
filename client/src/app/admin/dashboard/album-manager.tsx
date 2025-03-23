@@ -3,22 +3,24 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { 
+  getAlbums, 
+  createAlbum, 
+  updateAlbum, 
+  deleteAlbum, 
+  addImageToAlbum 
+} from '@/app/actions'
+import type { AlbumData } from '@/types/server-actions'
 
-interface Album {
-  id: string
-  title: string
-  description?: string
-  category: string
-  coverImage?: string
-  images: Image[]
-  createdAt: string
-  updatedAt: string
-}
-
-interface Image {
+interface AlbumImage {
   id: string
   url: string
-  caption?: string
+  caption: string | null
+  order: number
+}
+
+interface Album extends AlbumData {
+  images: AlbumImage[]
 }
 
 const categories = ['Urban', 'Portrait', 'Nature', 'Architecture']
@@ -40,10 +42,15 @@ export default function AlbumManager() {
   useEffect(() => {
     async function fetchAlbums() {
       try {
-        const res = await fetch('/api/admin/albums')
-        if (!res.ok) throw new Error('Failed to fetch albums')
-        const data = await res.json()
-        setAlbums(data)
+        const result = await getAlbums()
+        
+        if (result.error) {
+          throw new Error(result.error)
+        }
+        
+        if (result.data) {
+          setAlbums(result.data as Album[])
+        }
       } catch (error) {
         console.error('Error fetching albums:', error)
       }
@@ -76,33 +83,39 @@ export default function AlbumManager() {
 
         const data = await res.json()
         console.log('Upload response:', data)
-        return data.url
+        return { url: data.url, file }
       })
 
-      const imageUrls = await Promise.all(uploadPromises)
-      console.log('All images uploaded:', imageUrls)
+      const imageResults = await Promise.all(uploadPromises)
+      console.log('All images uploaded:', imageResults)
 
       // Ajouter les images à l'album
-      const albumRes = await fetch(`/api/admin/albums/${selectedAlbum?.id}/images`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          images: imageUrls.map(url => ({
-            url,
-            caption: ''
-          }))
-        })
-      })
-
-      if (!albumRes.ok) {
-        throw new Error('Failed to add images to album')
+      if (selectedAlbum) {
+        for (const { file, url } of imageResults) {
+          const arrayBuffer = await file.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+          
+          const result = await addImageToAlbum(
+            selectedAlbum.id,
+            buffer,
+            file.name,
+            file.type
+          )
+          
+          if (result.error) {
+            throw new Error(result.error)
+          }
+        }
       }
 
       // Rafraîchir la liste des albums
-      const updatedAlbums = await fetch('/api/admin/albums').then(res => res.json())
-      setAlbums(updatedAlbums)
+      const albumsResult = await getAlbums()
+      if (albumsResult.error) {
+        throw new Error(albumsResult.error)
+      }
+      if (albumsResult.data) {
+        setAlbums(albumsResult.data as Album[])
+      }
       setMode('list')
     } catch (error) {
       console.error('Error uploading images:', error)
@@ -117,16 +130,13 @@ export default function AlbumManager() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/admin/albums', {
-        method: mode === 'create' ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          id: selectedAlbum?.id
-        })
-      })
-
-      if (!res.ok) throw new Error('Failed to save album')
+      const result = mode === 'create'
+        ? await createAlbum(formData)
+        : await updateAlbum(selectedAlbum!.id, formData)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
       
       setMode('list')
       router.refresh()
@@ -134,6 +144,22 @@ export default function AlbumManager() {
       console.error('Error saving album:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Voulez-vous vraiment supprimer cet album ?')) return
+
+    try {
+      const result = await deleteAlbum(id)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
+      setAlbums(albums.filter(a => a.id !== id))
+    } catch (error) {
+      console.error('Error deleting album:', error)
     }
   }
 
@@ -192,16 +218,7 @@ export default function AlbumManager() {
                     Modifier
                   </button>
                   <button
-                    onClick={async () => {
-                      if (confirm('Voulez-vous vraiment supprimer cet album ?')) {
-                        const res = await fetch(`/api/admin/albums/${album.id}`, {
-                          method: 'DELETE'
-                        })
-                        if (res.ok) {
-                          setAlbums(albums.filter(a => a.id !== album.id))
-                        }
-                      }
-                    }}
+                    onClick={() => handleDelete(album.id)}
                     className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
                   >
                     Supprimer

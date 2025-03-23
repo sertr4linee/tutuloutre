@@ -7,7 +7,7 @@ import Toast from "@/components/ui/toast"
 import BlogBuilder from './blog-builder'
 import AboutEditor from './about-editor'
 import AlbumManager from './album-manager'
-import { fetchApi } from '@/lib/api'
+import { logout, getAbout } from '@/app/actions'
 
 type Tab = 'projects' | 'blog' | 'messages' | 'settings' | 'about' | 'albums'
 
@@ -37,30 +37,34 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchAboutData() {
       try {
-        const data = await fetchApi('/api/admin/about')
-        setFormData({
-          myApproach: data?.myApproach ?? "",
-          education: {
-            degree: data?.education?.degree ?? "",
-            school: data?.education?.school ?? "",
-            years: data?.education?.years ?? ""
-          },
-          skills: data?.skills ?? []
-        })
+        const result = await getAbout();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        const data = result.data;
+        if (data) {
+          setFormData({
+            myApproach: data.myApproach,
+            education: data.education,
+            skills: data.skills
+          });
+        }
       } catch (error) {
-        console.error('Error fetching about data:', error)
+        console.error('Error fetching about data:', error);
         setFormData({
           myApproach: "",
           education: { degree: "", school: "", years: "" },
           skills: []
-        })
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchAboutData()
-  }, [])
+    fetchAboutData();
+  }, []);
 
   const handleHome = () => {
     router.push('/')
@@ -68,11 +72,21 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await fetchApi('/api/admin/auth/logout', { method: 'POST' })
-      localStorage.removeItem('adminToken')
-      router.push('/admin/login')
+      const result = await logout();
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      localStorage.removeItem('adminToken');
+      router.push('/admin/login');
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('Logout error:', error);
+      setToast({
+        show: true,
+        message: 'Erreur lors de la déconnexion',
+        type: 'error'
+      });
     }
   }
 
