@@ -6,6 +6,7 @@ import Link from "next/link"
 import GradientBackground from "@/components/ui/background"
 import Loading from "@/components/ui/loading"
 import Image from "next/image"
+import { getPublicBlogBySlug } from "@/app/actions"
 
 interface BlogPost {
   id: string
@@ -24,12 +25,19 @@ interface BlogPost {
   featured: boolean
 }
 
+type BlogResponse = {
+  data?: BlogPost
+  error?: string
+}
+
 export default function BlogPost() {
   const params = useParams()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('useEffect triggered with slug:', params.slug)
     if (params.slug) {
       fetchBlogPost(params.slug as string)
     }
@@ -37,14 +45,30 @@ export default function BlogPost() {
 
   async function fetchBlogPost(slug: string) {
     try {
+      console.log('Starting to fetch blog post with slug:', slug)
       setLoading(true)
-      const res = await fetch(`/api/work/blog/${slug}`)
-      if (!res.ok) throw new Error("Failed to fetch blog post")
-      const data = await res.json()
-      setPost(data)
+      setError(null)
+      const result = await getPublicBlogBySlug(slug) as BlogResponse
+      
+      console.log('Blog post fetch result:', result)
+      
+      if ('error' in result) {
+        console.log('Setting error:', result.error)
+        setError(result.error || 'Une erreur est survenue')
+        return
+      }
+      
+      if (result.data) {
+        console.log('Setting post data')
+        setPost(result.data)
+      } else {
+        setError("Article introuvable")
+      }
     } catch (error) {
       console.error("Error fetching blog post:", error)
+      setError("Une erreur est survenue lors du chargement de l'article")
     } finally {
+      console.log('Setting loading to false')
       setLoading(false)
     }
   }
@@ -58,14 +82,13 @@ export default function BlogPost() {
   }
 
   if (loading) {
-    <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
+    return (
+      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
         <GradientBackground />
         <div className="relative z-30">
           <div className="relative">
-            {/* Loading box with neobrutalist style */}
             <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
               <div className="flex items-center space-x-4">
-                {/* Animated squares */}
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
@@ -80,7 +103,6 @@ export default function BlogPost() {
             </div>
           </div>
         </div>
-        {/* CSS pour l'animation */}
         <style jsx global>{`
           @keyframes bounce {
             0%, 100% {
@@ -92,43 +114,28 @@ export default function BlogPost() {
           }
         `}</style>
       </main>
+    )
   }
 
-  if (!post) {
+  if (error || !post) {
     return (
       <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
         <GradientBackground />
         <div className="relative z-30">
-          <div className="relative">
-            {/* Loading box with neobrutalist style */}
-            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
-              <div className="flex items-center space-x-4">
-                {/* Animated squares */}
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
-                    style={{
-                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
-                    }}
-                  />
-                ))}
+          <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+            <h2 className="text-xl font-bold mb-4">
+              {error || "Article introuvable"}
+            </h2>
+            <Link href="/work#blog">
+              <div className="relative">
+                <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md"></div>
+                <button className="relative bg-white text-black border-2 border-black px-4 py-2 text-sm font-semibold flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors">
+                  ← Retour aux articles
+                </button>
               </div>
-              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
-            </div>
+            </Link>
           </div>
         </div>
-        {/* CSS pour l'animation */}
-        <style jsx global>{`
-          @keyframes bounce {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-15px);
-            }
-          }
-        `}</style>
       </main>
     )
   }

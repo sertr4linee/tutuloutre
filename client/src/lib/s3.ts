@@ -9,28 +9,29 @@ const s3Client = new S3Client({
   },
 });
 
-export async function uploadToS3(file: Buffer, fileName: string, contentType: string) {
+export async function uploadToS3(file: Buffer, key: string, contentType: string) {
   try {
     const command = new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
+      Bucket: process.env.AWS_BUCKET_NAME!,
+      Key: key,
       Body: file,
       ContentType: contentType,
+      ACL: 'public-read',
     });
 
     await s3Client.send(command);
-    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
   } catch (error) {
     console.error('Error uploading to S3:', error);
     throw new Error('Failed to upload file to S3');
   }
 }
 
-export async function deleteFromS3(fileName: string) {
+export async function deleteFromS3(key: string) {
   try {
     const command = new DeleteObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
+      Bucket: process.env.AWS_BUCKET_NAME!,
+      Key: key,
     });
 
     await s3Client.send(command);

@@ -520,6 +520,40 @@ export async function getPublicBlogs() {
   }
 }
 
+export async function getPublicBlogBySlug(slug: string) {
+  try {
+    console.log('Fetching blog with slug:', slug);
+    const blog = await prisma.blog.findFirst({
+      where: {
+        slug,
+        status: 'published'
+      }
+    });
+
+    console.log('Blog found:', blog ? 'yes' : 'no');
+
+    if (!blog) {
+      console.log('Blog not found, returning error');
+      return { error: 'Blog not found' };
+    }
+
+    const response = {
+      data: {
+        ...blog,
+        author: {
+          name: 'Une Mômes'
+        },
+        readTime: Math.ceil(blog.content.split(' ').length / 200)
+      }
+    };
+    console.log('Returning blog data successfully');
+    return response;
+  } catch (error) {
+    console.error('Error in getPublicBlogBySlug:', error);
+    return { error: 'Failed to fetch blog' };
+  }
+}
+
 export async function getPublicAlbums() {
   try {
     const albums = await prisma.album.findMany({
@@ -532,6 +566,29 @@ export async function getPublicAlbums() {
   } catch (error) {
     console.error('Error fetching albums:', error);
     return { error: 'Failed to fetch albums' };
+  }
+}
+
+export async function uploadImage(formData: FormData) {
+  try {
+    const file = formData.get('file') as File;
+    const type = formData.get('type') as 'blog' | 'gallery';
+    const id = formData.get('id') as string;
+
+    if (!file || !type || !id) {
+      throw new Error('Missing required fields');
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    const key = `${type}/${id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const url = await uploadToS3(buffer, key, file.type);
+    
+    return { data: { url } };
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    return { error: 'Failed to upload image' };
   }
 }
 

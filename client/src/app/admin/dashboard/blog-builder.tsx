@@ -5,9 +5,15 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TiptapImage from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
+import TextAlign from '@tiptap/extension-text-align'
+import Underline from '@tiptap/extension-underline'
+import Strike from '@tiptap/extension-strike'
+import Highlight from '@tiptap/extension-highlight'
+import Color from '@tiptap/extension-color'
+import TextStyle from '@tiptap/extension-text-style'
 import { Upload } from 'lucide-react'
 import Image from 'next/image'
-import { getBlogs, createBlog, updateBlog, deleteBlog } from '@/app/actions'
+import { getBlogs, createBlog, updateBlog, deleteBlog, uploadImage } from '@/app/actions'
 
 interface Blog {
   id: string
@@ -45,7 +51,23 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
   })
 
   const editor = useEditor({
-    extensions: [StarterKit, TiptapImage, Link],
+    extensions: [
+      StarterKit,
+      TiptapImage,
+      Link.configure({
+        openOnClick: false,
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Underline,
+      Strike,
+      Highlight.configure({
+        multicolor: true,
+      }),
+      Color,
+      TextStyle,
+    ],
     content: formData.content,
     onUpdate: ({ editor }) => {
       setBlog(prev => ({ ...prev, content: editor.getHTML() }))
@@ -74,11 +96,11 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
     }
   }
 
-  const handleDelete = async (slug: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return
 
     try {
-      const result = await deleteBlog(slug)
+      const result = await deleteBlog(id)
       
       if (result.error) {
         throw new Error(result.error)
@@ -112,25 +134,23 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
 
       const formDataUpload = new FormData()
       formDataUpload.append('file', file)
-      formDataUpload.append('slug', slug)
+      formDataUpload.append('type', 'blog')
+      formDataUpload.append('id', slug)
 
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
+      const result = await uploadImage(formDataUpload)
 
-      if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || 'Failed to upload image')
+      if (result.error) {
+        throw new Error(result.error)
       }
-      
-      const data = await res.json()
-      setBlog(prev => ({ ...prev, coverImage: data.url }))
-      setToast({
-        show: true,
-        message: 'Image téléchargée avec succès',
-        type: 'success'
-      })
+
+      if (result.data) {
+        setBlog(prev => ({ ...prev, coverImage: result.data.url }))
+        setToast({
+          show: true,
+          message: 'Image téléchargée avec succès',
+          type: 'success'
+        })
+      }
     } catch (error) {
       console.error('Error uploading image:', error)
       setToast({
@@ -150,7 +170,7 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
       }
 
       const result = selectedBlog 
-        ? await updateBlog(selectedBlog.slug, blogData)
+        ? await updateBlog(selectedBlog.id, blogData)
         : await createBlog(blogData)
       
       if (result.error) {
@@ -255,7 +275,7 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
                     Modifier
                   </button>
                   <button
-                    onClick={() => handleDelete(blog.slug)}
+                    onClick={() => handleDelete(blog.id)}
                     className="px-3 py-1 text-sm border-2 border-red-500 text-red-500 rounded hover:bg-red-50"
                   >
                     Supprimer
@@ -415,41 +435,197 @@ export default function BlogBuilder({ setToast }: BlogBuilderProps) {
       <div>
         <label className="block mb-2 font-medium">Contenu</label>
         <div className="border-2 border-black rounded-lg overflow-hidden">
-          <div className="border-b-2 border-black p-2 flex gap-2 bg-gray-50">
-            <button
-              onClick={() => editor?.chain().focus().toggleBold().run()}
-              className={`px-3 py-1 border-2 border-black rounded ${
-                editor?.isActive('bold') ? 'bg-black text-white' : ''
-              }`}
-            >
-              Gras
-            </button>
-            <button
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
-              className={`px-3 py-1 border-2 border-black rounded ${
-                editor?.isActive('italic') ? 'bg-black text-white' : ''
-              }`}
-            >
-              Italique
-            </button>
-            <button
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={`px-3 py-1 border-2 border-black rounded ${
-                editor?.isActive('heading') ? 'bg-black text-white' : ''
-              }`}
-            >
-              Titre
-            </button>
-            <button
-              onClick={() => editor?.chain().focus().toggleBulletList().run()}
-              className={`px-3 py-1 border-2 border-black rounded ${
-                editor?.isActive('bulletList') ? 'bg-black text-white' : ''
-              }`}
-            >
-              Liste
-            </button>
+          <div className="border-b-2 border-black p-2 flex flex-wrap gap-2 bg-gray-50">
+            {/* Texte basique */}
+            <div className="flex gap-2 border-r-2 border-black pr-2">
+              <button
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('bold') ? 'bg-black text-white' : ''
+                }`}
+                title="Gras"
+              >
+                <strong>B</strong>
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('italic') ? 'bg-black text-white' : ''
+                }`}
+                title="Italique"
+              >
+                <em>I</em>
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('underline') ? 'bg-black text-white' : ''
+                }`}
+                title="Souligné"
+              >
+                <u>U</u>
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().toggleStrike().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('strike') ? 'bg-black text-white' : ''
+                }`}
+                title="Barré"
+              >
+                <s>S</s>
+              </button>
+            </div>
+
+            {/* Alignement */}
+            <div className="flex gap-2 border-r-2 border-black pr-2">
+              <button
+                onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive({ textAlign: 'left' }) ? 'bg-black text-white' : ''
+                }`}
+                title="Aligner à gauche"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive({ textAlign: 'center' }) ? 'bg-black text-white' : ''
+                }`}
+                title="Centrer"
+              >
+                ↔
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive({ textAlign: 'right' }) ? 'bg-black text-white' : ''
+                }`}
+                title="Aligner à droite"
+              >
+                →
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive({ textAlign: 'justify' }) ? 'bg-black text-white' : ''
+                }`}
+                title="Justifier"
+              >
+                ⇔
+              </button>
+            </div>
+
+            {/* Titres et listes */}
+            <div className="flex gap-2 border-r-2 border-black pr-2">
+              <select
+                onChange={(e) => {
+                  if (e.target.value === 'paragraph') {
+                    editor?.chain().focus().setParagraph().run()
+                  } else {
+                    editor?.chain().focus().toggleHeading({ level: parseInt(e.target.value) as 1 | 2 | 3 }).run()
+                  }
+                }}
+                className="px-3 py-1 border-2 border-black rounded"
+                value={
+                  editor?.isActive('heading', { level: 1 })
+                    ? '1'
+                    : editor?.isActive('heading', { level: 2 })
+                    ? '2'
+                    : editor?.isActive('heading', { level: 3 })
+                    ? '3'
+                    : 'paragraph'
+                }
+              >
+                <option value="paragraph">Paragraphe</option>
+                <option value="1">Titre 1</option>
+                <option value="2">Titre 2</option>
+                <option value="3">Titre 3</option>
+              </select>
+              <button
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('bulletList') ? 'bg-black text-white' : ''
+                }`}
+                title="Liste à puces"
+              >
+                •
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('orderedList') ? 'bg-black text-white' : ''
+                }`}
+                title="Liste numérotée"
+              >
+                1.
+              </button>
+            </div>
+
+            {/* Couleurs et surlignage */}
+            <div className="flex gap-2 border-r-2 border-black pr-2">
+              <input
+                type="color"
+                onInput={(e) => {
+                  editor?.chain().focus().setColor(e.currentTarget.value).run()
+                }}
+                className="w-8 h-8 border-2 border-black rounded cursor-pointer"
+                title="Couleur du texte"
+              />
+              <button
+                onClick={() => editor?.chain().focus().toggleHighlight().run()}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('highlight') ? 'bg-black text-white' : ''
+                }`}
+                title="Surligner"
+              >
+                <span className="bg-yellow-200 px-1">H</span>
+              </button>
+            </div>
+
+            {/* Liens et autres */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const url = window.prompt('URL du lien:')
+                  if (url) {
+                    editor?.chain().focus().setLink({ href: url }).run()
+                  }
+                }}
+                className={`px-3 py-1 border-2 border-black rounded ${
+                  editor?.isActive('link') ? 'bg-black text-white' : ''
+                }`}
+                title="Ajouter un lien"
+              >
+                🔗
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().unsetLink().run()}
+                className="px-3 py-1 border-2 border-black rounded"
+                title="Supprimer le lien"
+              >
+                🔗❌
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().undo().run()}
+                className="px-3 py-1 border-2 border-black rounded"
+                title="Annuler"
+              >
+                ↩
+              </button>
+              <button
+                onClick={() => editor?.chain().focus().redo().run()}
+                className="px-3 py-1 border-2 border-black rounded"
+                title="Rétablir"
+              >
+                ↪
+              </button>
+            </div>
           </div>
-          <EditorContent editor={editor} className="prose max-w-none p-4 min-h-[400px]" />
+          <EditorContent 
+            editor={editor} 
+            className="prose max-w-none p-4 min-h-[400px]"
+          />
         </div>
       </div>
     </div>
