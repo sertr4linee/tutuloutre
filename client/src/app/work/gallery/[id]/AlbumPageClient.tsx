@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import GradientBackground from '@/components/ui/background'
@@ -24,6 +24,31 @@ interface AlbumPageClientProps {
 
 export default function AlbumPageClient({ initialData }: AlbumPageClientProps) {
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Handle keyboard navigation for the modal
+  useEffect(() => {
+    if (!selectedImage) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedImage(null)
+      } else if (e.key === 'ArrowLeft' && selectedImage > 0) {
+        setSelectedImage(selectedImage - 1)
+      } else if (e.key === 'ArrowRight' && initialData && selectedImage < initialData.images.length - 1) {
+        setSelectedImage(selectedImage + 1)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedImage, initialData])
+
+  if (!mounted) return null
 
   if (!initialData) {
     return (
@@ -169,41 +194,56 @@ export default function AlbumPageClient({ initialData }: AlbumPageClientProps) {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal with improved accessibility */}
       {selectedImage !== null && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-4 right-4 text-white text-4xl hover:opacity-75"
+            aria-label="Fermer"
           >
             ×
           </button>
           <button
             onClick={() => setSelectedImage(prev => prev !== null && prev > 0 ? prev - 1 : null)}
             className="absolute left-4 text-white text-4xl hover:opacity-75"
+            aria-label="Image précédente"
+            disabled={selectedImage === 0}
           >
             ←
           </button>
           <button
             onClick={() => setSelectedImage(prev => prev !== null && prev < initialData.images.length - 1 ? prev + 1 : null)}
             className="absolute right-4 text-white text-4xl hover:opacity-75"
+            aria-label="Image suivante"
+            disabled={selectedImage === initialData.images.length - 1}
           >
             →
           </button>
           <div className="relative w-full max-w-5xl max-h-[90vh] mx-4">
             <Image
               src={initialData.images[selectedImage].url}
-              alt={initialData.images[selectedImage].caption || ''}
+              alt={initialData.images[selectedImage].caption || initialData.title}
               width={1920}
               height={1080}
               className="w-full h-full object-contain"
               priority
+              sizes="(max-width: 1920px) 100vw, 1920px"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = '/placeholder.svg';
-                console.error('Modal image load error for URL:', initialData.images[selectedImage].url);
               }}
             />
+            {initialData.images[selectedImage].caption && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-black bg-opacity-50 text-white text-center">
+                {initialData.images[selectedImage].caption}
+              </div>
+            )}
           </div>
         </div>
       )}

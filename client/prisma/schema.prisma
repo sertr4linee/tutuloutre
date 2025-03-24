@@ -62,4 +62,22 @@ model Blog {
   publishDate DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model SchoolProject {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  year        String
+  category    String
+  tags        String[]
+  image       String?
+  objectives  String[]
+  skills      String[]
+  color       String
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("school_projects")
 } 

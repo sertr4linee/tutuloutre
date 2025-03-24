@@ -13,11 +13,15 @@ interface Album {
   description: string | null
   category: string
   coverImage: string | null
-  images: {
+  imageCount: number
+  previewImage: {
     id: string
     url: string
     caption: string | null
-  }[]
+    order: number
+  }
+  createdAt: string
+  updatedAt: string
 }
 
 export default function GalleryPage() {
@@ -213,7 +217,7 @@ export default function GalleryPage() {
                         )}
                         <div className="mt-3 sm:mt-4 flex items-center justify-between">
                           <span className="text-xs sm:text-sm text-gray-500">
-                            {album.images.length} photos
+                            {album.imageCount} photos
                           </span>
                           <motion.span 
                             className="text-[#f67a45] flex items-center text-xs sm:text-sm"

@@ -31,6 +31,7 @@ import {
 import { cookies } from "next/headers";
 import { verifyTOTP } from "@/lib/auth";
 import { uploadToS3, deleteFromS3 } from '@/lib/s3';
+import { unstable_cache } from 'next/cache';
 
 // Authentication actions
 export async function login(input: LoginInput): Promise<LoginResponse> {
@@ -247,37 +248,55 @@ export async function getAlbums(): Promise<AlbumsResponse> {
   }
 }
 
-export async function getAlbum(id: string): Promise<AlbumResponse> {
-  try {
-    const album = await prisma.album.findUnique({
-      where: { id },
-      include: { images: true }
-    });
+export const getAlbum = unstable_cache(
+  async (id: string) => {
+    try {
+      const album = await prisma.album.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          category: true,
+          coverImage: true,
+          createdAt: true,
+          updatedAt: true,
+          images: {
+            select: {
+              id: true,
+              url: true,
+              caption: true,
+              order: true,
+            },
+            orderBy: {
+              order: 'asc'
+            }
+          }
+        }
+      });
 
-    if (!album) {
-      return { error: 'Album not found' };
+      if (!album) {
+        return { error: 'Album not found' };
+      }
+
+      return {
+        data: {
+          ...album,
+          createdAt: album.createdAt.toISOString(),
+          updatedAt: album.updatedAt.toISOString()
+        }
+      };
+    } catch (error) {
+      console.error('Get album error:', error);
+      return { error: error instanceof Error ? error.message : 'Failed to get album' };
     }
-
-    return { data: {
-      id: album.id,
-      title: album.title,
-      description: album.description,
-      category: album.category,
-      coverImage: album.coverImage,
-      images: album.images.map(image => ({
-        id: image.id,
-        url: image.url,
-        caption: image.caption,
-        order: image.order
-      })),
-      createdAt: album.createdAt.toISOString(),
-      updatedAt: album.updatedAt.toISOString()
-    }};
-  } catch (error) {
-    console.error('Get album error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to get album' };
+  },
+  ['album'],
+  {
+    revalidate: 60,
+    tags: ['album']
   }
-}
+);
 
 export async function createAlbum(input: AlbumInput): Promise<AlbumResponse> {
   try {
@@ -566,48 +585,65 @@ export async function getPublicBlogBySlug(slug: string) {
   }
 }
 
-export async function getPublicAlbums() {
-  try {
-    console.log('Starting getPublicAlbums');
-    const albums = await prisma.album.findMany({
-      include: { images: true },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-
-    console.log('Albums fetched from database:', albums.length);
-    
-    const formattedAlbums = albums.map(album => {
-      console.log(`Processing album ${album.id}:`, {
-        coverImage: album.coverImage,
-        imagesCount: album.images.length
+export const getPublicAlbums = unstable_cache(
+  async () => {
+    try {
+      const albums = await prisma.album.findMany({
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          category: true,
+          coverImage: true,
+          createdAt: true,
+          updatedAt: true,
+          images: {
+            select: {
+              id: true,
+              url: true,
+              caption: true,
+              order: true,
+            },
+            take: 1, // Only get one image for preview
+            orderBy: {
+              order: 'asc'
+            }
+          },
+          _count: {
+            select: {
+              images: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
       });
-      
-      return {
-        id: album.id,
-        title: album.title,
-        description: album.description,
-        category: album.category,
-        coverImage: album.coverImage,
-        images: album.images.map(image => ({
-          id: image.id,
-          url: image.url,
-          caption: image.caption,
-          order: image.order
-        })),
-        createdAt: album.createdAt.toISOString(),
-        updatedAt: album.updatedAt.toISOString()
-      };
-    });
 
-    console.log('Returning formatted albums');
-    return { data: formattedAlbums };
-  } catch (error) {
-    console.error('Error in getPublicAlbums:', error);
-    return { error: 'Failed to fetch albums' };
+      return {
+        data: albums.map(album => ({
+          id: album.id,
+          title: album.title,
+          description: album.description,
+          category: album.category,
+          coverImage: album.coverImage,
+          imageCount: album._count.images,
+          previewImage: album.images[0],
+          createdAt: album.createdAt.toISOString(),
+          updatedAt: album.updatedAt.toISOString()
+        }))
+      };
+    } catch (error) {
+      console.error('Error in getPublicAlbums:', error);
+      return { error: 'Failed to fetch albums' };
+    }
+  },
+  ['public-albums'],
+  {
+    revalidate: 60, // Cache for 60 seconds
+    tags: ['albums']
   }
-}
+);
 
 export async function uploadImage(formData: FormData) {
   try {
@@ -629,6 +665,206 @@ export async function uploadImage(formData: FormData) {
   } catch (error) {
     console.error('Error uploading image:', error);
     return { error: 'Failed to upload image' };
+  }
+}
+
+// Work page data
+export async function getWorkPageData() {
+  try {
+    const [blogs, albums, projects] = await Promise.all([
+      prisma.blog.findMany({
+        where: { status: 'published' },
+        orderBy: { publishDate: 'desc' },
+        take: 3
+      }),
+      prisma.album.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 6
+      }),
+      prisma.schoolProject.findMany({
+        orderBy: { createdAt: 'desc' }
+      })
+    ]);
+
+    return {
+      data: {
+        blogs: blogs.map(transformBlogData),
+        albums: albums.map(transformAlbumData),
+        projects: projects.map(project => ({
+          ...project,
+          createdAt: project.createdAt.toISOString(),
+          updatedAt: project.updatedAt.toISOString()
+        }))
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching work page data:', error);
+    return { error: error instanceof Error ? error.message : "An unexpected error occurred" };
+  }
+}
+
+// School Project Types
+export interface SchoolProject {
+  id: string
+  title: string
+  description: string
+  year: string
+  category: string
+  tags: string[]
+  image: string | null
+  objectives: string[]
+  skills: string[]
+  color: string
+  featured: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateSchoolProjectInput {
+  title: string
+  description: string
+  year: string
+  category: string
+  tags: string[]
+  image?: string | null
+  objectives: string[]
+  skills: string[]
+  color: string
+  featured?: boolean
+}
+
+export interface UpdateSchoolProjectInput extends Partial<CreateSchoolProjectInput> {
+  id: string
+}
+
+// School Project Actions
+export async function createSchoolProject(input: CreateSchoolProjectInput): Promise<ServerActionResponse<SchoolProject>> {
+  'use server'
+  try {
+    console.log('Creating school project with input:', input)
+    const project = await prisma.schoolProject.create({
+      data: {
+        ...input,
+        featured: input.featured ?? false
+      }
+    })
+    console.log('Project created:', project)
+    
+    return {
+      data: {
+        ...project,
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString()
+      }
+    }
+  } catch (error) {
+    console.error('Create school project error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to create school project' }
+  }
+}
+
+export async function updateSchoolProject(input: UpdateSchoolProjectInput): Promise<ServerActionResponse<SchoolProject>> {
+  'use server'
+  try {
+    console.log('Updating school project with input:', input)
+    const project = await prisma.schoolProject.update({
+      where: { id: input.id },
+      data: input
+    })
+    console.log('Project updated:', project)
+    
+    return {
+      data: {
+        ...project,
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString()
+      }
+    }
+  } catch (error) {
+    console.error('Update school project error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to update school project' }
+  }
+}
+
+export async function deleteSchoolProject(id: string): Promise<ServerActionResponse> {
+  try {
+    await prisma.schoolProject.delete({
+      where: { id }
+    })
+    
+    return { message: 'School project deleted successfully' }
+  } catch (error) {
+    console.error('Delete school project error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to delete school project' }
+  }
+}
+
+export async function getSchoolProject(id: string): Promise<ServerActionResponse<SchoolProject>> {
+  try {
+    const project = await prisma.schoolProject.findUnique({
+      where: { id }
+    })
+    
+    if (!project) {
+      return { error: 'School project not found' }
+    }
+    
+    return {
+      data: {
+        ...project,
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString()
+      }
+    }
+  } catch (error) {
+    console.error('Get school project error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to get school project' }
+  }
+}
+
+export async function getSchoolProjects(options?: { 
+  featured?: boolean 
+  limit?: number
+}): Promise<ServerActionResponse<SchoolProject[]>> {
+  try {
+    const projects = await prisma.schoolProject.findMany({
+      where: options?.featured !== undefined ? { featured: options.featured } : undefined,
+      take: options?.limit,
+      orderBy: { createdAt: 'desc' }
+    })
+    
+    return {
+      data: projects.map(project => ({
+        ...project,
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString()
+      }))
+    }
+  } catch (error) {
+    console.error('Get school projects error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to get school projects' }
+  }
+}
+
+export async function uploadProjectImage(formData: FormData) {
+  try {
+    const file = formData.get('file') as File;
+    const projectId = formData.get('projectId') as string;
+
+    if (!file || !projectId) {
+      throw new Error('Missing required fields');
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    const key = `projects/${projectId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const url = await uploadToS3(buffer, key, file.type);
+    
+    return { data: { url } };
+  } catch (error) {
+    console.error('Error uploading project image:', error);
+    return { error: 'Failed to upload project image' };
   }
 }
 

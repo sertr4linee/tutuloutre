@@ -98,6 +98,9 @@ export default function AdminDashboard() {
         return <AboutEditor setToast={setToast} />
       case 'albums':
         return <AlbumManager setToast={setToast} />
+      case 'projects':
+        router.push('/admin/projects')
+        return null
       default:
         return <div>Sélectionnez un onglet</div>
     }
@@ -161,6 +164,18 @@ export default function AdminDashboard() {
                 <div>
                   <div className="font-medium">Albums</div>
                   <div className="text-xs opacity-75">Gérer vos photos</div>
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={() => router.push('/admin/projects')}
+              className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all transform hover:-translate-y-0.5 border-black hover:bg-gray-50 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📚</span>
+                <div>
+                  <div className="font-medium">Projets</div>
+                  <div className="text-xs opacity-75">Gérer vos projets d'école</div>
                 </div>
               </div>
             </button>

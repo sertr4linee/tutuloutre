@@ -4,16 +4,16 @@ import GradientBackground from "@/components/ui/background"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { getPublicBlogs, getPublicAlbums } from "@/app/actions"
+import { getWorkPageData } from "@/app/actions"
 
 interface Blog {
   id: string
   title: string
   excerpt: string
-  content: string
+  content?: string
   category: string
   publishDate: string | Date
-  status: string
+  status?: string
   slug: string
   coverImage: string | null
   featured: boolean
@@ -26,48 +26,78 @@ interface Album {
   description: string | null
   category: string
   coverImage: string | null
+  imageCount: number
+  createdAt: string
 }
 
-export default function Work() {
+interface SchoolProject {
+  id: string
+  title: string
+  description: string
+  year: string
+  category: string
+  tags: string[]
+  image: string | null
+  objectives: string[]
+  skills: string[]
+  color: string
+  featured: boolean
+}
+
+export default function WorkPage() {
+  const [data, setData] = useState<{ blogs: Blog[], albums: Album[], projects: SchoolProject[] }>({ 
+    blogs: [], 
+    albums: [], 
+    projects: [] 
+  })
+  const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState("all")
-  const [activeProject, setActiveProject] = useState<number | null>(null)
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [activeProject, setActiveProject] = useState<string | null>(null)
   const [scrollY, setScrollY] = useState(0)
-  const galleryRef = useRef<HTMLDivElement>(null)
-  const [blogs, setBlogs] = useState<Blog[]>([])
-  const [albums, setAlbums] = useState<Album[]>([])
   const [filter, setFilter] = useState('Tous')
+  const [mounted, setMounted] = useState(false)
   const categories = ['Tous', 'Urban', 'Portrait', 'Nature', 'Architecture']
 
-  // Handle scroll for parallax effects
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    setMounted(true)
   }, [])
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const blogsResult = await getPublicBlogs()
-        if (blogsResult.data) {
-          setBlogs(blogsResult.data)
-        }
-
-        const albumsResult = await getPublicAlbums()
-        if (albumsResult.data) {
-          setAlbums(albumsResult.data)
+        const result = await getWorkPageData()
+        if (result && result.data) {
+          setData({
+            blogs: result.data.blogs || [],
+            albums: result.data.albums || [],
+            projects: result.data.projects || []
+          })
         }
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error fetching work page data:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchData()
+  }, [])
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    
+    const handleScroll = () => {
+      if (timeoutId) clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setScrollY(window.scrollY)
+      }, 10)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [])
 
   const formatDate = (date: string | Date) => {
@@ -79,83 +109,38 @@ export default function Work() {
     });
   }
 
-  // Sample photography gallery data
-  const photoGallery = [
-    { id: 1, src: "/placeholder.svg?height=600&width=800", title: "Lumière urbaine", category: "Urban" },
-    { id: 2, src: "/placeholder.svg?height=600&width=800", title: "Portrait en studio", category: "Portrait" },
-    { id: 3, src: "/placeholder.svg?height=600&width=800", title: "Nature abstraite", category: "Nature" },
-    { id: 4, src: "/placeholder.svg?height=600&width=800", title: "Architecture moderne", category: "Architecture" },
-    { id: 5, src: "/placeholder.svg?height=600&width=800", title: "Scène de rue", category: "Urban" },
-    { id: 6, src: "/placeholder.svg?height=600&width=800", title: "Portrait artistique", category: "Portrait" },
-    { id: 7, src: "/placeholder.svg?height=600&width=800", title: "Macro nature", category: "Nature" },
-    { id: 8, src: "/placeholder.svg?height=600&width=800", title: "Géométrie urbaine", category: "Architecture" },
-  ]
+  const filteredAlbums = data?.albums?.filter(album => 
+    filter === 'Tous' ? true : album.category === filter
+  ) || []
 
-  // Sample school projects data
-  const schoolProjects = [
-    {
-      id: 1,
-      title: "Redesign de l'application Météo",
-      description: "Projet de refonte UX/UI pour une application météo plus intuitive et visuellement attrayante.",
-      year: "2022",
-      tags: ["UX/UI", "Mobile App", "Weather"],
-      image: "/placeholder.svg?height=500&width=700",
-      color: "#FFD2BF",
-    },
-    {
-      id: 2,
-      title: "Campagne de sensibilisation écologique",
-      description: "Création d'une campagne visuelle complète pour sensibiliser à la protection de l'environnement.",
-      year: "2021",
-      tags: ["Branding", "Print", "Campaign"],
-      image: "/placeholder.svg?height=500&width=700",
-      color: "#E9B949",
-    },
-    {
-      id: 3,
-      title: "Typographie expérimentale",
-      description: "Exploration de formes typographiques innovantes pour créer une police de caractères unique.",
-      year: "2021",
-      tags: ["Typography", "Experimental", "Print"],
-      image: "/placeholder.svg?height=500&width=700",
-      color: "#F67A45",
-    },
-  ]
-
-  // Filter photos by category
-  const filteredPhotos =
-    activeCategory === "all" ? photoGallery : photoGallery.filter((photo) => photo.category === activeCategory)
-
-  // Open gallery with specific photo
-  const openGallery = (index: number) => {
-    setCurrentPhotoIndex(index)
-    setIsGalleryOpen(true)
-    document.body.style.overflow = "hidden"
-  }
-
-  // Close gallery
-  const closeGallery = () => {
-    setIsGalleryOpen(false)
-    document.body.style.overflow = "auto"
-  }
-
-  // Navigate through gallery
-  const navigateGallery = (direction: "next" | "prev") => {
-    if (direction === "next") {
-      setCurrentPhotoIndex((prev) => (prev === filteredPhotos.length - 1 ? 0 : prev + 1))
-    } else {
-      setCurrentPhotoIndex((prev) => (prev === 0 ? filteredPhotos.length - 1 : prev - 1))
-    }
-  }
-
-  // Toggle project details
-  const toggleProject = (id: number) => {
+  const toggleProject = (id: string) => {
     setActiveProject(activeProject === id ? null : id)
   }
 
-  const filteredAlbums = albums.filter(album => 
-    filter === 'Tous' ? true : album.category === filter
-  )
+  if (!mounted) return null
+
+  if (loading) {
+    return (
+      <main className="relative min-h-screen">
+        <GradientBackground />
+        <div className="relative z-30 container mx-auto px-4 py-12">
+          <div className="animate-pulse">
+            {/* Loading skeleton */}
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg p-4">
+                  <div className="h-48 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="relative min-h-screen overflow-x-hidden">
@@ -297,7 +282,7 @@ export default function Work() {
             {/* Work page title with decorative element */}
             <div className="mb-8 sm:mb-12">
               <div className="relative">
-                <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
+                <div className="absolute -top-10 sm:-top-12 left-1 sm:left-2">
                   <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
                     My work
                   </div>
@@ -358,29 +343,29 @@ export default function Work() {
               {/* Blog posts in a creative layout */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
                 {/* Featured post - larger */}
-                {blogs[0] && (
+                {data?.blogs[0] && (
                   <div className="md:col-span-8 group">
                     <div className="relative">
                       <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
                       <article className="border-3 border-black rounded-lg overflow-hidden bg-white transition-transform group-hover:-translate-y-1">
                         <div className="relative h-[300px] sm:h-[400px] overflow-hidden">
                           <Image
-                            src={blogs[0].coverImage || "/placeholder.svg"}
-                            alt={blogs[0].title}
+                            src={data.blogs[0].coverImage || "/placeholder.svg"}
+                            alt={data.blogs[0].title}
                             width={100}
                             height={100}
                             className="w-full h-full object-cover transition-transform group-hover:scale-105"
                           />
                           <div className="absolute top-4 left-4 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs">
-                            {blogs[0].category}
+                            {data.blogs[0].category}
                           </div>
                         </div>
                         <div className="p-4 sm:p-6">
-                          <span className="text-sm text-[#3C3C3C]">{formatDate(blogs[0].publishDate)}</span>
-                          <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-3">{blogs[0].title}</h3>
-                          <p className="text-[#3C3C3C] mb-4">{blogs[0].excerpt}</p>
+                          <span className="text-sm text-[#3C3C3C]">{formatDate(data.blogs[0].publishDate)}</span>
+                          <h3 className="text-xl sm:text-2xl font-bold mt-2 mb-3">{data.blogs[0].title}</h3>
+                          <p className="text-[#3C3C3C] mb-4">{data.blogs[0].excerpt}</p>
                           <Link 
-                            href={`/work/blog/${blogs[0].slug}`}
+                            href={`/work/blog/${data.blogs[0].slug}`}
                             className="flex items-center font-medium text-[#f67a45] group-hover:underline"
                           >
                             Lire l'article
@@ -396,7 +381,7 @@ export default function Work() {
 
                 {/* Smaller posts - stacked */}
                 <div className="md:col-span-4 space-y-6">
-                  {blogs.slice(1, 3).map((blog) => (
+                  {data?.blogs.slice(1, 3).map((blog) => (
                     <div key={blog.id} className="group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-lg -z-10 transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
@@ -468,16 +453,24 @@ export default function Work() {
 
               {/* Filtres */}
               <div className="flex flex-wrap gap-2 mb-8">
-                {categories.map((category) => (
+                <button
+                  onClick={() => setFilter('Tous')}
+                  className={`px-4 py-2 rounded-full border-2 border-black transition-colors ${
+                    filter === 'Tous' 
+                      ? 'bg-black text-white' 
+                      : 'bg-[#E9B949] hover:bg-gray-100'
+                  }`}
+                >
+                  Tous
+                </button>
+                {Array.from(new Set(data?.albums.map(album => album.category) || [])).map((category) => (
                   <button
                     key={category}
                     onClick={() => setFilter(category)}
                     className={`px-4 py-2 rounded-full border-2 border-black transition-colors ${
                       filter === category 
                         ? 'bg-black text-white' 
-                        : category === 'Tous' 
-                          ? 'bg-[#E9B949]'
-                          : 'bg-white hover:bg-gray-100'
+                        : 'bg-white hover:bg-gray-100'
                     }`}
                   >
                     {category}
@@ -517,6 +510,9 @@ export default function Work() {
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t-4 border-black">
                       <h3 className="text-xl font-bold">{album.title}</h3>
                       <p className="text-gray-600">{album.category}</p>
+                      <div className="mt-2 text-sm text-gray-500">
+                        {album.imageCount} photos
+                      </div>
                     </div>
                   </Link>
                 ))}
@@ -557,7 +553,7 @@ export default function Work() {
 
               {/* Interactive project cards */}
               <div className="space-y-8">
-                {schoolProjects.map((project) => (
+                {data?.projects.map((project) => (
                   <div key={project.id} className="relative">
                     <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
                     <div
@@ -626,36 +622,19 @@ export default function Work() {
                             <div>
                               <h4 className="font-bold mb-2">Objectifs du projet</h4>
                               <ul className="list-disc pl-5 space-y-1 text-[#3C3C3C]">
-                                <li>Développer une solution créative pour un problème réel</li>
-                                <li>Appliquer les principes de design appris en cours</li>
-                                <li>Créer une expérience utilisateur intuitive et engageante</li>
+                                {project.objectives.map((objective, index) => (
+                                  <li key={index}>{objective}</li>
+                                ))}
                               </ul>
                             </div>
                             <div>
                               <h4 className="font-bold mb-2">Compétences développées</h4>
                               <ul className="list-disc pl-5 space-y-1 text-[#3C3C3C]">
-                                <li>Recherche utilisateur et analyse des besoins</li>
-                                <li>Prototypage et tests d'utilisabilité</li>
-                                <li>Présentation et défense du concept</li>
+                                {project.skills.map((skill, index) => (
+                                  <li key={index}>{skill}</li>
+                                ))}
                               </ul>
                             </div>
-                          </div>
-
-                          <div className="mt-4 flex justify-end">
-                            <button className="relative inline-block group">
-                              <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
-                              <div className="relative px-4 py-2 bg-[#f67a45] text-white border-2 border-black rounded-md font-medium flex items-center transition-transform group-hover:-translate-y-0.5">
-                                Voir le projet complet
-                                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                  />
-                                </svg>
-                              </div>
-                            </button>
                           </div>
                         </div>
                       )}
@@ -667,70 +646,6 @@ export default function Work() {
           </div>
         </section>
       </div>
-
-      {/* Fullscreen gallery modal */}
-      {isGalleryOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <button
-            onClick={closeGallery}
-            className="absolute top-4 right-4 bg-white rounded-full p-2 border-2 border-black"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <button
-            onClick={() => navigateGallery("prev")}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 border-2 border-black"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <button
-            onClick={() => navigateGallery("next")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 border-2 border-black"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
-          <div className="max-w-4xl max-h-[80vh] relative">
-            <div className="absolute inset-0 bg-black translate-x-4 translate-y-4 rounded-xl -z-10"></div>
-            <div className="border-4 border-black rounded-xl overflow-hidden bg-white">
-              <Image
-                src={filteredPhotos[currentPhotoIndex].src || "/placeholder.svg"}
-                alt={filteredPhotos[currentPhotoIndex].title}
-                width={100}
-                height={100}
-                className="max-h-[70vh] object-contain mx-auto"
-              />
-              <div className="p-4 bg-white">
-                <h3 className="font-bold text-lg">{filteredPhotos[currentPhotoIndex].title}</h3>
-                <p className="text-sm text-[#3C3C3C]">{filteredPhotos[currentPhotoIndex].category}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Thumbnail navigation */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 overflow-x-auto max-w-[90vw] p-2">
-            {filteredPhotos.map((photo, index) => (
-              <button
-                key={photo.id}
-                onClick={() => setCurrentPhotoIndex(index)}
-                className={`w-12 h-12 flex-shrink-0 border-2 ${
-                  currentPhotoIndex === index ? "border-white" : "border-gray-500"
-                } rounded-md overflow-hidden`}
-              >
-                <Image src={photo.src || "/placeholder.svg"} alt={photo.title} width={100} height={100} className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </main>
   )
 }
