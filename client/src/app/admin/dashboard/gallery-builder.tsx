@@ -33,6 +33,9 @@ export default function GalleryBuilder({ setToast }: GalleryBuilderProps) {
   const [albums, setAlbums] = useState<Album[]>([])
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null)
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState(['Urban', 'Portrait', 'Nature', 'Architecture'])
+  const [showCategoryManager, setShowCategoryManager] = useState(false)
+  const [newCategory, setNewCategory] = useState('')
 
   const [formData, setAlbum] = useState<Omit<Album, 'id' | 'createdAt' | 'updatedAt' | 'images'>>({
     title: '',
@@ -253,18 +256,114 @@ export default function GalleryBuilder({ setToast }: GalleryBuilderProps) {
     }
   }, [mode, selectedAlbum])
 
+  const handleAddCategory = () => {
+    if (!newCategory.trim()) return
+    if (categories.includes(newCategory.trim())) {
+      setToast({
+        show: true,
+        message: 'Cette catégorie existe déjà',
+        type: 'error'
+      })
+      return
+    }
+    setCategories(prev => [...prev, newCategory.trim()])
+    setNewCategory('')
+    setToast({
+      show: true,
+      message: 'Catégorie ajoutée avec succès',
+      type: 'success'
+    })
+  }
+
+  const handleDeleteCategory = (category: string) => {
+    // Vérifier si la catégorie est utilisée
+    const isUsed = albums.some(album => album.category === category)
+    if (isUsed) {
+      setToast({
+        show: true,
+        message: 'Cette catégorie est utilisée par un ou plusieurs albums',
+        type: 'error'
+      })
+      return
+    }
+    setCategories(prev => prev.filter(c => c !== category))
+    setToast({
+      show: true,
+      message: 'Catégorie supprimée avec succès',
+      type: 'success'
+    })
+  }
+
   if (mode === 'list') {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Albums Photos</h2>
-          <button
-            onClick={() => setMode('create')}
-            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
-          >
-            Nouvel album
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowCategoryManager(true)}
+              className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100"
+            >
+              Gérer les catégories
+            </button>
+            <button
+              onClick={() => setMode('create')}
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+            >
+              Nouvel album
+            </button>
+          </div>
         </div>
+
+        {/* Category Manager Modal */}
+        {showCategoryManager && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg border-4 border-black max-w-md w-full mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Gérer les catégories</h3>
+                <button
+                  onClick={() => setShowCategoryManager(false)}
+                  className="text-gray-500 hover:text-black"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Nouvelle catégorie"
+                  className="flex-1 p-2 border-2 border-black rounded-lg"
+                />
+                <button
+                  onClick={handleAddCategory}
+                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                >
+                  Ajouter
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex justify-between items-center p-2 border-2 border-black rounded-lg"
+                  >
+                    <span>{category}</span>
+                    <button
+                      onClick={() => handleDeleteCategory(category)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-4">
           {albums.map((album) => (

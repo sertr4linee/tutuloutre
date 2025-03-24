@@ -274,7 +274,7 @@ export default function Work() {
                 <div className="relative inline-block mt-4 sm:mt-0">
                   <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
                   <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
-                    Resume
+                    CV
                     <svg
                       className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
                       viewBox="0 0 24 24"
@@ -526,9 +526,15 @@ export default function Work() {
               <div className="mt-8 text-center">
                 <Link
                   href="/work/gallery"
-                  className="inline-block px-6 py-3 bg-black text-white rounded-full border-2 border-black hover:bg-gray-800 transition-colors"
+                  className="relative inline-block group"
                 >
-                  Voir plus de photos
+                  <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
+                  <div className="relative px-6 py-2 bg-white border-2 border-black rounded-full font-medium flex items-center transition-transform group-hover:-translate-y-0.5">
+                    Voir plus de photos
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </div>
                 </Link>
               </div>
             </div>

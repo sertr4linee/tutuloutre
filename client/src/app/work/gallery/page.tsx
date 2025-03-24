@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import GradientBackground from '@/components/ui/background'
-import ResponsiveGrid from '@/components/ui/ResponsiveGrid'
 import { getPublicAlbums } from '@/app/actions'
+import { motion } from 'framer-motion'
 
 interface Album {
   id: string
@@ -20,24 +20,18 @@ interface Album {
   }[]
 }
 
-export default function Gallery() {
+export default function GalleryPage() {
   const [albums, setAlbums] = useState<Album[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState('Tous')
-  const categories = ['Tous', 'Urban', 'Portrait', 'Nature', 'Architecture']
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [hoveredAlbum, setHoveredAlbum] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchAlbums() {
       try {
         const result = await getPublicAlbums()
-        if (result.error) {
-          throw new Error(result.error)
-        }
         if (result.data) {
-          setAlbums(result.data.map(album => ({
-            ...album,
-            images: []
-          })))
+          setAlbums(result.data)
         }
       } catch (error) {
         console.error('Error fetching albums:', error)
@@ -49,118 +43,249 @@ export default function Gallery() {
     fetchAlbums()
   }, [])
 
-  const filteredAlbums = selectedCategory === 'Tous'
-    ? albums
-    : albums.filter(album => album.category === selectedCategory)
+  const categories = Array.from(new Set(albums.map(album => album.category)))
+  const filteredAlbums = selectedCategory 
+    ? albums.filter(album => album.category === selectedCategory)
+    : albums
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFFBF5]">
-        <div className="relative">
-          <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full"></div>
-          <div className="relative animate-spin rounded-full h-32 w-32 border-4 border-black border-t-[#FFFBF5] bg-[#FFFBF5]"></div>
-        </div>
-      </div>
+      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        <GradientBackground />
+        <motion.div 
+          className="relative z-30"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="relative">
+            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+              <div className="flex items-center space-x-4">
+                {[...Array(3)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-5 h-5 bg-[#f67a45] border-2 border-black rounded-full"
+                    animate={{
+                      y: ["0%", "-50%", "0%"],
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[#FFFBF5] relative">
+    <main className="relative min-h-screen">
       <GradientBackground />
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
-        {/* Header with category filters */}
-        <div className="mb-12">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Galerie Photo</h1>
-              <p className="text-gray-600">Découvrez mes séries photographiques</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map(category => (
+      {/* Hero Section */}
+      <div className="relative z-30 pt-6 sm:pt-12 pb-12 sm:pb-24">
+        <motion.div 
+          className="container mx-auto px-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            className="absolute left-4 sm:left-8 top-0"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <Link 
+              href="/"
+              className="group flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-black bg-white group-hover:bg-[#FFD2BF] transition-colors">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </span>
+              <span className="group-hover:underline text-xs sm:text-sm">Retour</span>
+            </Link>
+          </motion.div>
+
+          <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 mt-8 sm:mt-0">
+            <motion.h1 
+              className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 sm:mb-6 tracking-tight"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Galerie Photo
+            </motion.h1>
+            <motion.p 
+              className="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              Découvrez mes collections de photographies à travers différents univers et ambiances
+            </motion.p>
+
+            {/* Categories */}
+            <motion.div 
+              className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-3 py-1.5 sm:px-6 sm:py-3 rounded-full border-2 border-black transition-all transform hover:-translate-y-1 text-xs sm:text-base ${
+                  !selectedCategory ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'
+                }`}
+              >
+                Tous
+              </button>
+              {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full border-2 border-black transition-all transform hover:-translate-y-0.5 ${
-                    selectedCategory === category
-                      ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                      : 'bg-white hover:bg-gray-50 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                  className={`px-3 py-1.5 sm:px-6 sm:py-3 rounded-full border-2 border-black transition-all transform hover:-translate-y-1 text-xs sm:text-base ${
+                    selectedCategory === category ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'
                   }`}
                 >
                   {category}
                 </button>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </div>
 
-        {/* Albums grid */}
-        {filteredAlbums.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="inline-block relative">
-              <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl"></div>
-              <div className="relative bg-white border-2 border-black rounded-xl p-8">
-                <p className="text-xl font-bold mb-2">Aucun album trouvé</p>
-                <p className="text-gray-600">Il n'y a pas encore d'albums dans cette catégorie</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <ResponsiveGrid
-            columns={{ sm: 1, md: 2, lg: 3 }}
-            gap={{ sm: 6, md: 8, lg: 8 }}
-            className="mb-12"
+          {/* Albums Grid */}
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
-            {filteredAlbums.map((album) => (
-              <Link
+            {filteredAlbums.map((album, index) => (
+              <motion.div
                 key={album.id}
-                href={`/work/gallery/${album.id}`}
-                className="group relative block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                onHoverStart={() => setHoveredAlbum(album.id)}
+                onHoverEnd={() => setHoveredAlbum(null)}
               >
-                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
-                <div className="relative border-2 border-black rounded-xl overflow-hidden bg-white">
-                  <div className="relative aspect-[4/3]">
-                    {album.coverImage ? (
-                      <Image
-                        src={album.coverImage}
-                        alt={album.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200" />
-                    )}
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
+                <Link href={`/work/gallery/${album.id}`}>
+                  <div className="relative group cursor-pointer">
+                    <div className="absolute inset-0 bg-black translate-x-1.5 translate-y-1.5 sm:translate-x-2 sm:translate-y-2 rounded-lg sm:rounded-xl transition-transform group-hover:translate-x-2 group-hover:translate-y-2 sm:group-hover:translate-x-3 sm:group-hover:translate-y-3"></div>
+                    <div className="relative border-2 sm:border-3 border-black rounded-lg sm:rounded-xl overflow-hidden bg-white">
+                      <div className="relative aspect-[4/3]">
+                        {album.coverImage ? (
+                          <Image
+                            src={album.coverImage}
+                            alt={album.title}
+                            fill
+                            className={`object-cover transition-all duration-500 ${
+                              hoveredAlbum === album.id ? 'scale-110' : 'scale-100'
+                            }`}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <span className="text-gray-400 text-xs sm:text-sm">No cover image</span>
+                          </div>
+                        )}
+                        <div className={`absolute inset-0 bg-black transition-opacity duration-300 ${
+                          hoveredAlbum === album.id ? 'opacity-40' : 'opacity-0'
+                        }`} />
+                      </div>
+                      <div className="p-3 sm:p-6">
+                        <div className="mb-2 sm:mb-3">
+                          <span className="inline-block px-2 py-1 sm:px-4 sm:py-1 bg-[#E9B949] text-black text-xs sm:text-sm font-medium rounded-full border-2 border-black transform -translate-y-6 sm:-translate-y-8 shadow-brutal-sm">
+                            {album.category}
+                          </span>
+                        </div>
+                        <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">{album.title}</h2>
+                        {album.description && (
+                          <p className="text-gray-600 text-xs sm:text-base line-clamp-2">{album.description}</p>
+                        )}
+                        <div className="mt-3 sm:mt-4 flex items-center justify-between">
+                          <span className="text-xs sm:text-sm text-gray-500">
+                            {album.images.length} photos
+                          </span>
+                          <motion.span 
+                            className="text-[#f67a45] flex items-center text-xs sm:text-sm"
+                            animate={{
+                              x: hoveredAlbum === album.id ? 5 : 0
+                            }}
+                          >
+                            Voir l'album
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                          </motion.span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h2 className="text-xl font-bold mb-1">{album.title}</h2>
-                    {album.description && (
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{album.description}</p>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className="px-3 py-1 bg-[#E9B949] text-black rounded-full text-sm border-2 border-black">
-                        {album.category}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {album.images?.length || 0} photos
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
-          </ResponsiveGrid>
-        )}
+          </motion.div>
+        </motion.div>
       </div>
+
+      {/* Decorative elements */}
+      <motion.div 
+        className="fixed z-10 top-[15%] right-[5%] w-[120px] h-[120px]"
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, 5, 0]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        <Image
+          src="/stars.svg"
+          alt="Decorative star"
+          width={120}
+          height={120}
+          className="w-full h-full"
+          style={{
+            filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))"
+          }}
+        />
+      </motion.div>
+
+      <motion.div 
+        className="fixed z-10 bottom-[10%] left-[8%] w-[100px] h-[100px]"
+        animate={{
+          y: [0, 20, 0],
+          rotate: [0, -5, 0]
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        <Image
+          src="/stars.svg"
+          alt="Decorative star"
+          width={100}
+          height={100}
+          className="w-full h-full"
+          style={{
+            filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5)) hue-rotate(340deg)",
+            opacity: 0.9
+          }}
+        />
+      </motion.div>
     </main>
   )
 } 

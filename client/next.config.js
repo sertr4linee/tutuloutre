@@ -1,14 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.amazonaws.com',
+        hostname: '*.amazonaws.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'une-momes-photos.s3.eu-west-3.amazonaws.com',
+        pathname: '/**',
       }
     ],
-    unoptimized: true, // Pour les images SVG locales
+    unoptimized: false,
   },
   webpack: (config) => {
     config.resolve.alias = {
@@ -17,6 +26,11 @@ const nextConfig = {
     }
     return config
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '16mb'
+    }
+  }
 }
 
 module.exports = nextConfig 

@@ -568,15 +568,43 @@ export async function getPublicBlogBySlug(slug: string) {
 
 export async function getPublicAlbums() {
   try {
+    console.log('Starting getPublicAlbums');
     const albums = await prisma.album.findMany({
+      include: { images: true },
       orderBy: {
         createdAt: 'desc'
       }
     });
 
-    return { data: albums };
+    console.log('Albums fetched from database:', albums.length);
+    
+    const formattedAlbums = albums.map(album => {
+      console.log(`Processing album ${album.id}:`, {
+        coverImage: album.coverImage,
+        imagesCount: album.images.length
+      });
+      
+      return {
+        id: album.id,
+        title: album.title,
+        description: album.description,
+        category: album.category,
+        coverImage: album.coverImage,
+        images: album.images.map(image => ({
+          id: image.id,
+          url: image.url,
+          caption: image.caption,
+          order: image.order
+        })),
+        createdAt: album.createdAt.toISOString(),
+        updatedAt: album.updatedAt.toISOString()
+      };
+    });
+
+    console.log('Returning formatted albums');
+    return { data: formattedAlbums };
   } catch (error) {
-    console.error('Error fetching albums:', error);
+    console.error('Error in getPublicAlbums:', error);
     return { error: 'Failed to fetch albums' };
   }
 }

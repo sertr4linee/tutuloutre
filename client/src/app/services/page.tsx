@@ -347,7 +347,7 @@ export default function Services() {
                 <div className="relative inline-block mt-4 sm:mt-0">
                   <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
                   <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
-                    Resume
+                    CV
                     <svg
                       className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
                       viewBox="0 0 24 24"
