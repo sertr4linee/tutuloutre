@@ -36,7 +36,7 @@
     "dotenv": "^16.4.7",
     "framer-motion": "^12.4.10",
     "ioredis": "^5.6.0",
-    "jose": "^6.0.8",
+    "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.479.0",
     "nanoid": "^5.1.3",

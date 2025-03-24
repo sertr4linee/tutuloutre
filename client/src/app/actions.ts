@@ -2,7 +2,7 @@
 
 import { neon } from "@neondatabase/serverless";
 import { compare } from "bcryptjs";
-import { sign, verify } from "jsonwebtoken";
+import * as jose from 'jose';
 import { authenticator } from "otplib";
 import { saveToken, removeToken } from "@/lib/redis";
 import { prisma } from "@/lib/prisma";
@@ -35,31 +35,45 @@ import { uploadToS3, deleteFromS3 } from '@/lib/s3';
 // Authentication actions
 export async function login(input: LoginInput): Promise<LoginResponse> {
   try {
+    console.log('Login attempt started')
     const user = await prisma.admin.findFirst();
 
     if (!user) {
+      console.error('No admin user found')
       throw new AuthenticationError("Invalid credentials");
     }
 
     const isValid = await verifyTOTP(input.totp, user.totpSecret);
     if (!isValid) {
+      console.error('Invalid TOTP code')
       throw new AuthenticationError("Invalid TOTP code");
     }
 
-    const token = sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+    console.log('TOTP verification successful')
+    
+    // Create JWT with jose
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    const token = await new jose.SignJWT({ id: user.id })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('7d')
+      .sign(secret)
+
     await saveToken(user.id, token);
 
     const cookieStore = await cookies();
     cookieStore.set("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 // 7 days in seconds
+      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+      priority: 'high'
     });
 
+    console.log('Login successful, token set in cookies')
     return { data: { token } };
   } catch (error) {
+    console.error('Login error:', error)
     return { error: error instanceof Error ? error.message : "An unexpected error occurred" };
   }
 }
@@ -70,8 +84,13 @@ export async function logout(): Promise<ServerActionResponse> {
     const token = cookieStore.get("token")?.value;
     
     if (token) {
-      const decoded = verify(token, process.env.JWT_SECRET!) as { id: string };
-      await removeToken(decoded.id);
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+        const { payload } = await jose.jwtVerify(token, secret)
+        await removeToken(payload.id as string);
+      } catch (error) {
+        console.error('Error verifying token during logout:', error)
+      }
       cookieStore.delete("token");
     }
 
