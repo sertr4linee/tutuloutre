@@ -20,11 +20,9 @@ export default function ImageUploader({ albumId, onSuccess }: ImageUploaderProps
       setIsUploading(true);
       setError(null);
 
-      // Convert file to Buffer
-      const buffer = await file.arrayBuffer();
       const result = await addImageToAlbum(
         albumId,
-        Buffer.from(buffer),
+        file,
         file.name,
         file.type
       );

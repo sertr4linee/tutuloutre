@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react";
-import { updateAbout } from "@/app/actions";
+import { useState, useEffect } from "react";
+import { updateAbout, getAbout } from "@/app/actions";
 
 interface AboutEditorProps {
   setToast: (toast: { show: boolean; message: string; type: 'success' | 'error' }) => void;
@@ -17,6 +17,26 @@ export default function AboutEditor({ setToast }: AboutEditorProps) {
     },
     skills: [] as string[]
   })
+
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const result = await getAbout();
+        if (result.data) {
+          setFormData(result.data);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+        setToast({
+          show: true,
+          message: 'Erreur lors du chargement des données',
+          type: 'error'
+        });
+      }
+    };
+
+    fetchAboutData();
+  }, []);
 
   const handleSave = async () => {
     try {

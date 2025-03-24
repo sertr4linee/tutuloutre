@@ -309,7 +309,7 @@ export default function About() {
                   <Link href="/contact" className="inline-block">
                     <div className="relative">
                       <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md"></div>
-                      <button className="relative bg-[#f67a45] text-white border-2 border-black px-5 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold flex items-center justify-center rounded-md">
+                      <button className="relative bg-[#f67a45] text-white border-2 border-black px-5 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold flex items-center justify-center rounded-md transition-all transform hover:-translate-y-1">
                         Travaillons ensemble
                         <svg
                           className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
@@ -317,7 +317,7 @@ export default function About() {
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       </button>
                     </div>

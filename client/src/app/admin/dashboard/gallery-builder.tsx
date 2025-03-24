@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Upload, Move } from 'lucide-react'
 import Image from 'next/image'
 import { getAlbums, createAlbum, updateAlbum, deleteAlbum, uploadImage, addImageToAlbum, deleteImage, updateImageOrder } from '@/app/actions'
-import { DragDropContext, Droppable, Draggable, DroppableProvided, DraggableProvided, DropResult } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 interface Album {
   id: string
@@ -22,18 +22,17 @@ interface Album {
   updatedAt: string
 }
 
-interface AlbumManagerProps {
+interface GalleryBuilderProps {
   setToast: (toast: { show: boolean; message: string; type: 'success' | 'error' }) => void;
 }
 
 const categories = ['Urban', 'Portrait', 'Nature', 'Architecture']
 
-export default function AlbumManager({ setToast }: AlbumManagerProps) {
+export default function GalleryBuilder({ setToast }: GalleryBuilderProps) {
   const [mode, setMode] = useState<'list' | 'create' | 'edit'>('list')
   const [albums, setAlbums] = useState<Album[]>([])
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null)
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
 
   const [formData, setAlbum] = useState<Omit<Album, 'id' | 'createdAt' | 'updatedAt' | 'images'>>({
     title: '',
@@ -152,70 +151,38 @@ export default function AlbumManager({ setToast }: AlbumManagerProps) {
   }
 
   const handleAddImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!selectedAlbum) return;
+    if (!selectedAlbum) return
     
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setUploading(true);
-    const uploadPromises = Array.from(files).map(async (file) => {
+    const files = Array.from(e.target.files || [])
+    
+    for (const file of files) {
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('type', 'gallery');
-        formData.append('id', selectedAlbum.id);
+        const formDataUpload = new FormData()
+        formDataUpload.append('file', file)
+        formDataUpload.append('type', 'gallery')
+        formDataUpload.append('id', selectedAlbum.id)
 
-        const result = await uploadImage(formData);
+        const result = await uploadImage(formDataUpload)
+
         if (result.error) {
-          throw new Error(result.error);
+          throw new Error(result.error)
         }
 
-        if (!result.data?.url) {
-          throw new Error('No URL returned from upload');
+        if (result.data) {
+          await addImageToAlbum(selectedAlbum.id, file, file.name, file.type)
         }
-
-        // Add image to album
-        const imageResult = await addImageToAlbum(
-          selectedAlbum.id,
-          file,
-          file.name,
-          file.type
-        );
-
-        if (imageResult.error) {
-          throw new Error(imageResult.error);
-        }
-
-        return imageResult.data;
       } catch (error) {
-        console.error('Error uploading image:', error);
-        setToast({
-          show: true,
-          message: error instanceof Error ? error.message : 'Erreur lors du téléchargement',
-          type: 'error'
-        });
-        return null;
+        console.error('Error uploading image:', error)
       }
-    });
-
-    try {
-      const results = await Promise.all(uploadPromises);
-      const successfulUploads = results.filter(Boolean);
-      
-      if (successfulUploads.length > 0) {
-        setToast({
-          show: true,
-          message: `${successfulUploads.length} image(s) ajoutée(s) avec succès`,
-          type: 'success'
-        });
-        fetchAlbums();
-      }
-    } catch (error) {
-      console.error('Error processing uploads:', error);
-    } finally {
-      setUploading(false);
     }
-  };
+
+    fetchAlbums()
+    setToast({
+      show: true,
+      message: 'Images ajoutées avec succès',
+      type: 'success'
+    })
+  }
 
   const handleDeleteImage = async (imageId: string) => {
     try {
@@ -240,7 +207,7 @@ export default function AlbumManager({ setToast }: AlbumManagerProps) {
     }
   }
 
-  const handleDragEnd = async (result: DropResult) => {
+  const handleDragEnd = async (result: any) => {
     if (!result.destination || !selectedAlbum) return
 
     const items = Array.from(selectedAlbum.images)
@@ -467,7 +434,7 @@ export default function AlbumManager({ setToast }: AlbumManagerProps) {
 
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="gallery" direction="horizontal">
-              {(provided: DroppableProvided) => (
+              {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
@@ -475,7 +442,7 @@ export default function AlbumManager({ setToast }: AlbumManagerProps) {
                 >
                   {selectedAlbum.images.map((image, index) => (
                     <Draggable key={image.id} draggableId={image.id} index={index}>
-                      {(provided: DraggableProvided) => (
+                      {(provided) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
@@ -520,4 +487,4 @@ export default function AlbumManager({ setToast }: AlbumManagerProps) {
       )}
     </div>
   )
-}
+} 

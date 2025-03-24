@@ -353,17 +353,29 @@ export async function deleteAlbum(id: string): Promise<ServerActionResponse> {
   }
 }
 
-export async function addImageToAlbum(albumId: string, file: Buffer, fileName: string, contentType: string) {
+export async function addImageToAlbum(albumId: string, file: File, fileName: string, contentType: string) {
   try {
-    // Upload to S3
-    const imageUrl = await uploadToS3(file, `albums/${albumId}/${fileName}`, contentType);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'gallery');
+    formData.append('id', albumId);
+
+    const result = await uploadImage(formData);
+    
+    if (result.error) {
+      throw new Error(result.error);
+    }
+
+    if (!result.data?.url) {
+      throw new Error('No URL returned from upload');
+    }
 
     // Save to database
     const image = await prisma.image.create({
       data: {
-        url: imageUrl,
+        url: result.data.url,
         albumId: albumId,
-        order: 0 // You might want to implement proper ordering logic
+        order: 0
       }
     });
 
