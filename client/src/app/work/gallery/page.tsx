@@ -101,22 +101,22 @@ export default function GalleryPage() {
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <Link 
+            <Link
               href="/"
-              className="group flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+              className="group flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white border-2 border-black rounded-full hover:bg-[#FFD2BF] transition-colors shadow-brutal mt-4 ml-10"
             >
-              <span className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-black bg-white group-hover:bg-[#FFD2BF] transition-colors">
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center">
+                <svg className="w-4 h-4 mr-1 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-              </span>
-              <span className="group-hover:underline text-xs sm:text-sm">Retour</span>
+                <span className="text-sm">Retour</span>
+              </div>
             </Link>
           </motion.div>
 
           <div className="max-w-4xl mx-auto text-center mb-8 sm:mb-16 mt-8 sm:mt-0">
             <motion.h1 
-              className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 sm:mb-6 tracking-tight"
+              className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-3 sm:mb-6 tracking-tight text-black"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}

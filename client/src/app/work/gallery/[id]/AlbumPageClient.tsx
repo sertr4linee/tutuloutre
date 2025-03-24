@@ -29,12 +29,17 @@ export default function AlbumPageClient({ initialData }: AlbumPageClientProps) {
     return (
       <main className="relative min-h-screen">
         <GradientBackground />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Album non trouvé</h1>
-            <Link href="/work/gallery" className="mt-4 inline-block text-[#f67a45] hover:underline">
+        <div className="relative z-30 container mx-auto px-4 py-12">
+          {/* <div className="mb-8">
+            <Link
+              href="/work/gallery"
+              className="inline-flex items-center text-[#f67a45] hover:underline"
+            >
               ← Retour à la galerie
             </Link>
+          </div> */}
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Album non trouvé</h1>
           </div>
         </div>
       </main>
@@ -78,16 +83,6 @@ export default function AlbumPageClient({ initialData }: AlbumPageClientProps) {
       </div>
 
       <div className="relative z-30 container mx-auto px-4 py-12">
-        {/* Navigation */}
-        <div className="mb-8">
-          <Link
-            href="/work/gallery"
-            className="inline-flex items-center text-[#f67a45] hover:underline"
-          >
-            ← Retour à la galerie
-          </Link>
-        </div>
-
         {/* Album header */}
         <div className="relative border-4 border-black bg-white p-6 rounded-xl mb-12">
           <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
@@ -98,10 +93,33 @@ export default function AlbumPageClient({ initialData }: AlbumPageClientProps) {
                 {initialData.category}
               </div>
             </div>
-            <h1 className="text-4xl font-bold mt-4">{initialData.title}</h1>
-            {initialData.description && (
-              <p className="text-gray-600 mt-2">{initialData.description}</p>
-            )}
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-4xl font-bold mt-4">{initialData.title}</h1>
+                {initialData.description && (
+                  <p className="text-gray-600 mt-2">{initialData.description}</p>
+                )}
+              </div>
+              <Link 
+                href="/work/gallery"
+                className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition-colors mt-4"
+              >
+                <span>Retour à la galerie</span>
+                <svg 
+                  className="w-4 h-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M6 18L18 6M6 6l12 12" 
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Image grid avec disposition dynamique */}

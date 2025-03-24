@@ -53,7 +53,7 @@ export default function GradientBackground() {
           </div>
         </div>
 
-        {/* Top right small flower */}
+        {/* Top right small flower
         <div className="absolute -right-2 -top-1" style={{ width: "220px", height: "180px" }}>
           <div className="relative w-full h-full">
             <Image
@@ -67,7 +67,7 @@ export default function GradientBackground() {
               }}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Center top flower */}
         <div className="absolute left-1/2 -translate-x-1/2 top-4" style={{ width: "120px", height: "120px" }}>
