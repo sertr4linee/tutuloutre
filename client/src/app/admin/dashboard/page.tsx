@@ -104,7 +104,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] relative">
+    <div className="min-h-screen relative">
       {toast.show && (
         <Toast
           message={toast.message}

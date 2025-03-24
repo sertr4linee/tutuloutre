@@ -14,7 +14,7 @@ export default function Contact() {
     name: "",
     email: "",
     message: "",
-    subject: "Just saying hi!",
+    subject: "Juste pour dire bonjour !",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -31,19 +31,19 @@ export default function Contact() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
+    // Simulation de l'envoi du formulaire
     setTimeout(() => {
       setIsSubmitting(false)
       setIsSuccess(true)
 
-      // Reset form after showing success message
+      // Réinitialisation du formulaire après affichage du message de succès
       setTimeout(() => {
         setIsSuccess(false)
         setFormState({
           name: "",
           email: "",
           message: "",
-          subject: "Just saying hi!",
+          subject: "Juste pour dire bonjour !",
         })
       }, 3000)
     }, 1500)
@@ -119,42 +119,42 @@ export default function Contact() {
         />
       </div>
 
-      {/* Portfolio content with neobrutalism design */}
+      {/* Contenu du portfolio avec design néobrutalist */}
       <div className="relative z-30 flex items-center justify-center min-h-screen py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4">
         <div className="relative w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl bg-[#FFFBF5] border-[4px] sm:border-[6px] md:border-[8px] lg:border-[10px] border-black mx-auto">
-          {/* Corner elements - L-shaped design - responsive sizes */}
+          {/* Éléments des coins - Design en L - tailles responsives */}
           <div className="hidden sm:block absolute -top-[12px] -left-[12px] w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[45px] lg:h-[45px]">
             <div className="absolute top-0 left-0 w-[25px] md:w-[35px] lg:w-[45px] h-[8px] md:h-[12px] lg:h-[15px] bg-black"></div>
             <div className="absolute top-0 left-0 w-[8px] md:w-[12px] lg:w-[15px] h-[25px] md:h-[35px] lg:h-[45px] bg-black"></div>
           </div>
 
-          {/* Top-right corner */}
+          {/* Coin supérieur droit */}
           <div className="hidden sm:block absolute -top-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute top-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute top-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-left corner */}
+          {/* Coin inférieur gauche */}
           <div className="hidden sm:block absolute -bottom-[15px] -left-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 left-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 left-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-right corner */}
+          {/* Coin inférieur droit */}
           <div className="hidden sm:block absolute -bottom-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Content container with better responsive padding */}
+          {/* Conteneur avec meilleur padding responsive */}
           <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-            {/* Navigation - improved mobile layout */}
+            {/* Navigation - mise en page mobile améliorée */}
             <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
-                {/* Empty for now */}
+                {/* Vide pour l'instant */}
               </div>
 
-              {/* Mobile menu button - better positioning */}
+              {/* Bouton menu mobile - meilleur positionnement */}
               <button
                 className="sm:hidden fixed top-4 right-4 p-2 z-50 bg-white/80 backdrop-blur-sm rounded-md border-2 border-black"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -168,7 +168,7 @@ export default function Contact() {
                 </svg>
               </button>
 
-              {/* Navigation links - improved mobile menu */}
+              {/* Liens de navigation - menu mobile amélioré */}
               <div
                 className={`
                 ${menuOpen ? "flex fixed inset-0 bg-white/95 z-40" : "hidden"} 
@@ -180,12 +180,12 @@ export default function Contact() {
                 w-full sm:w-auto
               `}
               >
-                <Link href="/" className="hover:underline">Home</Link>
+                <Link href="/" className="hover:underline">Accueil</Link>
                 <Link href="/about" className="hover:underline">
-                  About
+                  À propos
                 </Link>
                 <Link href="/work" className="hover:underline">
-                  Work
+                  Travaux
                 </Link>
                 <Link href="/services" className="hover:underline">
                   Services
@@ -194,11 +194,11 @@ export default function Contact() {
                   Contact
                 </Link>
 
-                {/* Resume button - responsive sizing */}
+                {/* Bouton CV - taille responsive */}
                 <div className="relative inline-block mt-4 sm:mt-0">
                   <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
                   <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
-                    Resume
+                    CV
                     <svg
                       className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
                       viewBox="0 0 24 24"
@@ -218,26 +218,26 @@ export default function Contact() {
               </div>
             </nav>
 
-            {/* Contact page content */}
+            {/* Contenu de la page Contact */}
             <div className="grid grid-cols-1 gap-6 sm:gap-8 md:gap-10">
-              {/* Contact page title with decorative element */}
+              {/* Titre de la page Contact avec élément décoratif */}
               <div className="mb-2 sm:mb-4">
                 <div className="relative">
                   <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
-                      Say hello!
+                      Dites bonjour !
                     </div>
                   </div>
                   <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] leading-[0.9] font-black text-[#2D2D2D] tracking-tighter font-family-clash">
-                    Let's Connect
+                    Prenons Contact
                   </h1>
                 </div>
                 <p className="text-lg sm:text-xl md:text-2xl mt-4 sm:mt-6 font-normal text-[#3C3C3C] max-w-xl leading-tight">
-                  Have a project in mind? I'd love to hear about it!
+                  Vous avez un projet en tête ? J'aimerais en entendre parler !
                 </p>
               </div>
 
-              {/* Interactive contact tabs */}
+              {/* Onglets interactifs de contact */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <button
                   onClick={() => setActiveTab("form")}
@@ -247,7 +247,7 @@ export default function Contact() {
                       : "bg-white hover:bg-[#FFE8DD]"
                   }`}
                 >
-                  Send a Message
+                  Envoyer un Message
                 </button>
                 <button
                   onClick={() => setActiveTab("socials")}
@@ -257,7 +257,7 @@ export default function Contact() {
                       : "bg-white hover:bg-[#FFE8DD]"
                   }`}
                 >
-                  Social Media
+                  Réseaux Sociaux
                 </button>
                 <button
                   onClick={() => setActiveTab("info")}
@@ -267,16 +267,16 @@ export default function Contact() {
                       : "bg-white hover:bg-[#FFE8DD]"
                   }`}
                 >
-                  Contact Info
+                  Informations de Contact
                 </button>
               </div>
 
-              {/* Tab content container */}
+              {/* Conteneur des onglets */}
               <div className="relative">
-                {/* Interactive form tab */}
+                {/* Onglet formulaire interactif */}
                 {activeTab === "form" && (
                   <div className="relative">
-                    {/* Decorative elements */}
+                    {/* Éléments décoratifs */}
                     <div className="absolute -top-10 -right-10 w-[80px] h-[80px] opacity-50 hidden md:block">
                       <Image
                         src="/stars.svg"
@@ -291,7 +291,7 @@ export default function Contact() {
                       />
                     </div>
 
-                    {/* Interactive form with neobrutalism style */}
+                    {/* Formulaire interactif avec style néobrutalist */}
                     <div className="bg-white border-4 border-black rounded-xl p-4 sm:p-6 md:p-8 relative">
                       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-10 translate-x-2 translate-y-2 rounded-xl -z-10"></div>
 
@@ -302,15 +302,15 @@ export default function Contact() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           </div>
-                          <h3 className="text-2xl font-bold text-[#2D2D2D] mb-2">Message Sent!</h3>
-                          <p className="text-[#3C3C3C]">Thanks for reaching out. I'll get back to you soon!</p>
+                          <h3 className="text-2xl font-bold text-[#2D2D2D] mb-2">Message Envoyé !</h3>
+                          <p className="text-[#3C3C3C]">Merci de m'avoir contactée. Je vous répondrai bientôt !</p>
                         </div>
                       ) : (
                         <form onSubmit={handleSubmit} className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="name" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                                Your Name
+                                Votre Nom
                               </label>
                               <div className="relative">
                                 <input
@@ -321,14 +321,14 @@ export default function Contact() {
                                   onChange={handleInputChange}
                                   required
                                   className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all"
-                                  placeholder="Jane Doe"
+                                  placeholder="Jean Dupont"
                                 />
                               </div>
                             </div>
 
                             <div>
                               <label htmlFor="email" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                                Your Email
+                                Votre Email
                               </label>
                               <input
                                 type="email"
@@ -338,14 +338,14 @@ export default function Contact() {
                                 onChange={handleInputChange}
                                 required
                                 className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all"
-                                placeholder="jane@example.com"
+                                placeholder="jean@exemple.com"
                               />
                             </div>
                           </div>
 
                           <div>
                             <label htmlFor="subject" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                              Subject
+                              Sujet
                             </label>
                             <select
                               id="subject"
@@ -360,17 +360,17 @@ export default function Contact() {
                                 backgroundSize: "1.5em 1.5em",
                               }}
                             >
-                              <option value="Just saying hi!">Just saying hi!</option>
-                              <option value="Project inquiry">Project inquiry</option>
+                              <option value="Juste pour dire bonjour !">Juste pour dire bonjour !</option>
+                              <option value="Demande de projet">Demande de projet</option>
                               <option value="Collaboration">Collaboration</option>
-                              <option value="Job opportunity">Job opportunity</option>
-                              <option value="Other">Other</option>
+                              <option value="Opportunité d'emploi">Opportunité d'emploi</option>
+                              <option value="Autre">Autre</option>
                             </select>
                           </div>
 
                           <div>
                             <label htmlFor="message" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                              Your Message
+                              Votre Message
                             </label>
                             <textarea
                               id="message"
@@ -380,7 +380,7 @@ export default function Contact() {
                               required
                               rows={5}
                               className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all resize-none"
-                              placeholder="Tell me about your project..."
+                              placeholder="Parlez-moi de votre projet..."
                             ></textarea>
                           </div>
 
@@ -412,11 +412,11 @@ export default function Contact() {
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                       ></path>
                                     </svg>
-                                    Sending...
+                                    Envoi en cours...
                                   </>
                                 ) : (
                                   <>
-                                    Send Message
+                                    Envoyer le Message
                                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path
                                         strokeLinecap="round"
@@ -436,7 +436,7 @@ export default function Contact() {
                   </div>
                 )}
 
-                {/* Social media tab with interactive cards */}
+                {/* Onglet réseaux sociaux avec cartes interactives */}
                 {activeTab === "socials" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {socialLinks.map((social, index) => (
@@ -452,7 +452,7 @@ export default function Contact() {
                       >
                         <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-1 group-hover:translate-y-1"></div>
                         <div className="relative border-3 border-black rounded-xl p-4 flex flex-col items-center text-center transition-all bg-white overflow-hidden group-hover:-translate-y-1">
-                          {/* Hover effect */}
+                          {/* Effet de survol */}
                           <div
                             className="absolute inset-0 transition-opacity group-hover:opacity-10 rounded-xl"
                             style={{
@@ -490,7 +490,7 @@ export default function Contact() {
                   </div>
                 )}
 
-                {/* Contact info tab with interactive map */}
+                {/* Onglet informations de contact avec carte interactive */}
                 {activeTab === "info" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
@@ -509,21 +509,6 @@ export default function Contact() {
                         <p className="text-[#3C3C3C]">hello@maellecrescence.com</p>
                       </div>
 
-                      {/* <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative">
-                        <h3 className="font-bold text-lg text-[#2D2D2D] mb-2 flex items-center">
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                            />
-                          </svg>
-                          Phone
-                        </h3>
-                        <p className="text-[#3C3C3C]">+33 6 12 34 56 78</p>
-                      </div> */}
-
                       <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative">
                         <h3 className="font-bold text-lg text-[#2D2D2D] mb-2 flex items-center">
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -540,7 +525,7 @@ export default function Contact() {
                               d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                             />
                           </svg>
-                          Location
+                          Localisation
                         </h3>
                         <p className="text-[#3C3C3C]">Nice, France</p>
                       </div>
@@ -555,13 +540,13 @@ export default function Contact() {
                               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                           </svg>
-                          Working Hours
+                          Horaires de Travail
                         </h3>
-                        <p className="text-[#3C3C3C]">Very flexible</p>
+                        <p className="text-[#3C3C3C]">Très flexible</p>
                       </div>
                     </div>
 
-                    {/* Interactive map with neobrutalism style */}
+                    {/* Carte interactive avec style néobrutalist */}
                     <div className="relative">
                       <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
                       <div className="relative border-4 border-black rounded-xl overflow-hidden h-[300px] md:h-full">
@@ -610,29 +595,29 @@ export default function Contact() {
 
               {/* FAQ Section */}
               <div className="mt-12 sm:mt-16">
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#2D2D2D] mb-6">Frequently Asked Questions</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#2D2D2D] mb-6">Questions Fréquentes</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     {
-                      question: "What is your typical process?",
+                      question: "Quel est votre processus habituel ?",
                       answer:
-                        "My process typically includes discovery, research, ideation, design, and implementation phases. I believe in collaborative work and keeping clients involved throughout.",
+                        "Mon processus comprend généralement les phases de découverte, recherche, idéation, conception et mise en œuvre. Je crois au travail collaboratif et à l'implication des clients tout au long du projet.",
                     },
                     {
-                      question: "How long does a project take?",
+                      question: "Combien de temps dure un projet ?", 
                       answer:
-                        "Project timelines vary based on scope and complexity. A simple branding project might take 2-3 weeks, while a comprehensive website could take 1-2 months.",
+                        "Les délais des projets varient selon leur portée et leur complexité. Un projet de branding simple peut prendre 2-3 semaines, tandis qu'un site web complet peut prendre 1-2 mois.",
                     },
                     {
-                      question: "Do you work with clients internationally?",
+                      question: "Travaillez-vous avec des clients internationaux ?",
                       answer:
-                        "I work with clients worldwide. Modern tools make remote collaboration seamless and effective.",
+                        "Je travaille avec des clients du monde entier. Les outils modernes rendent la collaboration à distance fluide et efficace.",
                     },
                     {
-                      question: "What are your payment terms?",
+                      question: "Quelles sont vos conditions de paiement ?",
                       answer:
-                        "I typically require a 50% deposit to begin work, with the remaining 50% due upon project completion. For larger projects, we can arrange milestone payments.",
+                        "Je demande généralement un acompte de 50% pour commencer le travail, les 50% restants étant dus à la fin du projet. Pour les projets plus importants, nous pouvons organiser des paiements échelonnés.",
                     },
                   ].map((faq, index) => (
                     <div

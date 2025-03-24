@@ -20,7 +20,7 @@ export default function About() {
         }
         setAboutData(result.data)
       } catch (error) {
-        console.error('Error fetching about data:', error)
+        console.error('Erreur lors de la récupération des données:', error)
       } finally {
         setLoading(false)
       }
@@ -35,10 +35,10 @@ export default function About() {
         <GradientBackground />
         <div className="relative z-30">
           <div className="relative">
-            {/* Loading box with neobrutalist style */}
+            {/* Boîte de chargement avec style néobrutalist */}
             <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
               <div className="flex items-center space-x-4">
-                {/* Animated squares */}
+                {/* Carrés animés */}
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
@@ -63,6 +63,19 @@ export default function About() {
               transform: translateY(-15px);
             }
           }
+
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+          }
+
+          .animate-float {
+            animation: float 8s ease-in-out infinite;
+          }
         `}</style>
       </main>
     )
@@ -72,42 +85,57 @@ export default function About() {
     <main className="relative min-h-screen overflow-hidden">
       <GradientBackground />
 
-      {/* Portfolio content with neobrutalism design */}
+      {/* Icône dans le coin supérieur gauche */}
+      <div className="fixed z-40 top-6 left-6 w-[60px] h-[60px] md:w-[80px] md:h-[80px] animate-float">
+        <Image
+          src="/stars.svg"
+          alt="Étoile décorative"
+          width={80}
+          height={80}
+          className="w-full h-full"
+          style={{
+            filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))",
+            animationDuration: "8s",
+          }}
+        />
+      </div>
+
+      {/* Contenu du portfolio avec design néobrutalist */}
       <div className="relative z-30 flex items-center justify-center min-h-screen py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4">
         <div className="relative w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl bg-[#FFFBF5] border-[4px] sm:border-[6px] md:border-[8px] lg:border-[10px] border-black mx-auto">
-          {/* Corner elements - L-shaped design - responsive sizes */}
+          {/* Éléments de coin - Design en L - tailles responsives */}
           <div className="hidden sm:block absolute -top-[12px] -left-[12px] w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[45px] lg:h-[45px]">
             <div className="absolute top-0 left-0 w-[25px] md:w-[35px] lg:w-[45px] h-[8px] md:h-[12px] lg:h-[15px] bg-black"></div>
             <div className="absolute top-0 left-0 w-[8px] md:w-[12px] lg:w-[15px] h-[25px] md:h-[35px] lg:h-[45px] bg-black"></div>
           </div>
 
-          {/* Top-right corner */}
+          {/* Coin supérieur droit */}
           <div className="hidden sm:block absolute -top-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute top-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute top-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-left corner */}
+          {/* Coin inférieur gauche */}
           <div className="hidden sm:block absolute -bottom-[15px] -left-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 left-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 left-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-right corner */}
+          {/* Coin inférieur droit */}
           <div className="hidden sm:block absolute -bottom-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Content container with better responsive padding */}
+          {/* Conteneur de contenu avec meilleur padding responsive */}
           <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-            {/* Navigation - improved mobile layout */}
+            {/* Navigation - mise en page mobile améliorée */}
             <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
-                {/* Empty for now */}
+                {/* Vide pour l'instant */}
               </div>
 
-              {/* Mobile menu button - better positioning */}
+              {/* Bouton menu mobile - meilleur positionnement */}
               <button
                 className="sm:hidden fixed top-4 right-4 p-2 z-50 bg-white/80 backdrop-blur-sm rounded-md border-2 border-black"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -121,7 +149,7 @@ export default function About() {
                 </svg>
               </button>
 
-              {/* Navigation links - improved mobile menu */}
+              {/* Liens de navigation - menu mobile amélioré */}
               <div
                 className={`
                 ${menuOpen ? "flex fixed inset-0 bg-white/95 z-40" : "hidden"} 
@@ -133,12 +161,12 @@ export default function About() {
                 w-full sm:w-auto
               `}
               >
-                <Link href="/" className="hover:underline font-medium">Home</Link>
+                <Link href="/" className="hover:underline">Accueil</Link>
                 <Link href="/about" className="hover:underline font-medium">
-                  About
+                  À propos
                 </Link>
                 <Link href="/work" className="hover:underline">
-                  Work
+                  Travaux
                 </Link>
                 <Link href="/services" className="hover:underline">
                   Services
@@ -147,11 +175,11 @@ export default function About() {
                   Contact
                 </Link>
 
-                {/* Resume button - responsive sizing */}
+                {/* Bouton CV - taille responsive */}
                 <div className="relative inline-block mt-4 sm:mt-0">
                   <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
                   <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
-                    Resume
+                    CV
                     <svg
                       className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
                       viewBox="0 0 24 24"
@@ -171,23 +199,23 @@ export default function About() {
               </div>
             </nav>
 
-            {/* About page content */}
+            {/* Contenu de la page À propos */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 md:gap-10">
-              {/* About page title with decorative element */}
+              {/* Titre de la page avec élément décoratif */}
               <div className="md:col-span-12 mb-2 sm:mb-4">
                 <div className="relative">
                   <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
-                      About me
+                      À propos de moi
                     </div>
                   </div>
                   <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] leading-[0.9] font-black text-[#2D2D2D] tracking-tighter font-family-clash">
-                    My Story
+                    Mon Histoire
                   </h1>
                 </div>
               </div>
 
-              {/* Profile image with neobrutalism style */}
+              {/* Image de profil avec style néobrutalist */}
               <div className="md:col-span-5 flex items-center justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl"></div>
@@ -201,8 +229,8 @@ export default function About() {
                       priority
                     />
 
-                    {/* Decorative elements */}
-                    <div className="absolute -bottom-4 -right-4 w-[80px] h-[80px]">
+                    {/* Éléments décoratifs */}
+                    <div className="absolute -top-1 -left-1 w-[80px] h-[80px]">
                       <Image
                         src="/effect3.svg"
                         alt=""
@@ -219,25 +247,24 @@ export default function About() {
                 </div>
               </div>
 
-              {/* About text content */}
+              {/* Contenu texte À propos */}
               <div className="md:col-span-7">
                 <div className="space-y-4 sm:space-y-5 md:space-y-6">
                   <p className="text-lg sm:text-xl font-medium text-[#3C3C3C]">
-                    Hi there! I&apos;m <span className="text-[#f67a45] font-bold">Maelle Crescence</span>, a passionate
-                    designer with a love for creating meaningful visual experiences.
+                    Salut ! Je suis <span className="text-[#f67a45] font-bold">Maelle Crescence</span>, une designer passionnée
+                    par la création d'expériences visuelles significatives.
                   </p>
 
                   <p className="text-base sm:text-lg text-[#3C3C3C]">
-                    With over 5 years of experience in the design industry, I&apos;ve had the pleasure of working with brands
-                    across various sectors, helping them communicate their vision through thoughtful and impactful
-                    design.
+                    Avec plus de 5 ans d'expérience dans l'industrie du design, j'ai eu le plaisir de travailler avec des marques
+                    dans divers secteurs, les aidant à communiquer leur vision à travers un design réfléchi et impactant.
                   </p>
 
-                  {/* My Approach */}
+                  {/* Mon Approche */}
                   {aboutData?.myApproach && (
                     <div className="bg-[#FFE8DD] border-2 border-black p-4 sm:p-5 rounded-lg relative">
                       <div className="absolute -top-3 -left-3 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs sm:text-sm">
-                        My approach
+                        Mon approche
                       </div>
                       <p className="text-base sm:text-lg text-[#3C3C3C] mt-2">
                         {aboutData.myApproach}
@@ -245,11 +272,11 @@ export default function About() {
                     </div>
                   )}
 
-                  {/* Education */}
+                  {/* Formation */}
                   {aboutData?.education && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                       <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
-                        <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Education</h3>
+                        <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Formation</h3>
                         <p className="text-sm sm:text-base text-[#3C3C3C]">
                           {aboutData.education.degree}<br />
                           {aboutData.education.school}<br />
@@ -259,10 +286,10 @@ export default function About() {
                     </div>
                   )}
 
-                  {/* Skills */}
+                  {/* Compétences */}
                   {aboutData?.skills?.length > 0 && (
                     <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
-                      <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Skills</h3>
+                      <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Compétences</h3>
                       <div className="flex flex-wrap gap-2">
                         {aboutData.skills.map((skill: string, index: number) => (
                           <span 
@@ -277,13 +304,13 @@ export default function About() {
                   )}
                 </div>
 
-                {/* Call to action */}
+                {/* Appel à l'action */}
                 <div className="mt-8 sm:mt-10">
                   <Link href="/contact" className="inline-block">
                     <div className="relative">
                       <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md"></div>
                       <button className="relative bg-[#f67a45] text-white border-2 border-black px-5 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold flex items-center justify-center rounded-md">
-                        Let&apos;s work together
+                        Travaillons ensemble
                         <svg
                           className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
                           fill="none"
@@ -298,9 +325,9 @@ export default function About() {
                 </div>
               </div>
 
-              {/* Fun facts section */}
+              {/* Section Faits Amusants */}
               <div className="md:col-span-12 mt-8 sm:mt-10">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4 sm:mb-6">Fun Facts</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4 sm:mb-6">Faits Amusants</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative overflow-hidden">
@@ -313,9 +340,9 @@ export default function About() {
                         className="w-full h-full"
                       />
                     </div>
-                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Coffee Enthusiast</h3>
+                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Passionnée de Café</h3>
                     <p className="text-sm sm:text-base text-[#3C3C3C]">
-                      I&apos;ve tried over 100 different coffee beans from around the world.
+                      J'ai goûté plus de 100 variétés de café du monde entier.
                     </p>
                   </div>
 
@@ -329,9 +356,9 @@ export default function About() {
                         className="w-full h-full"
                       />
                     </div>
-                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Amateur Botanist</h3>
+                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Botaniste Amateur</h3>
                     <p className="text-sm sm:text-base text-[#3C3C3C]">
-                      My apartment is home to more than 30 different plant species.
+                      Mon appartement abrite plus de 30 espèces de plantes différentes.
                     </p>
                   </div>
 
@@ -345,9 +372,9 @@ export default function About() {
                         className="w-full h-full"
                       />
                     </div>
-                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Weekend Hiker</h3>
+                    <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">Randonneuse du Weekend</h3>
                     <p className="text-sm sm:text-base text-[#3C3C3C]">
-                      I find inspiration in nature and try to hike a new trail every month.
+                      Je trouve l'inspiration dans la nature et essaie de découvrir un nouveau sentier chaque mois.
                     </p>
                   </div>
                 </div>
@@ -359,4 +386,3 @@ export default function About() {
     </main>
   )
 }
-

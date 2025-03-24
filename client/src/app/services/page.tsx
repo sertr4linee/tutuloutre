@@ -5,6 +5,47 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { motion, useAnimation, useInView } from "framer-motion"
 import Image from "next/image"
+import confetti from 'canvas-confetti'
+import { useRouter } from 'next/navigation'
+
+const steps = [
+  {
+    number: 1,
+    title: "Découverte",
+    description: "Comprendre vos besoins et objectifs",
+    color: "#ff6b57",
+    icon: "/icons/discovery.svg"
+  },
+  {
+    number: 2,
+    title: "Recherche",
+    description: "Analyse du marché et des tendances",
+    color: "#E9B949",
+    icon: "/icons/research.svg"
+  },
+  {
+    number: 3,
+    title: "Conception",
+    description: "Création de concepts et d'ébauches",
+    color: "#f67a45",
+    icon: "/icons/design.svg"
+  },
+  {
+    number: 4,
+    title: "Affinage",
+    description: "Itérations et perfectionnement du design",
+    color: "#4CAF50",
+    icon: "/icons/refine.svg"
+  },
+  {
+    number: 5,
+    title: "Livraison",
+    description: "Finalisation et remise des livrables",
+    color: "#2196F3",
+    icon: "/icons/delivery.svg"
+  }
+]
+
 export default function Services() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeService, setActiveService] = useState<number | null>(null)
@@ -16,23 +57,30 @@ export default function Services() {
   const intersectionRef = useRef(null)
   const isInView = useInView(intersectionRef, { once: true })
   const mainControls = useAnimation()
+  const [activeStep, setActiveStep] = useState<number | null>(null)
+  const [isProcessVisible, setIsProcessVisible] = useState(false)
+  const router = useRouter()
+  const [animatingStep, setAnimatingStep] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // setIsIntersecting(entry.isIntersecting)
+        if (entry.isIntersecting) {
+          setIsProcessVisible(true)
+        }
       },
-      { threshold: 0.5 },
+      { threshold: 0.2 }
     )
 
-    const currentRef = intersectionRef.current
-    if (currentRef) {
-      observer.observe(currentRef)
+    const element = document.getElementById('work-process')
+    if (element) {
+      observer.observe(element)
     }
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
+      if (element) {
+        observer.unobserve(element)
       }
     }
   }, [])
@@ -74,14 +122,6 @@ export default function Services() {
     },
   ]
 
-  const workProcess = [
-    { id: 1, title: "Découverte", description: "Comprendre vos besoins et objectifs" },
-    { id: 2, title: "Recherche", description: "Analyse du marché et des tendances" },
-    { id: 3, title: "Conception", description: "Création de concepts et d'ébauches" },
-    { id: 4, title: "Affinage", description: "Itérations et perfectionnement du design" },
-    { id: 5, title: "Livraison", description: "Finalisation et remise des livrables" },
-  ]
-
   const testimonials = [
     {
       id: 1,
@@ -117,7 +157,7 @@ export default function Services() {
   }
 
   const nextGameStep = () => {
-    if (currentGameStep < workProcess.length - 1) {
+    if (currentGameStep < steps.length - 1) {
       setCurrentGameStep((prev) => prev + 1)
     } else {
       setIsGameStarted(false)
@@ -129,6 +169,45 @@ export default function Services() {
     setEasterEggFound(true)
     setTimeout(() => setEasterEggFound(false), 3000)
   }
+
+  const handleStartProject = () => {
+    // Lance l'effet de confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#f67a45', '#E9B949', '#4CAF50', '#2196F3', '#ff6b57']
+    });
+
+    // Redirection après un court délai
+    setTimeout(() => {
+      router.push('/contact');
+    }, 800);
+  };
+
+  const animateProcess = async () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    // Animer chaque étape séquentiellement
+    for (let i = 1; i <= steps.length; i++) {
+      setAnimatingStep(i);
+      // Attendre 1 seconde avant de passer à l'étape suivante
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Animation finale avec confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#f67a45', '#E9B949', '#4CAF50', '#2196F3', '#ff6b57']
+    });
+    
+    // Réinitialiser l'animation
+    setAnimatingStep(null);
+    setIsAnimating(false);
+  };
 
   return (
     <main className="relative min-h-screen overflow-x-hidden">
@@ -353,7 +432,8 @@ export default function Services() {
                 <Link href="/contact" className="inline-block">
                   <div className="relative">
                     <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md"></div>
-                    <button className="relative bg-[#f67a45] text-white border-2 border-black px-6 py-3 text-lg font-semibold flex items-center justify-center rounded-md">
+                    
+                    <button className="relative bg-[#f67a45] text-white border-2 border-black px-6 py-3 text-lg font-semibold flex items-center justify-center rounded-md transition-all transform hover:-translate-y-1">
                       Obtenir un devis personnalisé
                       <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -364,71 +444,213 @@ export default function Services() {
               </motion.div>
             </div>
 
-            {/* Gamified Work Process */}
-            <div className="mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Découvrez mon processus de travail</h2>
-              {!isGameStarted ? (
-                <motion.div 
-                  className="text-center"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <button 
-                    onClick={startGame}
-                    className="bg-[#E9B949] text-black font-bold px-6 py-3 rounded-full border-3 border-black text-lg hover:bg-[#f67a45] hover:text-white transition-colors"
-                  >
-                    Commencer l'aventure créative
-                  </button>
-                </motion.div>
-              ) : (
-                <div className="relative">
-                  <div className="absolute left-8 top-0 bottom-0 w-1 bg-black"></div>
-                  {workProcess.map((step, index) => (
-                    <motion.div 
-                      key={step.id} 
-                      className={`relative flex items-center mb-8 ${index > currentGameStep ? 'opacity-50' : ''}`}
-                      initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.2 }}
-                    >
-                      <div 
-                        className={`w-16 h-16 rounded-full border-3 border-black flex items-center justify-center text-xl font-bold z-10 transition-all ${
-                          index === currentGameStep ? 'bg-[#f67a45] text-white scale-110' : 'bg-white'
-                        }`}
-                      >
-                        {step.id}
-                      </div>
-                      <div className="ml-6">
-                        <h3 className="text-lg font-bold">{step.title}</h3>
-                        <p className="text-[#3C3C3C]">{step.description}</p>
-                      </div>
-                      {index < workProcess.length - 1 && (
-                        <div className="absolute left-8 top-16 bottom-0 w-1 bg-black"></div>
-                      )}
-                    </motion.div>
-                  ))}
-                  {currentGameStep < workProcess.length - 1 ? (
-                    <motion.button 
-                      onClick={nextGameStep}
-                      className="ml-24 bg-[#E9B949] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm hover:bg-[#f67a45] hover:text-white transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Étape suivante
-                    </motion.button>
-                  ) : (
-                    <motion.div 
-                      className="ml-24 text-lg font-bold text-[#f67a45]"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      Félicitations ! Vous avez terminé le processus créatif !
-                    </motion.div>
-                  )}
+            {/* Work Process Section */}
+            <section id="work-process" className="w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl mx-auto mb-16">
+              <div className="relative">
+                <div className="absolute -top-6 left-4 transform rotate-2 z-10">
+                  <div className="bg-[#f67a45] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
+                    Mon processus
+                  </div>
                 </div>
-              )}
-            </div>
+
+                <div className="relative border-4 sm:border-6 border-black bg-white p-4 sm:p-6 md:p-8 rounded-xl">
+                  <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
+
+                  <motion.div
+                    initial="hidden"
+                    animate={isProcessVisible ? "visible" : "hidden"}
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: {
+                        opacity: 1,
+                        transition: {
+                          staggerChildren: 0.3
+                        }
+                      }
+                    }}
+                    className="max-w-4xl mx-auto"
+                  >
+                    <motion.h2
+                      variants={{
+                        hidden: { y: 20, opacity: 0 },
+                        visible: {
+                          y: 0,
+                          opacity: 1,
+                          transition: {
+                            duration: 0.5,
+                            ease: "easeOut"
+                          }
+                        }
+                      }}
+                      className="text-2xl md:text-3xl font-bold text-center mb-8 relative"
+                    >
+                      <span className="relative inline-block">
+                        Découvrez mon processus de travail
+                        <motion.div
+                          className="absolute -bottom-2 left-0 w-full h-1 bg-[#f67a45]"
+                          initial={{ scaleX: 0 }}
+                          animate={isProcessVisible ? { scaleX: 1 } : { scaleX: 0 }}
+                          transition={{ duration: 0.8, delay: 0.5 }}
+                        />
+                      </span>
+                    </motion.h2>
+
+                    <div className="relative">
+                      {/* Ligne verticale connectant les étapes */}
+                      <motion.div
+                        className="absolute left-[35px] md:left-[100px] top-0 w-1 h-full bg-black"
+                        variants={{
+                          hidden: { scaleY: 0 },
+                          visible: {
+                            scaleY: 1,
+                            transition: {
+                              duration: 0.8,
+                              ease: "easeInOut"
+                            }
+                          }
+                        }}
+                        style={{ originY: 0 }}
+                      />
+
+                      {/* Étapes */}
+                      {steps.map((step, index) => (
+                        <motion.div
+                          key={step.number}
+                          variants={{
+                            hidden: { y: 20, opacity: 0 },
+                            visible: {
+                              y: 0,
+                              opacity: 1,
+                              transition: {
+                                duration: 0.5,
+                                ease: "easeOut"
+                              }
+                            }
+                          }}
+                          className="relative mb-6 last:mb-0"
+                          onHoverStart={() => setActiveStep(step.number)}
+                          onHoverEnd={() => setActiveStep(null)}
+                        >
+                          <div className="flex items-start gap-4 md:gap-8">
+                            <motion.div
+                              className="relative z-10 w-[70px] h-[70px] md:w-[80px] md:h-[80px] rounded-full border-4 border-black bg-white flex items-center justify-center"
+                              animate={{
+                                scale: animatingStep === step.number ? [1, 1.2, 1] : 1,
+                                backgroundColor: animatingStep === step.number || activeStep === step.number ? step.color : 'white'
+                              }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              <span className="text-2xl md:text-3xl font-bold">{step.number}</span>
+                              <motion.div
+                                className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-[#f67a45] border-2 border-black"
+                                animate={{
+                                  scale: animatingStep === step.number || activeStep === step.number ? [1, 1.2, 1] : 1
+                                }}
+                                transition={{ duration: 0.5, repeat: animatingStep === step.number ? Infinity : 0 }}
+                              />
+                            </motion.div>
+
+                            <div className="flex-1">
+                              <motion.h3
+                                className="text-lg md:text-xl font-bold mb-1"
+                                animate={{
+                                  color: animatingStep === step.number || activeStep === step.number ? step.color : '#000',
+                                  x: animatingStep === step.number ? [0, 20, 0] : 0,
+                                  scale: animatingStep === step.number ? [1, 1.05, 1] : 1
+                                }}
+                                transition={{
+                                  duration: 0.8,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                {step.title}
+                              </motion.h3>
+                              <motion.p
+                                className="text-gray-600 text-sm md:text-base"
+                                animate={{
+                                  opacity: animatingStep === step.number || activeStep === step.number ? 1 : 0.8,
+                                  x: animatingStep === step.number ? [0, 15, 0] : 0
+                                }}
+                                transition={{
+                                  duration: 0.8,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                {step.description}
+                              </motion.p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Bouton d'action */}
+                    <motion.div
+                      variants={{
+                        hidden: { y: 20, opacity: 0 },
+                        visible: {
+                          y: 0,
+                          opacity: 1,
+                          transition: {
+                            duration: 0.5,
+                            ease: "easeOut"
+                          }
+                        }
+                      }}
+                      className="mt-8 text-center"
+                    >
+                      <motion.button
+                        className="relative inline-block group"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={animateProcess}
+                        disabled={isAnimating}
+                      >
+                        <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-full transition-transform group-hover:translate-x-3 group-hover:translate-y-3" />
+                        <motion.div 
+                          className="relative px-8 py-3 bg-[#f67a45] text-white rounded-full border-2 border-black font-bold"
+                          whileHover={{
+                            backgroundColor: "#ff8562",
+                            transition: { duration: 0.2 }
+                          }}
+                          whileTap={{
+                            scale: 0.95,
+                            backgroundColor: "#e56940"
+                          }}
+                        >
+                          <span className="relative z-10 flex items-center">
+                            {isAnimating ? "En cours..." : "Processus"}
+                            <motion.svg 
+                              className="w-5 h-5 ml-2" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                              initial={{ rotate: 0 }}
+                              animate={{ 
+                                rotate: isAnimating ? 360 : 0,
+                                x: isAnimating ? [0, 5, 0] : 0
+                              }}
+                              transition={{ 
+                                duration: isAnimating ? 2 : 1,
+                                repeat: isAnimating ? Infinity : 0,
+                                ease: "linear"
+                              }}
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" 
+                              />
+                            </motion.svg>
+                          </span>
+                        </motion.div>
+                      </motion.button>
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </div>
+            </section>
 
             {/* Dynamic Testimonials Carousel */}
             <div className="mb-16">
@@ -443,9 +665,10 @@ export default function Services() {
                     <div key={`${testimonial.id}-${index}`} className="flex-none w-80 mx-4">
                       <motion.div 
                         className="relative group"
-                        whileHover={{ y: -10 }}
+                        whileHover={{ y: -5 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
-                        <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
+                        <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
                         <div className="relative border-3 border-black rounded-xl p-6 bg-white">
                           <div className="flex items-center mb-4">
                             <Image  
