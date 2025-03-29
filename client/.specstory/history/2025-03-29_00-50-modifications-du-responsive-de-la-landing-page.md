@@ -672,6 +672,45 @@ _**Assistant**_
 
 ---
 
+I'll update the code to keep the "@une_mome" badge visible only on the landing page and not in the mobile menu:
+
+---
+
+```diff
+            {/* Bannière du bas - taille et positionnement responsifs */}
+            <div 
+-             className="absolute -bottom-[35px] sm:-bottom-[20px] md:-bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-40 w-[220px] sm:w-[220px] md:w-[280px] lg:w-[350px] h-[42px] sm:h-[45px] md:h-[55px] lg:h-[65px]"
++             className={`absolute -bottom-[35px] sm:-bottom-[20px] md:-bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-40 w-[220px] sm:w-[220px] md:w-[280px] lg:w-[350px] h-[42px] sm:h-[45px] md:h-[55px] lg:h-[65px] ${menuOpen ? 'hidden sm:flex' : 'flex'}`}
+              style={{
+                transform: "rotate(4.65deg)",
+```
+
+---
+
+I've updated the "@une_mome" badge so it disappears when the mobile menu is open. Here's what I changed:
+
+1. Added conditional rendering to the badge's className using a template literal
+2. When `menuOpen` is true, the badge gets the class `hidden sm:flex`, which means:
+   - `hidden`: It will be hidden on mobile/small screens
+   - `sm:flex`: It will still be visible on larger screens (sm breakpoint and above)
+3. When `menuOpen` is false, the badge gets the class `flex` and appears normally on all screen sizes
+
+This way, the badge will only be visible on the landing page in mobile view and won't show up when you open the mobile menu, while still remaining visible in desktop view at all times.
+
+---
+
+_**User**_
+
+@page.tsx fix l'ux de cette page en responsive c chiant a scroll 
+
+---
+
+_**Assistant**_
+
+
+
+---
+
 
 
 ---
