@@ -4,10 +4,19 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Upload } from 'lucide-react'
-import { getSchoolProject, createSchoolProject, updateSchoolProject, uploadProjectImage } from '@/app/actions'
+import { Upload, X, ArrowUp, ArrowDown, Edit, Trash } from 'lucide-react'
+import { 
+  getSchoolProject, 
+  createSchoolProject, 
+  updateSchoolProject, 
+  uploadProjectImage,
+  addProjectImage,
+  updateProjectImage,
+  deleteProjectImage,
+  reorderProjectImages
+} from '@/app/actions'
 import GradientBackground from '@/components/ui/background'
-import type { SchoolProject } from '@/app/actions'
+import type { SchoolProject, ProjectImage } from '@/app/actions'
 
 interface Props {
   id: string
@@ -20,50 +29,84 @@ export default function EditProjectClient({ id }: Props) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [project, setProject] = useState<SchoolProject | null>(null)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<SchoolProject, 'id' | 'createdAt' | 'updatedAt' | 'images'>>({
     title: '',
     description: '',
-    year: new Date().getFullYear().toString(),
+    year: '',
     category: '',
-    tags: [] as string[],
-    image: '',
-    objectives: [] as string[],
-    skills: [] as string[],
+    tags: [],
+    image: null,
+    objectives: [''],
+    skills: [''],
     color: '#FFD2BF',
-    featured: false
+    featured: false,
+    slug: ''
   })
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [galleryFile, setGalleryFile] = useState<File | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [newTag, setNewTag] = useState('')
   const [newObjective, setNewObjective] = useState('')
   const [newSkill, setNewSkill] = useState('')
-
-  const [uploading, setUploading] = useState(false)
+  const [newImageCaption, setNewImageCaption] = useState('')
+  const [editingImageId, setEditingImageId] = useState<string | null>(null)
+  const [editingCaption, setEditingCaption] = useState('')
+  const [projectImages, setProjectImages] = useState<ProjectImage[]>([])
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null)
+  const [galleryImagePreview, setGalleryImagePreview] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchProject = async () => {
-      if (!isNew) {
-        const response = await getSchoolProject(id)
-        if (response.data) {
-          setProject(response.data)
-          setFormData({
-            title: response.data.title,
-            description: response.data.description,
-            year: response.data.year,
-            category: response.data.category,
-            tags: response.data.tags,
-            image: response.data.image || '',
-            objectives: response.data.objectives,
-            skills: response.data.skills,
-            color: response.data.color,
-            featured: response.data.featured
-          })
-        }
+    async function fetchProject() {
+      if (id === 'new') {
+        setLoading(false)
+        return
       }
-      setLoading(false)
+
+      try {
+        const response = await getSchoolProject(id)
+        if (response.error) {
+          console.error('Error:', response.error)
+        } else if (response.data) {
+          const { 
+            title, 
+            description, 
+            year, 
+            category, 
+            tags, 
+            image, 
+            objectives, 
+            skills, 
+            color, 
+            featured,
+            slug,
+            images
+          } = response.data
+
+          setFormData({
+            title,
+            description,
+            year,
+            category,
+            tags,
+            image,
+            objectives: objectives.length ? objectives : [''],
+            skills: skills.length ? skills : [''],
+            color,
+            featured,
+            slug
+          })
+          setProjectImages(images || [])
+        }
+      } catch (error) {
+        console.error('Error fetching project:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchProject()
-  }, [isNew, id])
+  }, [id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -159,32 +202,200 @@ export default function EditProjectClient({ id }: Props) {
     })
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0]
+      setSelectedFile(file)
+      
+      // Créer une URL d'aperçu
+      const previewUrl = URL.createObjectURL(file)
+      setMainImagePreview(previewUrl)
+      
+      // Nettoyer l'URL à la fin
+      return () => URL.revokeObjectURL(previewUrl)
+    }
+  }
 
-    setUploading(true)
+  const handleGalleryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0]
+      setGalleryFile(file)
+      
+      // Créer une URL d'aperçu
+      const previewUrl = URL.createObjectURL(file)
+      setGalleryImagePreview(previewUrl)
+      
+      // Nettoyer l'URL à la fin
+      return () => URL.revokeObjectURL(previewUrl)
+    }
+  }
+
+  const handleUploadMainImage = async () => {
+    if (!selectedFile) return
+
+    setSaving(true)
+    const formData = new FormData()
+    formData.append('file', selectedFile)
+    
+    // Pour un nouveau projet, utiliser un ID temporaire
+    formData.append('projectId', id === 'new' ? 'temp-new-project' : id)
+
     try {
-      // Générer un ID temporaire si c'est un nouveau projet
-      const projectId = isNew ? `temp-${Date.now()}` : id
-
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('projectId', projectId)
-
-      const result = await uploadProjectImage(formDataUpload)
-
-      if (result.error) {
-        throw new Error(result.error)
-      }
-
-      if (result.data) {
-        setFormData(prev => ({ ...prev, image: result.data.url }))
+      const response = await uploadProjectImage(formData)
+      if (response.error) {
+        console.error('Error uploading image:', response.error)
+        alert(`Erreur lors de l'upload: ${response.error}`)
+      } else if (response.data) {
+        const url = response.data.url
+        if (url) {
+          setFormData(prev => ({ ...prev, image: url }))
+          setSelectedFile(null)
+          setMainImagePreview(null)
+        }
       }
     } catch (error) {
-      console.error('Error uploading image:', error)
+      console.error('Error uploading file:', error)
+      alert('Une erreur inattendue est survenue')
     } finally {
-      setUploading(false)
+      setSaving(false)
+    }
+  }
+
+  const handleAddProjectImage = async () => {
+    if (!galleryFile) return
+    
+    // Pour un nouveau projet, on ne peut pas ajouter des images avant de l'avoir créé
+    if (id === 'new') {
+      alert('Veuillez d\'abord créer le projet avant d\'ajouter des images à la galerie')
+      return
+    }
+
+    setUploadingImage(true)
+    const imageFormData = new FormData()
+    imageFormData.append('file', galleryFile)
+    imageFormData.append('projectId', id)
+    
+    console.log("Début téléchargement image de galerie", {
+      fileName: galleryFile.name,
+      projectId: id
+    })
+
+    try {
+      // First upload the image file
+      const uploadResponse = await uploadProjectImage(imageFormData)
+      console.log("Réponse upload:", uploadResponse)
+      
+      if (uploadResponse.error) {
+        console.error('Error uploading image:', uploadResponse.error)
+        alert(`Erreur lors du téléchargement: ${uploadResponse.error}`)
+        return
+      }
+
+      if (uploadResponse.data && uploadResponse.data.url) {
+        // Then save it as a project image with caption
+        const imageUrl = uploadResponse.data.url
+        console.log("URL image reçue:", imageUrl)
+        
+        const imageData = {
+          projectId: id,
+          url: imageUrl,
+          caption: newImageCaption || galleryFile.name
+        }
+        console.log("Ajout de l'image au projet avec données:", imageData)
+        
+        const imageResponse = await addProjectImage(imageData)
+        console.log("Réponse ajout image:", imageResponse)
+
+        if (imageResponse.error) {
+          console.error('Error adding project image:', imageResponse.error)
+          alert(`Erreur lors de l'ajout de l'image: ${imageResponse.error}`)
+        } else if (imageResponse.data) {
+          console.log("Image ajoutée avec succès:", imageResponse.data)
+          const newImage = imageResponse.data
+          setProjectImages(prevImages => [...prevImages, newImage])
+          setGalleryFile(null)
+          setGalleryImagePreview(null)
+          setNewImageCaption('')
+          
+          // Réinitialiser l'input file en ciblant l'élément DOM
+          const fileInput = document.getElementById('gallery-file-input') as HTMLInputElement
+          if (fileInput) fileInput.value = ''
+          
+          alert('Image ajoutée avec succès!')
+        }
+      }
+    } catch (error) {
+      console.error('Error handling project image:', error)
+      alert('Une erreur inattendue est survenue')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleMoveImage = async (imageId: string, direction: 'up' | 'down') => {
+    const index = projectImages.findIndex(img => img.id === imageId)
+    if (
+      (direction === 'up' && index === 0) || 
+      (direction === 'down' && index === projectImages.length - 1)
+    ) {
+      return
+    }
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1
+    const newImages = [...projectImages]
+    const temp = newImages[index]
+    newImages[index] = newImages[newIndex]
+    newImages[newIndex] = temp
+    setProjectImages(newImages)
+
+    // Update the order in the database
+    const imageIds = newImages.map(img => img.id)
+    await reorderProjectImages(id, imageIds)
+  }
+
+  const handleDeleteImage = async (imageId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+      return
+    }
+
+    try {
+      const response = await deleteProjectImage(imageId)
+      if (response.error) {
+        console.error('Error deleting image:', response.error)
+      } else {
+        setProjectImages(prev => prev.filter(img => img.id !== imageId))
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error)
+    }
+  }
+
+  const handleEditCaption = (imageId: string, currentCaption: string) => {
+    setEditingImageId(imageId)
+    setEditingCaption(currentCaption || '')
+  }
+
+  const handleSaveCaption = async () => {
+    if (!editingImageId) return
+
+    try {
+      const response = await updateProjectImage(editingImageId, {
+        caption: editingCaption
+      })
+
+      if (response.error) {
+        console.error('Error updating caption:', response.error)
+      } else if (response.data) {
+        setProjectImages(prev => prev.map(img => 
+          img.id === editingImageId 
+            ? { ...img, caption: editingCaption }
+            : img
+        ))
+        setEditingImageId(null)
+        setEditingCaption('')
+      }
+    } catch (error) {
+      console.error('Error saving caption:', error)
     }
   }
 
@@ -209,15 +420,18 @@ export default function EditProjectClient({ id }: Props) {
     <main className="relative min-h-screen">
       <GradientBackground />
       <div className="relative z-30 container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="inline-block bg-[#FFD2BF] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm transform -rotate-2 mb-2">
-              Administration
+        <div className="relative border-4 border-black bg-white p-6 rounded-xl mb-12">
+          <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
+          
+          <div className="relative mb-6">
+            <div className="absolute -top-8 left-4 transform rotate-3 z-10">
+              <div className="bg-[#FFD2BF] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm">
+                Administration
+              </div>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start mt-4">
               <h1 className="text-4xl font-bold">
-                {isNew ? 'Nouveau projet' : 'Modifier le projet'}
+                {id === 'new' ? 'Nouveau projet' : 'Modifier le projet'}
               </h1>
               <Link
                 href="/admin/projects"
@@ -225,17 +439,20 @@ export default function EditProjectClient({ id }: Props) {
               >
                 <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-xl transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
                 <div className="relative px-4 py-2 bg-white border-2 border-black rounded-xl font-medium inline-flex items-center space-x-2 transition-transform group-hover:-translate-y-0.5">
-                  <span className="text-xl">←</span>
                   <span>Retour</span>
                 </div>
               </Link>
             </div>
           </div>
 
-          {/* Form */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
-            <form onSubmit={handleSubmit} className="relative border-4 border-black bg-white p-6 rounded-xl space-y-6">
+          {loading ? (
+            <div className="animate-pulse">
+              <div className="h-12 bg-gray-200 rounded mb-6"></div>
+              <div className="h-32 bg-gray-200 rounded mb-6"></div>
+              <div className="h-12 bg-gray-200 rounded mb-6"></div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
                 <h2 className="text-xl font-bold">Informations de base</h2>
@@ -285,67 +502,48 @@ export default function EditProjectClient({ id }: Props) {
                   </div>
                 </div>
 
+                {/* Slug Field */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Image du projet</label>
-                  <div className="flex items-center gap-4">
-                    {formData.image ? (
-                      <div className="relative w-40 h-24">
-                        <Image
-                          src={formData.image}
-                          alt="Project image"
-                          width={160}
-                          height={90}
-                          className="w-full h-full object-cover rounded-lg border-2 border-black"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center w-40 h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black">
-                        {uploading ? (
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
-                        ) : (
-                          <>
-                            <Upload className="w-6 h-6 mb-1" />
-                            <span className="text-sm">Upload image</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          disabled={uploading}
-                        />
-                      </label>
-                    )}
-                  </div>
+                  <label className="block mb-2 font-medium">
+                    Slug (URL)
+                  </label>
+                  <input
+                    type="text"
+                    name="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    className="w-full p-3 border-2 border-black rounded-md"
+                    placeholder="slug-du-projet"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Laissez vide pour générer automatiquement
+                  </p>
+                  {errors.slug && (
+                    <p className="text-red-600 text-sm mt-1">{errors.slug}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Tags */}
+              {/* Tags Field */}
               <div>
-                <h2 className="text-xl font-bold mb-4">Tags</h2>
-                <div className="flex flex-wrap gap-2 mb-3">
+                <label className="block mb-2 font-medium">
+                  Tags
+                </label>
+                <div className="flex flex-wrap gap-2 mb-4">
                   {formData.tags.map((tag, index) => (
-                    <span
+                    <div 
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full border-2 border-black bg-[#FFE8DD]"
+                      className="bg-gray-100 px-3 py-1 rounded-full border border-black flex items-center gap-1"
                     >
-                      {tag}
-                      <button
+                      <span>{tag}</span>
+                      <button 
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-2 text-black hover:text-red-500"
+                        className="text-black hover:text-red-500"
                       >
-                        ×
+                        <X size={14} />
                       </button>
-                    </span>
+                    </div>
                   ))}
                 </div>
                 <div className="flex gap-2">
@@ -353,36 +551,47 @@ export default function EditProjectClient({ id }: Props) {
                     type="text"
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="Ajouter un tag"
-                    className="flex-1 px-3 py-2 border-2 border-black rounded-lg"
+                    className="flex-1 p-2 border-2 border-black rounded-md"
                   />
                   <button
                     type="button"
                     onClick={addTag}
-                    className="px-3 py-2 bg-white border-2 border-black rounded-lg hover:shadow-none transition-shadow"
+                    className="bg-[#f67a45] text-white border-2 border-black rounded-md px-4 py-2 text-sm font-medium"
                   >
-                    +
+                    Ajouter
                   </button>
                 </div>
               </div>
 
-              {/* Objectives */}
+              {/* Objectives Field */}
               <div>
-                <h2 className="text-xl font-bold mb-4">Objectifs</h2>
-                <div className="space-y-2 mb-3">
+                <label className="block mb-2 font-medium">
+                  Objectifs du projet
+                </label>
+                <div className="space-y-2 mb-4">
                   {formData.objectives.map((objective, index) => (
-                    <div
+                    <div 
                       key={index}
-                      className="flex items-center justify-between p-2 border-2 border-black rounded-lg bg-white"
+                      className="flex items-center gap-2"
                     >
-                      {objective}
-                      <button
+                      <input
+                        type="text"
+                        value={objective}
+                        onChange={(e) => {
+                          const newObjectives = [...formData.objectives];
+                          newObjectives[index] = e.target.value;
+                          setFormData({ ...formData, objectives: newObjectives });
+                        }}
+                        className="flex-1 p-2 border-2 border-black rounded-md"
+                      />
+                      <button 
                         type="button"
                         onClick={() => removeObjective(objective)}
-                        className="text-black hover:text-red-500"
+                        className="text-red-500 hover:text-red-700"
                       >
-                        ×
+                        <X size={18} />
                       </button>
                     </div>
                   ))}
@@ -392,36 +601,47 @@ export default function EditProjectClient({ id }: Props) {
                     type="text"
                     value={newObjective}
                     onChange={(e) => setNewObjective(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
-                    placeholder="Ajouter un objectif"
-                    className="flex-1 px-3 py-2 border-2 border-black rounded-lg"
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
+                    placeholder="Nouvel objectif"
+                    className="flex-1 p-2 border-2 border-black rounded-md"
                   />
                   <button
                     type="button"
                     onClick={addObjective}
-                    className="px-3 py-2 bg-white border-2 border-black rounded-lg hover:shadow-none transition-shadow"
+                    className="bg-[#f67a45] text-white border-2 border-black rounded-md px-4 py-2 text-sm font-medium"
                   >
-                    +
+                    Ajouter
                   </button>
                 </div>
               </div>
 
-              {/* Skills */}
+              {/* Skills Field */}
               <div>
-                <h2 className="text-xl font-bold mb-4">Compétences</h2>
-                <div className="space-y-2 mb-3">
+                <label className="block mb-2 font-medium">
+                  Compétences développées
+                </label>
+                <div className="space-y-2 mb-4">
                   {formData.skills.map((skill, index) => (
-                    <div
+                    <div 
                       key={index}
-                      className="flex items-center justify-between p-2 border-2 border-black rounded-lg bg-white"
+                      className="flex items-center gap-2"
                     >
-                      {skill}
-                      <button
+                      <input
+                        type="text"
+                        value={skill}
+                        onChange={(e) => {
+                          const newSkills = [...formData.skills];
+                          newSkills[index] = e.target.value;
+                          setFormData({ ...formData, skills: newSkills });
+                        }}
+                        className="flex-1 p-2 border-2 border-black rounded-md"
+                      />
+                      <button 
                         type="button"
                         onClick={() => removeSkill(skill)}
-                        className="text-black hover:text-red-500"
+                        className="text-red-500 hover:text-red-700"
                       >
-                        ×
+                        <X size={18} />
                       </button>
                     </div>
                   ))}
@@ -431,59 +651,207 @@ export default function EditProjectClient({ id }: Props) {
                     type="text"
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                    placeholder="Ajouter une compétence"
-                    className="flex-1 px-3 py-2 border-2 border-black rounded-lg"
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                    placeholder="Nouvelle compétence"
+                    className="flex-1 p-2 border-2 border-black rounded-md"
                   />
                   <button
                     type="button"
                     onClick={addSkill}
-                    className="px-3 py-2 bg-white border-2 border-black rounded-lg hover:shadow-none transition-shadow"
+                    className="bg-[#f67a45] text-white border-2 border-black rounded-md px-4 py-2 text-sm font-medium"
                   >
-                    +
+                    Ajouter
                   </button>
                 </div>
               </div>
 
-              {/* Style */}
+              {/* Color Picker */}
               <div>
-                <h2 className="text-xl font-bold mb-4">Style</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Couleur</label>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="color"
-                        value={formData.color}
-                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="h-10 w-20 border-2 border-black rounded"
-                      />
-                      <input
-                        type="text"
-                        value={formData.color}
-                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="flex-1 px-3 py-2 border-2 border-black rounded-lg"
-                      />
-                    </div>
-                  </div>
+                <label className="block mb-2 font-medium">
+                  Couleur du projet
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="color"
+                    value={formData.color}
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    className="w-12 h-12 border-2 border-black rounded-md cursor-pointer"
+                  />
+                  <span className="text-sm">
+                    Cette couleur sera utilisée pour les accents visuels sur la page du projet
+                  </span>
+                </div>
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Mise en avant</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.featured}
-                        onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                        className="sr-only peer"
+              {/* Featured Project Toggle */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.featured}
+                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                    className="w-5 h-5 border-2 border-black rounded accent-[#f67a45]"
+                  />
+                  <span className="font-medium">Projet mis en avant</span>
+                </label>
+                <p className="text-sm text-gray-500 mt-1">
+                  Les projets mis en avant apparaîtront en premier sur la page des travaux
+                </p>
+              </div>
+
+              {/* Main project image */}
+              <div>
+                <label className="block mb-2 font-medium">
+                  Image principale
+                </label>
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="relative border-2 border-black rounded-lg overflow-hidden w-full sm:w-64 h-48">
+                    {mainImagePreview ? (
+                      <Image
+                        src={mainImagePreview}
+                        alt="Image preview"
+                        fill
+                        className="object-cover"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#f67a45]"></div>
-                    </label>
+                    ) : formData.image ? (
+                      <Image
+                        src={formData.image}
+                        alt="Project preview"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <p className="text-gray-400">Aucune image</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="border-2 border-black rounded-md p-4 bg-[#f8f8f8]">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Upload size={18} />
+                        <span className="font-medium">Télécharger une image</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="block w-full text-sm mb-3"
+                      />
+                      {selectedFile && (
+                        <button
+                          type="button"
+                          onClick={handleUploadMainImage}
+                          disabled={saving}
+                          className="bg-[#f67a45] text-white border-2 border-black rounded-md px-4 py-2 text-sm font-medium inline-flex items-center"
+                        >
+                          {saving ? 'Chargement...' : 'Télécharger'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end pt-4">
+              {/* Project Gallery Section avec prévisualisation */}
+              <div>
+                <label className="block mb-4 font-medium text-xl">
+                  Galerie d'images du projet
+                </label>
+                
+                {/* Image uploading section */}
+                <div className="border-2 border-black rounded-md p-4 bg-[#f8f8f8] mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Upload size={18} />
+                    <span className="font-medium">Ajouter une image à la galerie</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <input
+                        id="gallery-file-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleGalleryFileChange}
+                        className="block w-full text-sm mb-3"
+                      />
+                      {galleryImagePreview && (
+                        <div className="relative w-full h-[150px] mt-2 border border-gray-300 rounded-md overflow-hidden">
+                          <Image 
+                            src={galleryImagePreview}
+                            alt="Prévisualisation"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        value={newImageCaption}
+                        onChange={(e) => setNewImageCaption(e.target.value)}
+                        placeholder="Légende de l'image"
+                        className="w-full p-2 border-2 border-black rounded-md"
+                      />
+                    </div>
+                  </div>
+                  
+                  {galleryFile && (
+                    <button
+                      type="button"
+                      onClick={handleAddProjectImage}
+                      disabled={uploadingImage}
+                      className="bg-[#f67a45] text-white border-2 border-black rounded-md px-4 py-2 text-sm font-medium inline-flex items-center"
+                    >
+                      {uploadingImage ? 'Chargement...' : 'Ajouter à la galerie'}
+                    </button>
+                  )}
+                </div>
+                
+                {/* Gallery images list */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {projectImages.map((image, index) => (
+                    <div 
+                      key={image.id} 
+                      className="border-2 border-black rounded-lg overflow-hidden"
+                    >
+                      <div className="aspect-video relative">
+                        <Image
+                          src={image.url}
+                          alt={image.caption || `Image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="p-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">{image.caption || `Image ${index + 1}`}</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleEditCaption(image.id, image.caption || '')}
+                              className="text-sm text-gray-500 hover:text-gray-700"
+                            >
+                              Modifier
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteImage(image.id)}
+                              className="text-sm text-red-500 hover:text-red-700"
+                            >
+                              Supprimer
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bouton de sauvegarde */}
+              <div className="flex justify-end mt-8">
                 <button
                   type="submit"
                   disabled={saving}
@@ -491,29 +859,14 @@ export default function EditProjectClient({ id }: Props) {
                 >
                   <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-xl transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
                   <div className="relative px-6 py-3 bg-[#f67a45] text-white border-2 border-black rounded-xl font-medium inline-flex items-center space-x-2 transition-transform group-hover:-translate-y-0.5">
-                    {saving ? (
-                      <>
-                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span>Enregistrement...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Enregistrer</span>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </>
-                    )}
+                    {saving ? 'Enregistrement...' : 'Enregistrer le projet'}
                   </div>
                 </button>
               </div>
             </form>
-          </div>
+          )}
         </div>
       </div>
     </main>
   )
-} 
+}

@@ -718,6 +718,18 @@ export interface SchoolProject {
   featured: boolean
   createdAt: string
   updatedAt: string
+  slug: string
+  images: ProjectImage[]
+}
+
+export interface ProjectImage {
+  id: string
+  url: string
+  caption: string | null
+  projectId: string
+  order: number
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CreateSchoolProjectInput {
@@ -731,6 +743,7 @@ export interface CreateSchoolProjectInput {
   skills: string[]
   color: string
   featured?: boolean
+  slug?: string
 }
 
 export interface UpdateSchoolProjectInput extends Partial<CreateSchoolProjectInput> {
@@ -799,10 +812,18 @@ export async function deleteSchoolProject(id: string): Promise<ServerActionRespo
   }
 }
 
-export async function getSchoolProject(id: string): Promise<ServerActionResponse<SchoolProject>> {
+export async function getSchoolProject(idOrSlug: string): Promise<ServerActionResponse<SchoolProject>> {
   try {
-    const project = await prisma.schoolProject.findUnique({
-      where: { id }
+    const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(idOrSlug)
+                || /^[0-9a-zA-Z]{25}$/.test(idOrSlug);
+    
+    const project = await prisma.schoolProject.findFirst({
+      where: isUUID ? { id: idOrSlug } : { slug: idOrSlug },
+      include: {
+        images: {
+          orderBy: { order: 'asc' }
+        }
+      }
     })
     
     if (!project) {
@@ -813,7 +834,12 @@ export async function getSchoolProject(id: string): Promise<ServerActionResponse
       data: {
         ...project,
         createdAt: project.createdAt.toISOString(),
-        updatedAt: project.updatedAt.toISOString()
+        updatedAt: project.updatedAt.toISOString(),
+        images: project.images.map(img => ({
+          ...img,
+          createdAt: img.createdAt.toISOString(),
+          updatedAt: img.updatedAt.toISOString()
+        }))
       }
     }
   } catch (error) {
@@ -830,14 +856,25 @@ export async function getSchoolProjects(options?: {
     const projects = await prisma.schoolProject.findMany({
       where: options?.featured !== undefined ? { featured: options.featured } : undefined,
       take: options?.limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: {
+        images: {
+          orderBy: { order: 'asc' },
+          take: 1 // Just get the first image for previews
+        }
+      }
     })
     
     return {
       data: projects.map(project => ({
         ...project,
         createdAt: project.createdAt.toISOString(),
-        updatedAt: project.updatedAt.toISOString()
+        updatedAt: project.updatedAt.toISOString(),
+        images: project.images.map(img => ({
+          ...img,
+          createdAt: img.createdAt.toISOString(),
+          updatedAt: img.updatedAt.toISOString()
+        }))
       }))
     }
   } catch (error) {
@@ -846,25 +883,142 @@ export async function getSchoolProjects(options?: {
   }
 }
 
-export async function uploadProjectImage(formData: FormData) {
+// Project Image Actions
+export interface AddProjectImageInput {
+  projectId: string
+  url: string
+  caption?: string
+  order?: number
+}
+
+export async function addProjectImage(input: AddProjectImageInput): Promise<ServerActionResponse<ProjectImage>> {
+  'use server'
+  try {
+    const image = await prisma.projectImage.create({
+      data: {
+        projectId: input.projectId,
+        url: input.url,
+        caption: input.caption || null,
+        order: input.order !== undefined 
+          ? input.order 
+          : await getNextImageOrder(input.projectId)
+      }
+    })
+    
+    return {
+      data: {
+        ...image,
+        createdAt: image.createdAt.toISOString(),
+        updatedAt: image.updatedAt.toISOString()
+      }
+    }
+  } catch (error) {
+    console.error('Add project image error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to add project image' }
+  }
+}
+
+export async function updateProjectImage(id: string, input: Partial<Omit<AddProjectImageInput, 'projectId'>>): Promise<ServerActionResponse<ProjectImage>> {
+  'use server'
+  try {
+    const image = await prisma.projectImage.update({
+      where: { id },
+      data: input
+    })
+    
+    return {
+      data: {
+        ...image,
+        createdAt: image.createdAt.toISOString(),
+        updatedAt: image.updatedAt.toISOString()
+      }
+    }
+  } catch (error) {
+    console.error('Update project image error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to update project image' }
+  }
+}
+
+export async function deleteProjectImage(id: string): Promise<ServerActionResponse> {
+  'use server'
+  try {
+    await prisma.projectImage.delete({
+      where: { id }
+    })
+    
+    return { message: 'Project image deleted successfully' }
+  } catch (error) {
+    console.error('Delete project image error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to delete project image' }
+  }
+}
+
+export async function reorderProjectImages(projectId: string, imageIds: string[]): Promise<ServerActionResponse> {
+  'use server'
+  try {
+    await Promise.all(
+      imageIds.map((id, index) => 
+        prisma.projectImage.update({
+          where: { id },
+          data: { order: index }
+        })
+      )
+    )
+    
+    return { message: 'Project images reordered successfully' }
+  } catch (error) {
+    console.error('Reorder project images error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to reorder project images' }
+  }
+}
+
+async function getNextImageOrder(projectId: string): Promise<number> {
+  const maxOrder = await prisma.projectImage.aggregate({
+    where: { projectId },
+    _max: { order: true }
+  })
+  
+  return (maxOrder._max.order ?? -1) + 1
+}
+
+export async function uploadProjectImage(formData: FormData): Promise<ServerActionResponse<{ url: string }>> {
+  'use server'
   try {
     const file = formData.get('file') as File;
     const projectId = formData.get('projectId') as string;
-
-    if (!file || !projectId) {
-      throw new Error('Missing required fields');
+    
+    if (!file || !(file instanceof File)) {
+      console.error('File not provided or invalid');
+      return { error: 'File not provided or invalid' };
     }
-
+    
+    console.log('Uploading project image:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      projectId
+    });
+    
+    // Convertir le File en Buffer pour uploadToS3
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
+    // Générer une clé unique pour le fichier
     const key = `projects/${projectId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    
+    // Uploader le fichier et obtenir l'URL
     const url = await uploadToS3(buffer, key, file.type);
     
-    return { data: { url } };
+    console.log('File uploaded successfully to:', url);
+    
+    return { 
+      data: { 
+        url  // URL de l'image réellement téléchargée
+      } 
+    }
   } catch (error) {
-    console.error('Error uploading project image:', error);
-    return { error: 'Failed to upload project image' };
+    console.error('Upload project image error:', error)
+    return { error: error instanceof Error ? error.message : 'Failed to upload project image' }
   }
 }
 

@@ -74,16 +74,27 @@ export default function ProjectsAdminPage() {
             </div>
             <div className="flex justify-between items-start mt-4">
               <h1 className="text-4xl font-bold">Projets</h1>
-              <Link
-                href="/admin/projects/new"
-                className="relative inline-block group"
-              >
-                <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-xl transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
-                <div className="relative px-4 py-2 bg-[#f67a45] text-white border-2 border-black rounded-xl font-medium inline-flex items-center space-x-2 transition-transform group-hover:-translate-y-0.5">
-                  <span className="text-xl">+</span>
-                  <span>Nouveau projet</span>
-                </div>
-              </Link>
+              <div className="flex gap-4">
+                <Link
+                  href="/admin/dashboard"
+                  className="relative inline-block group"
+                >
+                  <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-xl transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
+                  <div className="relative px-4 py-2 bg-[#4a90e2] text-white border-2 border-black rounded-xl font-medium inline-flex items-center space-x-2 transition-transform group-hover:-translate-y-0.5">
+                    <span>Retour au dashboard</span>
+                  </div>
+                </Link>
+                <Link
+                  href="/admin/projects/new"
+                  className="relative inline-block group"
+                >
+                  <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-xl transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
+                  <div className="relative px-4 py-2 bg-[#f67a45] text-white border-2 border-black rounded-xl font-medium inline-flex items-center space-x-2 transition-transform group-hover:-translate-y-0.5">
+                    <span className="text-xl">+</span>
+                    <span>Nouveau projet</span>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
 

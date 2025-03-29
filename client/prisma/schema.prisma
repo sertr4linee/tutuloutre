@@ -78,6 +78,21 @@ model SchoolProject {
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  images      ProjectImage[]
+  slug        String   @unique @default(cuid())
 
   @@map("school_projects")
+}
+
+model ProjectImage {
+  id          String        @id @default(cuid())
+  url         String
+  caption     String?
+  projectId   String
+  project     SchoolProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("project_images")
 } 

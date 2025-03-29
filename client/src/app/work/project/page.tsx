@@ -4,68 +4,56 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import GradientBackground from '@/components/ui/background'
-import { getPublicAlbums } from '@/app/actions'
+import { getSchoolProjects } from '@/app/actions'
 import { motion, AnimatePresence } from 'framer-motion'
+import type { SchoolProject } from '@/app/actions'
 
-interface Album {
-  id: string
-  title: string
-  description: string | null
-  category: string
-  coverImage: string | null
-  imageCount: number
-  previewImage: {
-    id: string
-    url: string
-    caption: string | null
-    order: number
-  }
-  createdAt: string
-  updatedAt: string
-}
-
-export default function GalleryPage() {
-  const [albums, setAlbums] = useState<Album[]>([])
-  const [loading, setLoading] = useState(true)
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<SchoolProject[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [hoveredAlbum, setHoveredAlbum] = useState<string | null>(null)
-  const [showGrid, setShowGrid] = useState(true) // Pour alterner entre grille et liste
+  const [loading, setLoading] = useState(true)
+  const [hoveredProject, setHoveredProject] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState('grid') // 'grid' ou 'list'
 
+  // Récupérer les données des projets
   useEffect(() => {
-    async function fetchAlbums() {
+    async function fetchProjects() {
       try {
-        const result = await getPublicAlbums()
+        const result = await getSchoolProjects()
         if (result.data) {
-          setAlbums(result.data)
+          setProjects(result.data)
         }
       } catch (error) {
-        console.error('Error fetching albums:', error)
+        console.error('Error fetching projects:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchAlbums()
+    fetchProjects()
   }, [])
 
-  const categories = Array.from(new Set(albums.map(album => album.category)))
-  const filteredAlbums = selectedCategory 
-    ? albums.filter(album => album.category === selectedCategory)
-    : albums
+  // Extraire les catégories uniques des projets
+  const categories = Array.from(new Set(projects.map(project => project.category)))
+  
+  // Filtrer les projets par catégorie
+  const filteredProjects = selectedCategory 
+    ? projects.filter(project => project.category === selectedCategory)
+    : projects
 
-  // Couleurs vives pour les catégories
-  const categoryColors = {
-    'Portrait': '#FF5E5B',
-    'Nature': '#4CD964',
-    'Urban': '#5E5CE6',
-    'Architecture': '#FF9500',
-    'Travel': '#BF5AF2',
-    'Fashion': '#FF2D55'
+  // Couleurs pour les différentes catégories
+  const categoryColors: {[key: string]: string} = {
+    'Branding': '#FF5E5B',
+    'Web Design': '#4CD964',
+    'Illustration': '#5E5CE6',
+    'UX/UI': '#FF9500', 
+    'Design': '#BF5AF2',
+    'Graphisme': '#FF2D55'
   }
 
-  // Obtenir une couleur pour une catégorie
+  // Obtenir la couleur d'une catégorie
   const getCategoryColor = (category: string) => {
-    return (categoryColors as Record<string, string>)[category] || '#F67A45'
+    return categoryColors[category] || '#f67a45'
   }
 
   if (loading) {
@@ -115,7 +103,7 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="relative min-h-screen">
+    <main className="relative min-h-screen overflow-x-hidden">
       <GradientBackground />
       
       {/* Éléments décoratifs flottants */}
@@ -143,8 +131,8 @@ export default function GalleryPage() {
           }}
         />
       </div>
-      
-      {/* Hero Section */}
+
+      {/* Contenu principal */}
       <div className="relative z-30 pt-6 sm:pt-12 pb-12 sm:pb-24">
         <div className="relative w-[95%] max-w-7xl mx-auto">
           <motion.div
@@ -185,6 +173,7 @@ export default function GalleryPage() {
               <div className="absolute bottom-0 right-0 w-3 h-full bg-black"></div>
             </div>
             
+            {/* En-tête de la page */}
             <div className="max-w-4xl mx-auto text-center mb-12">
               <motion.div 
                 initial={{ y: -50, opacity: 0 }}
@@ -193,7 +182,7 @@ export default function GalleryPage() {
                 className="relative inline-block mb-8"
               >
                 <div className="bg-[#f67a45] text-black font-bold px-6 py-3 rounded-full border-3 border-black transform rotate-[-3deg] text-xl">
-                  📸 Ma collection
+                  🎨 Mes créations
                 </div>
               </motion.div>
               
@@ -203,7 +192,7 @@ export default function GalleryPage() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
               >
-                Galerie Photo
+                Projets
                 <div className="absolute -bottom-3 left-0 w-full h-2 bg-[#f67a45]"></div>
               </motion.h1>
               
@@ -213,7 +202,7 @@ export default function GalleryPage() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.7, delay: 0.3 }}
               >
-                Découvrez mes collections à travers différents univers
+                Découvrez mes projets d'école et travaux personnels
               </motion.p>
 
               {/* Options d'affichage */}
@@ -224,11 +213,11 @@ export default function GalleryPage() {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <button 
-                  onClick={() => setShowGrid(true)}
-                  className={`relative ${showGrid ? 'opacity-100' : 'opacity-60'} transition-opacity`}
+                  onClick={() => setViewMode('grid')}
+                  className={`relative ${viewMode === 'grid' ? 'opacity-100' : 'opacity-60'} transition-opacity`}
                 >
-                  <div className={`absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md -z-10 ${showGrid ? 'opacity-100' : 'opacity-0'} transition-opacity`}></div>
-                  <div className={`p-2 border-2 border-black rounded-md ${showGrid ? 'bg-[#FFD2BF]' : 'bg-white'}`}>
+                  <div className={`absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md -z-10 ${viewMode === 'grid' ? 'opacity-100' : 'opacity-0'} transition-opacity`}></div>
+                  <div className={`p-2 border-2 border-black rounded-md ${viewMode === 'grid' ? 'bg-[#FFD2BF]' : 'bg-white'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="7" height="7"></rect>
                       <rect x="14" y="3" width="7" height="7"></rect>
@@ -238,11 +227,11 @@ export default function GalleryPage() {
                   </div>
                 </button>
                 <button 
-                  onClick={() => setShowGrid(false)}
-                  className={`relative ${!showGrid ? 'opacity-100' : 'opacity-60'} transition-opacity`}
+                  onClick={() => setViewMode('list')}
+                  className={`relative ${viewMode === 'list' ? 'opacity-100' : 'opacity-60'} transition-opacity`}
                 >
-                  <div className={`absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md -z-10 ${!showGrid ? 'opacity-100' : 'opacity-0'} transition-opacity`}></div>
-                  <div className={`p-2 border-2 border-black rounded-md ${!showGrid ? 'bg-[#FFD2BF]' : 'bg-white'}`}>
+                  <div className={`absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-md -z-10 ${viewMode === 'list' ? 'opacity-100' : 'opacity-0'} transition-opacity`}></div>
+                  <div className={`p-2 border-2 border-black rounded-md ${viewMode === 'list' ? 'bg-[#FFD2BF]' : 'bg-white'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="21" y1="6" x2="3" y2="6"></line>
                       <line x1="21" y1="12" x2="3" y2="12"></line>
@@ -252,7 +241,7 @@ export default function GalleryPage() {
                 </button>
               </motion.div>
 
-              {/* Categories */}
+              {/* Filtres par catégorie */}
               <motion.div 
                 className="flex flex-wrap justify-center gap-3 mb-12"
                 initial={{ y: 30, opacity: 0 }}
@@ -294,9 +283,35 @@ export default function GalleryPage() {
               </motion.div>
             </div>
 
-            {/* Albums Grid or List */}
+            {/* Liste des projets */}
             <AnimatePresence mode="wait">
-              {showGrid ? (
+              {filteredProjects.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-center py-12"
+                >
+                  <div className="relative inline-block mb-8">
+                    <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-full -z-10"></div>
+                    <div className="bg-[#FFD2BF] text-black font-bold px-8 py-4 rounded-full border-3 border-black">
+                      <span className="text-2xl">🔍</span>
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Aucun projet trouvé</h3>
+                  <p className="text-gray-600 mb-8">Essayez une autre catégorie ou revenez plus tard.</p>
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="relative inline-block group"
+                  >
+                    <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-full transition-transform group-hover:translate-x-3 group-hover:translate-y-3 -z-10"></div>
+                    <div className="relative px-6 py-3 bg-[#f67a45] text-white border-2 border-black rounded-full font-medium inline-flex items-center transition-transform group-hover:-translate-y-1">
+                      Voir tous les projets
+                    </div>
+                  </button>
+                </motion.div>
+              ) : viewMode === 'grid' ? (
+                // Vue en grille
                 <motion.div 
                   key="grid"
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -305,91 +320,88 @@ export default function GalleryPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                 >
-                  {filteredAlbums.map((album, index) => (
+                  {filteredProjects.map((project, index) => (
                     <motion.div
-                      key={album.id}
+                      key={project.id}
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      onHoverStart={() => setHoveredAlbum(album.id)}
-                      onHoverEnd={() => setHoveredAlbum(null)}
+                      onHoverStart={() => setHoveredProject(project.id)}
+                      onHoverEnd={() => setHoveredProject(null)}
                       whileHover={{ y: -10 }}
                     >
-                      <Link href={`/work/gallery/${album.id}`}>
+                      <Link href={`/work/project/${project.slug || project.id}`}>
                         <div className="relative cursor-pointer">
                           <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
                           <div className="relative border-3 border-black rounded-xl overflow-hidden bg-white">
                             <div className="relative aspect-[4/3]">
-                              {album.coverImage ? (
+                              {project.image ? (
                                 <Image
-                                  src={album.coverImage}
-                                  alt={album.title}
+                                  src={project.image}
+                                  alt={project.title}
                                   fill
                                   className={`object-cover transition-all duration-500 ${
-                                    hoveredAlbum === album.id ? 'scale-110' : 'scale-100'
+                                    hoveredProject === project.id ? 'scale-110' : 'scale-100'
                                   }`}
                                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 />
                               ) : (
                                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                  <span className="text-gray-400 text-sm">No cover image</span>
+                                  <span className="text-gray-400 text-sm">Pas d'image</span>
                                 </div>
                               )}
                               
                               {/* Overlay avec effet de survol */}
                               <div className={`absolute inset-0 transition-opacity duration-300 ${
-                                hoveredAlbum === album.id ? 'opacity-50' : 'opacity-0'
-                              }`} style={{ 
-                                backgroundColor: getCategoryColor(album.category) 
-                              }} />
+                                hoveredProject === project.id ? 'opacity-50' : 'opacity-0'
+                              }`} style={{ backgroundColor: project.color }} />
                               
-                              {/* Icône de zoom au survol */}
-                              <motion.div
-                                className={`absolute inset-0 flex items-center justify-center ${
-                                  hoveredAlbum === album.id ? 'opacity-100' : 'opacity-0'
-                                } transition-opacity duration-300`}
-                                animate={{
-                                  scale: hoveredAlbum === album.id ? 1 : 0.8,
-                                }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <div className="bg-white p-3 rounded-full border-2 border-black">
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                  </svg>
-                                </div>
-                              </motion.div>
+                              {/* Année du projet */}
+                              <div className="absolute top-4 right-4 px-3 py-1 bg-white rounded-full border-2 border-black text-black text-sm font-bold shadow-brutal-xs">
+                                {project.year}
+                              </div>
                             </div>
                             
                             <div className="p-5">
                               <div className="mb-2">
                                 <span 
                                   className="inline-block px-4 py-1 text-black text-sm font-bold rounded-full border-2 border-black transform -translate-y-8 shadow-brutal-xs"
-                                  style={{ backgroundColor: getCategoryColor(album.category) }}
+                                  style={{ backgroundColor: project.color }}
                                 >
-                                  {album.category}
+                                  {project.category}
                                 </span>
                               </div>
-                              <h2 className="text-2xl font-bold mb-2 line-clamp-1">{album.title}</h2>
-                              {album.description && (
-                                <p className="text-gray-600 text-base line-clamp-2 mb-4">{album.description}</p>
-                              )}
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium">
-                                  {album.imageCount} photos
-                                </span>
-                                <motion.span 
-                                  className="text-[#f67a45] font-bold flex items-center"
-                                  animate={{
-                                    x: hoveredAlbum === album.id ? 5 : 0
-                                  }}
-                                >
-                                  Voir
-                                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                  </svg>
-                                </motion.span>
+                              <h3 className="text-2xl font-bold mb-3 line-clamp-1">{project.title}</h3>
+                              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
+                              
+                              <div className="flex flex-wrap gap-1.5 mb-4">
+                                {project.tags.slice(0, 3).map((tag, index) => (
+                                  <span
+                                    key={index}
+                                    className="px-2 py-1 text-xs rounded-full border border-black"
+                                    style={{ backgroundColor: `${project.color}30` }}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                                {project.tags.length > 3 && (
+                                  <span className="px-2 py-1 bg-gray-100 rounded-full text-xs border border-black">
+                                    +{project.tags.length - 3}
+                                  </span>
+                                )}
                               </div>
+                              
+                              <motion.div 
+                                className="text-[#f67a45] font-bold flex items-center"
+                                animate={{
+                                  x: hoveredProject === project.id ? 5 : 0
+                                }}
+                              >
+                                Voir le projet
+                                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                              </motion.div>
                             </div>
                           </div>
                         </div>
@@ -398,6 +410,7 @@ export default function GalleryPage() {
                   ))}
                 </motion.div>
               ) : (
+                // Vue en liste
                 <motion.div 
                   key="list"
                   className="space-y-6"
@@ -406,60 +419,74 @@ export default function GalleryPage() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                 >
-                  {filteredAlbums.map((album, index) => (
+                  {filteredProjects.map((project, index) => (
                     <motion.div
-                      key={album.id}
+                      key={project.id}
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.07 }}
-                      onHoverStart={() => setHoveredAlbum(album.id)}
-                      onHoverEnd={() => setHoveredAlbum(null)}
+                      onHoverStart={() => setHoveredProject(project.id)}
+                      onHoverEnd={() => setHoveredProject(null)}
                       whileHover={{ x: 10 }}
                     >
-                      <Link href={`/work/gallery/${album.id}`}>
+                      <Link href={`/work/project/${project.slug || project.id}`}>
                         <div className="relative cursor-pointer">
                           <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
                           <div className="relative border-3 border-black rounded-xl overflow-hidden bg-white">
                             <div className="flex flex-col md:flex-row">
                               <div className="relative w-full md:w-1/3 aspect-[3/2] md:aspect-square">
-                                {album.coverImage ? (
+                                {project.image ? (
                                   <Image
-                                    src={album.coverImage}
-                                    alt={album.title}
+                                    src={project.image}
+                                    alt={project.title}
                                     fill
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 33vw"
                                   />
                                 ) : (
                                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                                    <span className="text-gray-400">No image</span>
+                                    <span className="text-gray-400">Pas d'image</span>
                                   </div>
                                 )}
                                 <div 
                                   className="absolute left-4 top-4 px-4 py-1 rounded-full border-2 border-black text-black text-sm font-bold shadow-brutal-xs"
-                                  style={{ backgroundColor: getCategoryColor(album.category) }}
+                                  style={{ backgroundColor: project.color }}
                                 >
-                                  {album.category}
+                                  {project.category}
+                                </div>
+                                <div className="absolute right-4 top-4 px-3 py-1 bg-white rounded-full border-2 border-black text-black text-sm font-bold shadow-brutal-xs">
+                                  {project.year}
                                 </div>
                               </div>
                               <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
                                 <div>
-                                  <h2 className="text-2xl md:text-3xl font-bold mb-3">{album.title}</h2>
-                                  {album.description && (
-                                    <p className="text-gray-600 line-clamp-2 mb-4 md:mb-0">{album.description}</p>
-                                  )}
+                                  <h3 className="text-2xl md:text-3xl font-bold mb-3">{project.title}</h3>
+                                  <p className="text-gray-600 line-clamp-2 mb-4 md:mb-0">{project.description}</p>
                                 </div>
-                                <div className="flex items-center justify-between pt-4">
-                                  <span className="font-medium text-lg">
-                                    {album.imageCount} photos
-                                  </span>
+                                <div className="pt-4">
+                                  <div className="flex flex-wrap gap-1.5 mb-4">
+                                    {project.tags.slice(0, 4).map((tag, index) => (
+                                      <span
+                                        key={index}
+                                        className="px-2 py-1 text-xs rounded-full border border-black"
+                                        style={{ backgroundColor: `${project.color}30` }}
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                    {project.tags.length > 4 && (
+                                      <span className="px-2 py-1 bg-gray-100 rounded-full text-xs border border-black">
+                                        +{project.tags.length - 4}
+                                      </span>
+                                    )}
+                                  </div>
                                   <motion.div 
                                     className="flex items-center font-bold text-[#f67a45]"
                                     animate={{
-                                      x: hoveredAlbum === album.id ? 5 : 0
+                                      x: hoveredProject === project.id ? 5 : 0
                                     }}
                                   >
-                                    Voir l'album
+                                    Voir le projet
                                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
@@ -475,34 +502,6 @@ export default function GalleryPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* Empty state */}
-            {filteredAlbums.length === 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="text-center py-12"
-              >
-                <div className="relative inline-block mb-8">
-                  <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-full -z-10"></div>
-                  <div className="bg-[#FFD2BF] text-black font-bold px-8 py-4 rounded-full border-3 border-black">
-                    <span className="text-2xl">🔍</span>
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Aucun album trouvé</h3>
-                <p className="text-gray-600 mb-8">Essayez une autre catégorie ou revenez plus tard.</p>
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className="relative inline-block group"
-                >
-                  <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-full transition-transform group-hover:translate-x-3 group-hover:translate-y-3 -z-10"></div>
-                  <div className="relative px-6 py-3 bg-[#f67a45] text-white border-2 border-black rounded-full font-medium inline-flex items-center transition-transform group-hover:-translate-y-1">
-                    Voir tous les albums
-                  </div>
-                </button>
-              </motion.div>
-            )}
           </div>
         </div>
       </div>

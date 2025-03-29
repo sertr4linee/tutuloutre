@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { getWorkPageData } from "@/app/actions"
+import { useRouter } from "next/navigation"
 
 interface Blog {
   id: string
@@ -42,6 +43,7 @@ interface SchoolProject {
   skills: string[]
   color: string
   featured: boolean
+  slug?: string
 }
 
 export default function WorkPage() {
@@ -57,6 +59,7 @@ export default function WorkPage() {
   const [filter, setFilter] = useState('Tous')
   const [mounted, setMounted] = useState(false)
   const categories = ['Tous', 'Urban', 'Portrait', 'Nature', 'Architecture']
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
@@ -69,7 +72,10 @@ export default function WorkPage() {
         if (result && result.data) {
           setData({
             blogs: result.data.blogs || [],
-            albums: result.data.albums || [],
+            albums: (result.data.albums || []).map(album => ({
+              ...album,
+              imageCount: 0 // Use 0 as default value since imageCount doesn't exist
+            })),
             projects: result.data.projects || []
           })
         }
@@ -121,23 +127,52 @@ export default function WorkPage() {
 
   if (loading) {
     return (
-      <main className="relative min-h-screen">
+      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
         <GradientBackground />
-        <div className="relative z-30 container mx-auto px-4 py-12">
-          <div className="animate-pulse">
-            {/* Loading skeleton */}
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg p-4">
-                  <div className="h-48 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
+        <div className="relative z-30">
+          <div className="relative">
+            {/* Boîte de chargement avec style néobrutalist */}
+            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
+              <div className="flex items-center space-x-4">
+                {/* Carrés animés */}
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
+                    style={{
+                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
             </div>
           </div>
         </div>
+        {/* CSS pour l'animation */}
+        <style jsx global>{`
+          @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-15px);
+            }
+          }
+
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+          }
+
+          .animate-float {
+            animation: float 8s ease-in-out infinite;
+          }
+        `}</style>
       </main>
     )
   }
@@ -554,7 +589,7 @@ export default function WorkPage() {
               {/* Interactive project cards */}
               <div className="space-y-8">
                 {data?.projects.map((project) => (
-                  <div key={project.id} className="relative">
+                  <div key={project.id} className="relative mb-8">
                     <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
                     <div
                       className={`border-3 border-black rounded-xl overflow-hidden bg-white transition-all ${
@@ -565,8 +600,9 @@ export default function WorkPage() {
                         {/* Project image */}
                         <div className="md:col-span-5 relative">
                           <div
-                            className="h-[200px] md:h-full overflow-hidden"
+                            className="h-[200px] md:h-full overflow-hidden cursor-pointer"
                             style={{ backgroundColor: `${project.color}30` }}
+                            onClick={() => router.push(`/work/project/${project.slug || project.id}`)}
                           >
                             <Image
                               src={project.image || "/placeholder.svg"}
@@ -575,6 +611,13 @@ export default function WorkPage() {
                               height={100}
                               className="w-full h-full object-cover"
                             />
+                            <div className="absolute inset-0 bg-black opacity-0 hover:opacity-30 transition-opacity flex items-center justify-center">
+                              <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
                           <div className="absolute top-3 left-3 bg-white text-black font-bold px-2 py-1 rounded-full border-2 border-black text-xs">
                             {project.year}
@@ -583,7 +626,11 @@ export default function WorkPage() {
 
                         {/* Project info */}
                         <div className="md:col-span-7 p-4 sm:p-6">
-                          <h3 className="text-xl font-bold mb-2">{project.title}</h3>
+                          <h3 className="text-xl font-bold mb-2">
+                            <Link href={`/work/project/${project.slug || project.id}`} className="hover:text-[#f67a45] transition-colors">
+                              {project.title}
+                            </Link>
+                          </h3>
                           <p className="text-[#3C3C3C] mb-4">{project.description}</p>
 
                           <div className="flex flex-wrap gap-2 mb-4">
@@ -598,20 +645,32 @@ export default function WorkPage() {
                             ))}
                           </div>
 
-                          <button
-                            onClick={() => toggleProject(project.id)}
-                            className="flex items-center font-medium text-[#f67a45]"
-                          >
-                            {activeProject === project.id ? "Voir moins" : "Voir plus"}
-                            <svg
-                              className={`w-4 h-4 ml-2 transition-transform ${activeProject === project.id ? "rotate-180" : ""}`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                          <div className="flex justify-between items-center">
+                            <button
+                              onClick={() => toggleProject(project.id)}
+                              className="flex items-center font-medium text-[#f67a45]"
                             >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </button>
+                              {activeProject === project.id ? "Voir moins" : "Voir plus"}
+                              <svg
+                                className={`w-4 h-4 ml-2 transition-transform ${activeProject === project.id ? "rotate-180" : ""}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            
+                            <Link href={`/work/project/${project.slug || project.id}`} className="relative inline-block group">
+                              <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
+                              <div className="relative px-4 py-2 bg-white border-2 border-black rounded-full font-medium flex items-center transition-transform group-hover:-translate-y-0.5 text-sm">
+                                Voir le projet
+                                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                              </div>
+                            </Link>
+                          </div>
                         </div>
                       </div>
 
@@ -641,6 +700,22 @@ export default function WorkPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+              
+              {/* View all projects button */}
+              <div className="mt-8 text-center">
+                <Link
+                  href="/work/project"
+                  className="relative inline-block group"
+                >
+                  <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
+                  <div className="relative px-6 py-2 bg-white border-2 border-black rounded-full font-medium flex items-center transition-transform group-hover:-translate-y-0.5">
+                    Voir tous les projets
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>

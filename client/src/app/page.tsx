@@ -2,16 +2,78 @@
 
 import GradientBackground from "@/components/ui/background"
 import Link from "next/link";
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion";
+import * as jose from 'jose';
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Fonction pour simuler une connexion avec un token temporaire
+  const simulateLogin = () => {
+    // Créer un token JWT simple (pour débogage uniquement)
+    const expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() + 7); // Expiration dans 7 jours
+    
+    document.cookie = `token=debug-token; path=/; expires=${expireDate.toUTCString()}`;
+    setIsAuthenticated(true);
+    alert('Token de test créé! Rechargez la page pour voir le bouton Admin');
+  };
+
+  // Vérifier si l'utilisateur est authentifié
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Récupérer le token depuis les cookies
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+          const [key, value] = cookie.trim().split('=');
+          acc[key] = value;
+          return acc;
+        }, {} as Record<string, string>);
+        
+        const token = cookies.token;
+        console.log("Token trouvé:", token ? "Oui" : "Non");
+        
+        if (token) {
+          // Vérifier si le token est valide (non expiré)
+          try {
+            const { payload } = jose.decodeJwt(token);
+            console.log("Payload JWT:", payload);
+            if (payload && 
+                typeof payload === 'object' && 
+                'exp' in payload && 
+                typeof payload.exp === 'number' && 
+                payload.exp * 1000 > Date.now()) {
+              setIsAuthenticated(true);
+              console.log("Authentification réussie!");
+            } else {
+              console.log("Token expiré ou invalide");
+            }
+          } catch (e) {
+            console.error('Token invalide:', e);
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de l\'authentification:', error);
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
       <GradientBackground />
+      
+      {/* Bouton de test pour la connexion (à supprimer en production) */}
+      <button
+        onClick={simulateLogin}
+        className="fixed bottom-4 right-4 bg-black text-white px-3 py-1.5 rounded z-50 text-sm"
+      >
+        Simuler connexion
+      </button>
       
       {/* Étoile décorative */}
       <div
@@ -60,7 +122,22 @@ export default function Home() {
             {/* Navigation - mise en page mobile améliorée */}
             <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10 w-full">
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
-                {/* Vide pour l'instant */}
+                {/* Bouton Admin si authentifié */}
+                {isAuthenticated ? (
+                  <Link href="/admin/dashboard" className="relative inline-block">
+                    <div className="absolute top-[2px] left-[2px] w-full h-full bg-black rounded-md"></div>
+                    <button className="relative bg-[#f67a45] text-white px-3 py-1.5 rounded-md flex items-center justify-center text-sm font-medium">
+                      Admin
+                      <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                      </svg>
+                    </button>
+                  </Link>
+                ) : (
+                  <div className="text-sm text-gray-400">
+                    Non connecté
+                  </div>
+                )}
               </div>
 
               {/* Bouton menu mobile - meilleur positionnement */}
@@ -91,6 +168,18 @@ export default function Home() {
                 <a href="/work" className="hover:underline">Travaux</a>
                 <a href="/services" className="hover:underline">Services</a>
                 <a href="/contact" className="hover:underline">Contact</a>
+                
+                {/* Lien Admin si authentifié - visible seulement sur mobile */}
+                {isAuthenticated && (
+                  <Link href="/admin/dashboard" className="sm:hidden">
+                    <div className="flex items-center text-[#f67a45] font-medium">
+                      Admin
+                      <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                      </svg>
+                    </div>
+                  </Link>
+                )}
                 
                 {/* Bouton CV - taille responsive */}
                 <div className="relative inline-block mt-4 sm:mt-0">

@@ -8,6 +8,8 @@ interface Props {
 }
 
 export default function EditProjectPage({ params }: Props) {
+  const { id } = params;
+
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#FFFBF5] p-4">
@@ -23,7 +25,7 @@ export default function EditProjectPage({ params }: Props) {
         </div>
       </div>
     }>
-      <EditProjectClient id={params.id} />
+      <EditProjectClient id={id} />
     </Suspense>
   )
 } 
