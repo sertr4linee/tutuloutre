@@ -7,6 +7,7 @@ import { motion, useAnimation, useInView } from "framer-motion"
 import Image from "next/image"
 import confetti from 'canvas-confetti'
 import { useRouter } from 'next/navigation'
+import { Metadata } from 'next'
 
 const steps = [
   {
@@ -46,6 +47,10 @@ const steps = [
   }
 ]
 
+export const metadata: Metadata = {
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'
+};
+
 export default function Services() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeService, setActiveService] = useState<number | null>(null)
@@ -62,6 +67,7 @@ export default function Services() {
   const router = useRouter()
   const [animatingStep, setAnimatingStep] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -70,7 +76,7 @@ export default function Services() {
           setIsProcessVisible(true)
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     )
 
     const element = document.getElementById('work-process')
@@ -90,6 +96,40 @@ export default function Services() {
       mainControls.start("visible")
     }
   }, [isInView, mainControls])
+
+  useEffect(() => {
+    // Check if the device is touch-enabled
+    const isTouchDevice = () => {
+      return (('ontouchstart' in window) ||
+             (navigator.maxTouchPoints > 0));
+    };
+    
+    // Apply touch-specific styles
+    if (isTouchDevice()) {
+      document.body.classList.add('touch-device');
+      // Fix iOS scroll issues
+      document.documentElement.style.height = '100%';
+      document.body.style.height = '100%';
+      document.body.style.position = 'relative';
+    }
+    
+    setIsMobile(window.innerWidth < 768);
+    
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (isTouchDevice()) {
+        document.body.classList.remove('touch-device');
+        document.documentElement.style.height = '';
+        document.body.style.height = '';
+        document.body.style.position = '';
+      }
+    };
+  }, []);
 
   const services = [
     {
@@ -171,7 +211,6 @@ export default function Services() {
   }
 
   const handleStartProject = () => {
-    // Lance l'effet de confetti
     confetti({
       particleCount: 100,
       spread: 70,
@@ -179,7 +218,6 @@ export default function Services() {
       colors: ['#f67a45', '#E9B949', '#4CAF50', '#2196F3', '#ff6b57']
     });
 
-    // Redirection après un court délai
     setTimeout(() => {
       router.push('/contact');
     }, 800);
@@ -189,33 +227,49 @@ export default function Services() {
     if (isAnimating) return;
     setIsAnimating(true);
     
-    // Animer chaque étape séquentiellement
+    const delay = isMobile ? 500 : 1000;
+    
     for (let i = 1; i <= steps.length; i++) {
       setAnimatingStep(i);
-      // Attendre 1 seconde avant de passer à l'étape suivante
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
     
-    // Animation finale avec confetti
     confetti({
-      particleCount: 100,
+      particleCount: isMobile ? 50 : 100,
       spread: 70,
       origin: { y: 0.6 },
       colors: ['#f67a45', '#E9B949', '#4CAF50', '#2196F3', '#ff6b57']
     });
     
-    // Réinitialiser l'animation
     setAnimatingStep(null);
     setIsAnimating(false);
   };
 
+  function launchConfetti() {
+    const isMobile = window.innerWidth < 768;
+    const options = {
+      particleCount: isMobile ? 30 : 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    };
+    confetti(options);
+  }
+
   return (
-    <main className="relative min-h-screen overflow-x-hidden">
+    <main className="relative min-h-screen overflow-x-hidden overflow-y-auto -mt-1" 
+      style={{ 
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'none'
+      }}>
+      <div 
+        className="absolute inset-0 -z-10" 
+        onTouchStart={() => {}} 
+        style={{ overscrollBehavior: 'none' }}
+      />
       <GradientBackground />
 
-      {/* Floating decorative elements */}
       <motion.div 
-        className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px]"
+        className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] hidden sm:block"
         animate={{
           y: [0, -20, 0],
           rotate: [0, 360],
@@ -237,7 +291,7 @@ export default function Services() {
       </motion.div>
 
       <motion.div 
-        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px]"
+        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] hidden sm:block"
         animate={{
           y: [0, 20, 0],
           rotate: [0, -360],
@@ -261,47 +315,42 @@ export default function Services() {
         />
       </motion.div>
 
-      {/* Main content */}
-      <div className="relative z-30 flex flex-col items-center justify-start min-h-screen py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4">
+      <div 
+        className="relative z-30 flex flex-col items-center justify-start py-4 pb-16 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         <motion.div 
-          className="relative w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl bg-[#FFFBF5] border-[4px] sm:border-[6px] md:border-[8px] lg:border-[10px] border-black mx-auto mb-8"
-          initial={{ opacity: 0, y: 50 }}
+          className="relative w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl bg-[#FFFBF5] border-[3px] sm:border-[6px] md:border-[8px] lg:border-[10px] border-black mx-auto mb-8"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: isMobile ? 0.1 : 0.3 }}
+          style={{ touchAction: 'pan-y' }}
         >
-          {/* Corner elements - L-shaped design - responsive sizes */}
           <div className="hidden sm:block absolute -top-[12px] -left-[12px] w-[25px] h-[25px] md:w-[35px] md:h-[35px] lg:w-[45px] lg:h-[45px]">
             <div className="absolute top-0 left-0 w-[25px] md:w-[35px] lg:w-[45px] h-[8px] md:h-[12px] lg:h-[15px] bg-black"></div>
             <div className="absolute top-0 left-0 w-[8px] md:w-[12px] lg:w-[15px] h-[25px] md:h-[35px] lg:h-[45px] bg-black"></div>
           </div>
 
-          {/* Top-right corner */}
           <div className="hidden sm:block absolute -top-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute top-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute top-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-left corner */}
           <div className="hidden sm:block absolute -bottom-[15px] -left-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 left-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 left-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Bottom-right corner */}
           <div className="hidden sm:block absolute -bottom-[15px] -right-[15px] w-[30px] h-[30px] md:w-[45px] md:h-[45px]">
             <div className="absolute bottom-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
 
-          {/* Content container with better responsive padding */}
           <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-            {/* Navigation - improved mobile layout */}
             <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
-                {/* Empty for now */}
               </div>
 
-              {/* Mobile menu button - better positioning */}
               <button
                 className="sm:hidden fixed top-4 right-4 p-2 z-50 bg-white/80 backdrop-blur-sm rounded-md border-2 border-black"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -315,7 +364,6 @@ export default function Services() {
                 </svg>
               </button>
 
-              {/* Navigation links - improved mobile menu */}
               <div
                 className={`
                 ${menuOpen ? "flex fixed inset-0 bg-white/95 z-40" : "hidden"} 
@@ -343,7 +391,6 @@ export default function Services() {
                   Contact
                 </Link>
 
-                {/* Resume button - responsive sizing */}
                 <div className="relative inline-block mt-4 sm:mt-0">
                   <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
                   <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
@@ -367,8 +414,7 @@ export default function Services() {
               </div>
             </nav>
 
-            {/* Services page title with decorative element */}
-            <div className="mb-8 sm:mb-12">
+            <div className="mb-6 sm:mb-12">
               <div className="relative">
                 <motion.div 
                   className="absolute -top-8 sm:-top-10 left-1 sm:left-2"
@@ -394,16 +440,15 @@ export default function Services() {
               </p>
             </div>
 
-            {/* Interactive Service Configurator */}
-            <div className="mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Configurez votre pack de services</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Configurez votre pack de services</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {services.map((service) => (
                   <motion.div 
                     key={service.id} 
                     className="relative group cursor-pointer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => toggleService(service.id)}
                   >
                     <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-3 group-hover:translate-y-3"></div>
@@ -444,8 +489,11 @@ export default function Services() {
               </motion.div>
             </div>
 
-            {/* Work Process Section */}
-            <section id="work-process" className="w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl mx-auto mb-16">
+            <section 
+              id="work-process" 
+              className="w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl mx-auto mb-10 sm:mb-16"
+              style={{ touchAction: 'pan-y' }}
+            >
               <div className="relative">
                 <div className="absolute -top-6 left-4 transform rotate-2 z-10">
                   <div className="bg-[#f67a45] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
@@ -464,11 +512,12 @@ export default function Services() {
                       visible: {
                         opacity: 1,
                         transition: {
-                          staggerChildren: 0.3
+                          staggerChildren: 0.2
                         }
                       }
                     }}
                     className="max-w-4xl mx-auto"
+                    style={{ touchAction: 'pan-y' }}
                   >
                     <motion.h2
                       variants={{
@@ -496,7 +545,6 @@ export default function Services() {
                     </motion.h2>
 
                     <div className="relative">
-                      {/* Ligne verticale connectant les étapes */}
                       <motion.div
                         className="absolute left-[35px] md:left-[100px] top-0 w-1 h-full bg-black"
                         variants={{
@@ -512,7 +560,6 @@ export default function Services() {
                         style={{ originY: 0 }}
                       />
 
-                      {/* Étapes */}
                       {steps.map((step, index) => (
                         <motion.div
                           key={step.number}
@@ -584,7 +631,6 @@ export default function Services() {
                       ))}
                     </div>
 
-                    {/* Bouton d'action */}
                     <motion.div
                       variants={{
                         hidden: { y: 20, opacity: 0 },
@@ -652,14 +698,14 @@ export default function Services() {
               </div>
             </section>
 
-            {/* Dynamic Testimonials Carousel */}
-            <div className="mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Ce que disent mes clients</h2>
-              <div className="relative overflow-hidden">
+            <div className="mb-10 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Ce que disent mes clients</h2>
+              <div className="relative overflow-hidden" style={{ touchAction: 'pan-y' }}>
                 <motion.div 
                   className="flex"
                   animate={{ x: [0, -100, 0] }}
                   transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                  style={{ touchAction: "pan-y" }}
                 >
                   {[...testimonials, ...testimonials].map((testimonial, index) => (
                     <div key={`${testimonial.id}-${index}`} className="flex-none w-80 mx-4">
@@ -692,7 +738,6 @@ export default function Services() {
               </div>
             </div>
 
-            {/* Interactive Call to Action */}
             <motion.div 
               ref={intersectionRef}
               className="relative"
@@ -703,6 +748,7 @@ export default function Services() {
               initial="hidden"
               animate={mainControls}
               transition={{ duration: 0.5, delay: 0.25 }}
+              style={{ touchAction: "auto" }}
             >
               <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
               <div className="border-3 border-black rounded-xl p-8 bg-[#FFE8DD]">
