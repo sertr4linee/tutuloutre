@@ -10,44 +10,9 @@ import Image from "next/image"
 
 export default function Contact() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    message: "",
-    subject: "Juste pour dire bonjour !",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [activeTab, setActiveTab] = useState("form")
+  const [activeTab, setActiveTab] = useState("socials")
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 })
   const [isHovering, setIsHovering] = useState(false)
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormState((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    // Simulation de l'envoi du formulaire
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsSuccess(true)
-
-      // Réinitialisation du formulaire après affichage du message de succès
-      setTimeout(() => {
-        setIsSuccess(false)
-        setFormState({
-          name: "",
-          email: "",
-          message: "",
-          subject: "Juste pour dire bonjour !",
-        })
-      }, 3000)
-    }, 1500)
-  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -240,16 +205,6 @@ export default function Contact() {
               {/* Onglets interactifs de contact */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <button
-                  onClick={() => setActiveTab("form")}
-                  className={`px-4 py-2 border-2 border-black rounded-full text-sm font-medium transition-all ${
-                    activeTab === "form"
-                      ? "bg-[#f67a45] text-white transform -translate-y-1"
-                      : "bg-white hover:bg-[#FFE8DD]"
-                  }`}
-                >
-                  Envoyer un Message
-                </button>
-                <button
                   onClick={() => setActiveTab("socials")}
                   className={`px-4 py-2 border-2 border-black rounded-full text-sm font-medium transition-all ${
                     activeTab === "socials"
@@ -273,169 +228,6 @@ export default function Contact() {
 
               {/* Conteneur des onglets */}
               <div className="relative">
-                {/* Onglet formulaire interactif */}
-                {activeTab === "form" && (
-                  <div className="relative">
-                    {/* Éléments décoratifs */}
-                    <div className="absolute -top-10 -right-10 w-[80px] h-[80px] opacity-50 hidden md:block">
-                      <Image
-                        src="/stars.svg"
-                        alt=""
-                        width={100}
-                        height={100}
-                        className="w-full h-full animate-spin-slow"
-                        style={{
-                          filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.9))",
-                          animationDuration: "15s",
-                        }}
-                      />
-                    </div>
-
-                    {/* Formulaire interactif avec style néobrutalist */}
-                    <div className="bg-white border-4 border-black rounded-xl p-4 sm:p-6 md:p-8 relative">
-                      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-10 translate-x-2 translate-y-2 rounded-xl -z-10"></div>
-
-                      {isSuccess ? (
-                        <div className="flex flex-col items-center justify-center py-10 text-center">
-                          <div className="w-20 h-20 bg-[#f67a45] rounded-full flex items-center justify-center mb-4 border-2 border-black">
-                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-                          <h3 className="text-2xl font-bold text-[#2D2D2D] mb-2">Message Envoyé !</h3>
-                          <p className="text-[#3C3C3C]">Merci de m'avoir contactée. Je vous répondrai bientôt !</p>
-                        </div>
-                      ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label htmlFor="name" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                                Votre Nom
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  id="name"
-                                  name="name"
-                                  value={formState.name}
-                                  onChange={handleInputChange}
-                                  required
-                                  className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all"
-                                  placeholder="Jean Dupont"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label htmlFor="email" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                                Votre Email
-                              </label>
-                              <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formState.email}
-                                onChange={handleInputChange}
-                                required
-                                className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all"
-                                placeholder="jean@exemple.com"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label htmlFor="subject" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                              Sujet
-                            </label>
-                            <select
-                              id="subject"
-                              name="subject"
-                              value={formState.subject}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all appearance-none bg-white"
-                              style={{
-                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23000'%3E%3Cpath strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                                backgroundRepeat: "no-repeat",
-                                backgroundPosition: "right 1rem center",
-                                backgroundSize: "1.5em 1.5em",
-                              }}
-                            >
-                              <option value="Juste pour dire bonjour !">Juste pour dire bonjour !</option>
-                              <option value="Demande de projet">Demande de projet</option>
-                              <option value="Collaboration">Collaboration</option>
-                              <option value="Opportunité d'emploi">Opportunité d'emploi</option>
-                              <option value="Autre">Autre</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-[#2D2D2D] mb-1">
-                              Votre Message
-                            </label>
-                            <textarea
-                              id="message"
-                              name="message"
-                              value={formState.message}
-                              onChange={handleInputChange}
-                              required
-                              rows={5}
-                              className="w-full px-4 py-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-[#f67a45] focus:outline-none transition-all resize-none"
-                              placeholder="Parlez-moi de votre projet..."
-                            ></textarea>
-                          </div>
-
-                          <div className="pt-2">
-                            <button type="submit" disabled={isSubmitting} className="relative group">
-                              <div className="absolute inset-0 bg-black translate-x-1.5 translate-y-1.5 rounded-lg transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                              <div
-                                className={`relative px-6 py-3 bg-[#f67a45] text-white font-bold rounded-lg border-2 border-black flex items-center ${isSubmitting ? "opacity-80" : ""}`}
-                              >
-                                {isSubmitting ? (
-                                  <>
-                                    <svg
-                                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                      ></circle>
-                                      <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                      ></path>
-                                    </svg>
-                                    Envoi en cours...
-                                  </>
-                                ) : (
-                                  <>
-                                    Envoyer le Message
-                                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                      />
-                                    </svg>
-                                  </>
-                                )}
-                              </div>
-                            </button>
-                          </div>
-                        </form>
-                      )}
-                    </div>
-                  </div>
-                )}
-
                 {/* Onglet réseaux sociaux avec cartes interactives */}
                 {activeTab === "socials" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -640,4 +432,3 @@ export default function Contact() {
     </main>
   )
 }
-

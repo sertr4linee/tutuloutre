@@ -56,9 +56,9 @@ export default function Home() {
           </div>
           
           {/* Conteneur avec meilleur padding responsive */}
-          <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+          <div className="p-3 pt-5 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center md:block">
             {/* Navigation - mise en page mobile améliorée */}
-            <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
+            <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 lg:mb-10 w-full">
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
                 {/* Vide pour l'instant */}
               </div>
@@ -107,19 +107,33 @@ export default function Home() {
             
             {/* Grille de contenu principal - mise en page responsive améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 md:gap-8">
-              <div className="md:col-span-7 order-2 md:order-1">
-                <div className="relative">
+              {/* Illustration du personnage - taille responsive */}
+              <div className="md:col-span-5 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 pt-2">
+                <div className="w-[45%] sm:w-[35%] md:w-[75%] lg:w-[80%] max-w-[280px]">
+                  <Image
+                    src="/maskote.svg"
+                    alt="Illustration du personnage"
+                    width={1000}
+                    height={1000}
+                    className="w-full h-auto"
+                    priority
+                  />
+                </div>
+              </div>
+              
+              <div className="md:col-span-7 order-2 md:order-1 text-left flex flex-col items-start">
+                <div className="relative w-full max-w-[500px] px-4">
                   {/* Bulle "Bonjour je suis" - positionnement et taille responsive */}
-                  <div className="absolute -top-8 sm:-top-10 left-1 sm:left-2">
+                  <div className="absolute -top-8 sm:-top-10 left-2 md:left-2 transform md:translate-x-0">
                     <div className="bg-[#ff6b57] text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap">
                     👋 Heyy, je suis
                     </div>
                   </div>
 
                   {/* Nom avec typographie responsive */}
-                  <h1 className="text-[32px] sm:text-[40px] md:text-[50px] lg:text-[70px] xl:text-[80px] leading-[0.9] font-black text-[#2D2D2D] tracking-tighter font-family-clash">
+                  <h1 className="text-[40px] sm:text-[40px] md:text-[50px] lg:text-[70px] xl:text-[80px] leading-[0.9] font-black text-[#2D2D2D] tracking-tighter font-family-clash mt-2 md:mt-0">
                     Maelle <br />
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-start">
                       Crescence
                       <Image 
                         src="/effect.svg" 
@@ -133,22 +147,22 @@ export default function Home() {
                 </div>
                 
                 {/* Description - texte responsive */}
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mt-4 sm:mt-6 font-normal text-[#3C3C3C] max-w-xl leading-tight">
+                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mt-4 sm:mt-6 font-normal text-[#3C3C3C] max-w-md mx-0 leading-tight px-4 md:px-0">
                   Je <span className="text-[#f67a45] font-medium">griffonne</span> sur papier et aide les marques à créer des designs.
                 </p>
                 
                 {/* Boutons - taille et espacement responsifs */}
-                <div className="flex flex-col sm:flex-row sm:space-x-3 md:space-x-4 space-y-3 sm:space-y-0 mt-6 sm:mt-8 md:mt-10">
-                  <Link href="/work">
-                  <button className="bg-[#2D2D2D] text-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex flex-col sm:flex-row items-center self-center sm:self-start sm:items-start justify-center sm:justify-start sm:space-x-3 md:space-x-4 space-y-3 sm:space-y-0 mt-6 sm:mt-8 md:mt-10 w-full max-w-md">
+                  <Link href="/work" className="w-3/4 sm:w-auto">
+                  <button className="bg-[#2D2D2D] text-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] w-full sm:w-auto">
                     Engagez-moi
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                   </Link>
-                  <Link href="/about">
-                  <button className="bg-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <Link href="/about" className="w-3/4 sm:w-auto">
+                  <button className="bg-white border-2 border-black px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base font-semibold flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] w-full sm:w-auto">
                     Mon Histoire
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -157,35 +171,23 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              
-              {/* Illustration du personnage - taille responsive */}
-              <div className="md:col-span-5 flex items-center justify-center order-1 md:order-2 mb-6 md:mb-0">
-                <Image
-                  src="/portrai.svg"
-                  alt="Illustration du personnage"
-                  width={500}
-                  height={500}
-                  className="w-[55%] sm:w-[45%] md:w-[75%] lg:w-[80%] max-w-[400px]"
-                  priority
-                />
-              </div>
             </div>
           </div>
           
           {/* Bannière du bas - taille et positionnement responsifs */}
           <div 
-            className="absolute -bottom-[15px] sm:-bottom-[20px] md:-bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-40 w-[180px] sm:w-[220px] md:w-[280px] lg:w-[350px] h-[35px] sm:h-[45px] md:h-[55px] lg:h-[65px]"
+            className={`absolute -bottom-[35px] sm:-bottom-[20px] md:-bottom-[25px] left-1/2 -translate-x-1/2 flex items-center justify-center z-40 w-[220px] sm:w-[220px] md:w-[280px] lg:w-[350px] h-[42px] sm:h-[45px] md:h-[55px] lg:h-[65px] ${menuOpen ? 'hidden sm:flex' : 'flex'}`}
             style={{
               transform: "rotate(4.65deg)",
               backgroundColor: "#FFD2BF",
               borderRadius: "40px",
-              border: "2px sm:border-3px border-black",
+              border: "2px solid black",
               boxShadow: "2px 2px 0px 0px rgba(0,0,0,1)",
-              padding: "0 8px sm:0 10px",
+              padding: "0 8px",
             }}
           >
             <span 
-              className="text-[14px] sm:text-[18px] md:text-[22px] lg:text-[28px] font-black text-black"
+              className="text-[18px] sm:text-[18px] md:text-[22px] lg:text-[28px] font-black text-black text-center"
               style={{
                 fontFamily: "'Clash Display', sans-serif",
                 letterSpacing: "-0.03em",
@@ -195,7 +197,7 @@ export default function Home() {
             </span>
             
             <motion.div 
-            className="absolute -right-3 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[50px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[40px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
+            className="absolute -right-6 sm:-right-4 md:-right-5 lg:-right-6 -top-1 w-[65px] sm:w-[65px] md:w-[85px] lg:w-[100px] h-[50px] sm:h-[50px] md:h-[65px] lg:h-[80px]"
             animate={{
               rotate: [-5, 5, -5],
               y: [0, -5, 0]
