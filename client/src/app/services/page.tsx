@@ -7,7 +7,6 @@ import { motion, useAnimation, useInView } from "framer-motion"
 import Image from "next/image"
 import confetti from 'canvas-confetti'
 import { useRouter } from 'next/navigation'
-import { Metadata } from 'next'
 
 const steps = [
   {
@@ -46,10 +45,6 @@ const steps = [
     icon: "/icons/delivery.svg"
   }
 ]
-
-export const metadata: Metadata = {
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'
-};
 
 export default function Services() {
   const [menuOpen, setMenuOpen] = useState(false)
