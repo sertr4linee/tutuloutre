@@ -8,7 +8,20 @@ const nextConfig = {
   typescript: {
     // Disable TypeScript errors during production builds
     ignoreBuildErrors: true,
-  }
+  },
+  // Production optimizations
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
+  // Increase performance
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true
 }
 
 module.exports = nextConfig
