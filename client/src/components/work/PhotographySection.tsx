@@ -8,6 +8,7 @@ export interface Album {
   description: string | null
   category: string
   coverImage: string | null
+  images: string[]
   imageCount: number
   createdAt: string
   slug?: string
@@ -32,7 +33,7 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
     <section id="photography" className="w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl mx-auto mb-16 sm:mb-24">
       <div className="relative">
         <div className="absolute -top-6 left-4 transform -rotate-2 z-10">
-          <div className="bg-[#E9B949] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
+          <div className="bg-[#f4a990] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
             Photographie
           </div>
         </div>
@@ -52,8 +53,8 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
                   filter === category 
                     ? 'bg-black text-white' 
                     : category === 'Tous' 
-                      ? 'bg-[#E9B949] hover:bg-gray-100'
-                      : 'bg-white hover:bg-gray-100'
+                      ? 'bg-[#f4a990] hover:bg-[#f8d7e6]'
+                      : 'bg-white hover:bg-[#f8d7e6]'
                 }`}
               >
                 {category}
@@ -73,7 +74,7 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
                 <Link
                   key={album.id}
                   href={`/work/gallery/${album.slug || album.id}`}
-                  className={`relative border-4 border-black rounded-xl overflow-hidden ${
+                  className={`relative border-4 border-black rounded-xl overflow-hidden group ${
                     index === 0 ? 'col-span-12 md:col-span-8 row-span-2' : 'col-span-12 md:col-span-4'
                   }`}
                 >
@@ -84,13 +85,13 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
                         alt={album.title}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover"
+                        className="object-cover transition-transform group-hover:scale-105"
                         loading="lazy"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200" />
                     )}
-                    <div className="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity flex items-center justify-center">
                       <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -102,7 +103,7 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
                     <h3 className="text-xl font-bold">{album.title}</h3>
                     <p className="text-gray-600">{album.category}</p>
                     <div className="mt-2 text-sm text-gray-500">
-                      {album.imageCount} photos
+                      {album.imageCount} photos • {new Date(album.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                     </div>
                   </div>
                 </Link>
@@ -136,6 +137,9 @@ const PhotographySection = memo(({ albums }: PhotographySectionProps) => {
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t-4 border-black">
                     <h3 className="text-lg font-bold truncate">{album.title}</h3>
                     <p className="text-gray-600 text-sm">{album.category}</p>
+                    <div className="mt-1 text-sm text-gray-500">
+                      {album.imageCount} photos • {new Date(album.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                    </div>
                   </div>
                 </Link>
               ))}

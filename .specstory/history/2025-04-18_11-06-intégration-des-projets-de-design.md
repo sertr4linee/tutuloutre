@@ -1274,6 +1274,735 @@ change la couleur de ce button
 
 _**Assistant**_
 
+Je vais changer la couleur du bandeau d'alerte bleu pour utiliser les couleurs de votre direction artistique.
+
+---
+
+```diff
+            </Link>
+  
+-           <NeoAlert type="info" title="Projet" className="rounded-xl">
++           <NeoAlert type="info" title="Projet" className="rounded-xl bg-[#f4a990] border-black text-black">
+              Découvrez les détails de ce projet {project.category}
+            </NeoAlert>
+```
+
+---
+
+J'ai modifié le bandeau d'alerte pour :
+1. Utiliser la couleur `#f4a990` (le rose-orangé de votre DA) comme fond
+2. Ajouter une bordure noire pour la cohérence avec le reste du design
+3. Mettre le texte en noir pour un meilleur contraste avec le fond clair
+
+Le bandeau est maintenant en harmonie avec votre palette de couleurs et le reste de l'interface.
+
+---
+
+_**User**_
+
+maintenant fait pareil que pour les projet mais cette fois ci pour des albums photo:
+
+Réalisation de photographies de plateau dans le cadre d’un 
+reportage mené avec Cigless Film sur la Coupe de France de Rallye. 
+
+Ce projet m’a permis de 
+documenter l’événement de 
+l’intérieur, en capturant à la fois les coulisses, l’intensité des courses et les moments clés de la compétition.
+
+Mode
+Réalisation de photographies de mode mettant en valeur les mannequins à travers les poses, les expressions et la mise en scène, afin de refléter leur personnalité et leur style.
+
+apres jte laisse complete pour 3 autres albums
+
+sport
+laverie
+rallye
+
+met ca dans constant, et fait un composant album@PhotographySection.tsx 
+
+---
+
+_**Assistant**_
+
+Je vais créer les albums photos et mettre à jour les composants nécessaires.
+
+---
+
+```diff
+  import { SchoolProject } from '../components/work/ProjectsSection';
++ import { Album } from '../components/work/PhotographySection';
+  
+  export const SCHOOL_PROJECTS: SchoolProject[] = [
+    }
+  ];
++ 
++ export const PHOTO_ALBUMS: Album[] = [
++   {
++     id: "rallye-coupe-france",
++     title: "Coupe de France de Rallye",
++     description: "Réalisation de photographies de plateau dans le cadre d'un reportage mené avec Cigless Film sur la Coupe de France de Rallye. Ce projet m'a permis de documenter l'événement de l'intérieur, en capturant à la fois les coulisses, l'intensité des courses et les moments clés de la compétition.",
++     category: "Reportage",
++     coverImage: "/images/albums/rallye/cover.jpg",
++     images: [
++       "/images/albums/rallye/1.jpg",
++       "/images/albums/rallye/2.jpg",
++       "/images/albums/rallye/3.jpg",
++       "/images/albums/rallye/4.jpg",
++     ],
++     imageCount: 4,
++     createdAt: "2023-10",
++     slug: "rallye-coupe-france"
++   },
++   {
++     id: "mode-portraits",
++     title: "Portraits Mode",
++     description: "Réalisation de photographies de mode mettant en valeur les mannequins à travers les poses, les expressions et la mise en scène, afin de refléter leur personnalité et leur style.",
++     category: "Mode",
++     coverImage: "/images/albums/mode/cover.jpg",
++     images: [
++       "/images/albums/mode/1.jpg",
++       "/images/albums/mode/2.jpg",
++       "/images/albums/mode/3.jpg",
++     ],
++     imageCount: 3,
++     createdAt: "2023-11",
++     slug: "mode-portraits"
++   },
++   {
++     id: "sport-action",
++     title: "Sport en Action",
++     description: "Capturer l'énergie et la passion du sport à travers l'objectif. Une série de photographies mettant en valeur les athlètes dans leurs moments les plus intenses, révélant la force, l'agilité et la détermination.",
++     category: "Sport",
++     coverImage: "/images/albums/sport/cover.jpg",
++     images: [
++       "/images/albums/sport/1.jpg",
++       "/images/albums/sport/2.jpg",
++       "/images/albums/sport/3.jpg",
++       "/images/albums/sport/4.jpg",
++     ],
++     imageCount: 4,
++     createdAt: "2023-09",
++     slug: "sport-action"
++   },
++   {
++     id: "laverie-nocturne",
++     title: "Laverie Nocturne",
++     description: "Une exploration visuelle de la vie nocturne dans les laveries automatiques. Cette série capture l'ambiance unique et presque surréaliste de ces espaces urbains la nuit, mélangeant lumières artificielles et moments de solitude.",
++     category: "Urban",
++     coverImage: "/images/albums/laverie/cover.jpg",
++     images: [
++       "/images/albums/laverie/1.jpg",
++       "/images/albums/laverie/2.jpg",
++       "/images/albums/laverie/3.jpg",
++     ],
++     imageCount: 3,
++     createdAt: "2023-12",
++     slug: "laverie-nocturne"
++   },
++   {
++     id: "rallye-competition",
++     title: "Rallye - L'esprit de Compétition",
++     description: "Une immersion dans l'univers passionnant du rallye automobile. Cette série met en lumière l'adrénaline de la course, la précision technique et l'engagement total des équipes dans leur quête de performance.",
++     category: "Sport",
++     coverImage: "/images/albums/rallye-comp/cover.jpg",
++     images: [
++       "/images/albums/rallye-comp/1.jpg",
++       "/images/albums/rallye-comp/2.jpg",
++       "/images/albums/rallye-comp/3.jpg",
++       "/images/albums/rallye-comp/4.jpg",
++     ],
++     imageCount: 4,
++     createdAt: "2024-01",
++     slug: "rallye-competition"
++   }
++ ];
+  
+```
+
+---
+
+Je vais maintenant mettre à jour l'interface Album dans le composant PhotographySection pour inclure la propriété 'images'.
+
+---
+
+```diff
+    category: string
+    coverImage: string | null
++   images: string[]
+    imageCount: number
+    createdAt: string
+        <div className="relative">
+          <div className="absolute -top-6 left-4 transform -rotate-2 z-10">
+-           <div className="bg-[#E9B949] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
++           <div className="bg-[#f4a990] text-black font-bold px-4 py-2 rounded-full border-2 border-black text-sm sm:text-base">
+              Photographie
+            </div>
+                      ? 'bg-black text-white' 
+                      : category === 'Tous' 
+-                       ? 'bg-[#E9B949] hover:bg-gray-100'
+-                       : 'bg-white hover:bg-gray-100'
++                       ? 'bg-[#f4a990] hover:bg-[#f8d7e6]'
++                       : 'bg-white hover:bg-[#f8d7e6]'
+                  }`}
+                >
+                    key={album.id}
+                    href={`/work/gallery/${album.slug || album.id}`}
+-                   className={`relative border-4 border-black rounded-xl overflow-hidden ${
++                   className={`relative border-4 border-black rounded-xl overflow-hidden group ${
+                      index === 0 ? 'col-span-12 md:col-span-8 row-span-2' : 'col-span-12 md:col-span-4'
+                    }`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+-                         className="object-cover"
++                         className="object-cover transition-transform group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200" />
+                      )}
+-                     <div className="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
++                     <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <p className="text-gray-600">{album.category}</p>
+                      <div className="mt-2 text-sm text-gray-500">
+-                       {album.imageCount} photos
++                       {album.imageCount} photos • {new Date(album.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                      </div>
+                    </div>
+                      <h3 className="text-lg font-bold truncate">{album.title}</h3>
+                      <p className="text-gray-600 text-sm">{album.category}</p>
++                     <div className="mt-1 text-sm text-gray-500">
++                       {album.imageCount} photos • {new Date(album.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
++                     </div>
+                    </div>
+                  </Link>
+```
+
+---
+
+J'ai effectué plusieurs modifications importantes :
+
+1. Ajouté la propriété `images` à l'interface `Album`
+2. Mis à jour les couleurs pour correspondre à votre direction artistique :
+   - Changé la couleur de fond du badge "Photographie" de jaune à rose-orangé (`#f4a990`)
+   - Ajouté des effets de survol en rose clair (`#f8d7e6`)
+3. Amélioré l'interface utilisateur :
+   - Ajouté des effets de groupe pour une meilleure interaction
+   - Ajouté des transitions d'échelle sur les images au survol
+   - Amélioré l'affichage de la date avec un format français
+   - Ajouté un séparateur "•" entre le nombre de photos et la date
+4. Optimisé la structure des cartes d'album :
+   - Ajouté des effets de transition plus fluides
+   - Amélioré la lisibilité des informations
+   - Uniformisé le style avec le reste de l'application
+
+Le composant est maintenant prêt à être utilisé avec les albums photo que nous avons définis dans `constants.ts`. Il offre une expérience utilisateur cohérente avec votre identité visuelle et permet une navigation intuitive dans votre galerie photo.
+
+---
+
+_**User**_
+
+y'a pas les photographie
+
+---
+
+_**Assistant**_
+
+Je vais ajouter le composant PhotographySection à la page work pour afficher la section photographie. Je vais également charger ce composant de manière dynamique comme ProjectsSection.
+
+---
+
+```diff
+  import { useState, useEffect, useCallback, Suspense, lazy } from "react"
+  import dynamic from 'next/dynamic'
++ import { PHOTO_ALBUMS } from "@/lib/constants"
+  
+  // Imports de base pour le premier rendu
+    ssr: false
+  })
++ 
++ const PhotographySection = dynamic(() => import('@/components/work/PhotographySection'), {
++   loading: () => <div className="my-10 h-40 w-full bg-gray-100 animate-pulse rounded-lg"></div>,
++   ssr: false
++ })
+  
+  export default function WorkPage() {
+        {/* Sections de contenu chargées de manière différée */}      
+        {mounted && (
++         <>
+            <ProjectsSection />
++           <PhotographySection albums={PHOTO_ALBUMS} />
++         </>
+        )}
+      </main>
+```
+
+---
+
+J'ai effectué les modifications suivantes :
+
+1. Importé la constante `PHOTO_ALBUMS` depuis le fichier constants
+2. Ajouté le chargement dynamique du composant `PhotographySection`
+3. Ajouté le composant `PhotographySection` dans le rendu de la page, en lui passant les albums photos en props
+4. Encapsulé les sections dans un fragment React pour avoir plusieurs composants côte à côte
+
+Maintenant, la page affichera à la fois la section des projets d'école et la section photographie. La section photographie affichera tous les albums photos que nous avons définis précédemment dans `constants.ts`.
+
+Les deux sections seront chargées de manière dynamique avec un état de chargement similaire (animation de pulsation grise) pour une expérience utilisateur cohérente.
+
+---
+
+_**User**_
+
+http://localhost:3000/work/gallery/rallye-coupe-france
+
+
+y'a pas la slug gallery, fait en une adapte au gallerie photo
+
+---
+
+_**Assistant**_
+
+Je vais créer une nouvelle page pour afficher les galeries photos individuelles. Je vais créer le fichier dans le bon chemin.
+
+---
+
+```diff
+- 
++ "use client"
++ 
++ import { useEffect, useState, useCallback } from "react"
++ import { useParams, useRouter } from "next/navigation"
++ import Link from "next/link"
++ import Image from "next/image"
++ import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react"
++ import GradientBackground from "@/components/ui/background"
++ import { NeoButton } from "@/components/ui/neo-button"
++ import { NeoCard } from "@/components/ui/neo-card"
++ import { PHOTO_ALBUMS } from "@/lib/constants"
++ 
++ export default function GalleryPage() {
++   const params = useParams()
++   const slug = params?.slug as string
++   const [currentImageIndex, setCurrentImageIndex] = useState(0)
++   const [mounted, setMounted] = useState(false)
++   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
++   const router = useRouter()
++ 
++   // Trouver l'album correspondant dans PHOTO_ALBUMS
++   const album = PHOTO_ALBUMS.find((p) => p.slug === slug || p.id === slug)
++ 
++   const handleKeyDown = useCallback((e: KeyboardEvent) => {
++     if (e.key === "ArrowRight") nextImage()
++     if (e.key === "ArrowLeft") previousImage()
++     if (e.key === "Escape") setIsImageViewerOpen(false)
++   }, [])
++ 
++   const nextImage = useCallback(() => {
++     if (!album) return
++     setCurrentImageIndex((prev) => (prev + 1) % album.images.length)
++   }, [album])
++ 
++   const previousImage = useCallback(() => {
++     if (!album) return
++     setCurrentImageIndex((prev) => (prev - 1 + album.images.length) % album.images.length)
++   }, [album])
++ 
++   useEffect(() => {
++     setMounted(true)
++   }, [])
++ 
++   useEffect(() => {
++     if (isImageViewerOpen) {
++       window.addEventListener("keydown", handleKeyDown)
++       return () => window.removeEventListener("keydown", handleKeyDown)
++     }
++   }, [isImageViewerOpen, handleKeyDown])
++ 
++   if (!mounted) return null
++ 
++   if (!album) {
++     return (
++       <div className="min-h-screen flex flex-col items-center justify-center p-8">
++         <GradientBackground />
++         <NeoCard className="max-w-md w-full rounded-xl">
++           <h1 className="text-3xl font-black mb-4 neo-heading">Album non trouvé</h1>
++           <p className="text-xl mb-6 font-bold">L'album que vous recherchez n'existe pas ou a été supprimé.</p>
++           <NeoButton variant="primary" className="rounded-full">
++             <Link href="/work" className="inline-flex items-center">
++               <ArrowLeft className="h-5 w-5 mr-2" />
++               Retour aux albums
++             </Link>
++           </NeoButton>
++         </NeoCard>
++       </div>
++     )
++   }
++ 
++   return (
++     <div className="min-h-screen pt-12 pb-20">
++       <GradientBackground />
++       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
++         <Link href="/work">
++           <NeoButton variant="secondary" className="mb-8 rounded-full">
++             <span className="inline-flex items-center">
++               <ArrowLeft className="h-5 w-5 mr-2" />
++               Retour aux albums
++             </span>
++           </NeoButton>
++         </Link>
++ 
++         <div className="border-3 border-black bg-white p-6 md:p-10 mb-8 shadow-neo rounded-xl">
++           <h1 className="text-4xl md:text-6xl font-black mb-6 neo-heading">{album.title}</h1>
++           
++           <div className="mb-8">
++             <div className="flex items-center gap-4 mb-6">
++               <div className="flex items-center bg-[#f4a990] border-3 border-black px-4 py-2 font-bold rounded-full">
++                 <span>{album.category}</span>
++               </div>
++               <div className="text-gray-600">
++                 {new Date(album.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
++               </div>
++             </div>
++             <p className="text-lg font-medium">{album.description}</p>
++           </div>
++ 
++           {/* Grille de photos */}
++           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
++             {album.images.map((image, index) => (
++               <div
++                 key={index}
++                 className="relative aspect-[4/3] border-3 border-black rounded-xl overflow-hidden cursor-pointer group"
++                 onClick={() => {
++                   setCurrentImageIndex(index)
++                   setIsImageViewerOpen(true)
++                 }}
++               >
++                 <Image
++                   src={image}
++                   alt={`${album.title} - Photo ${index + 1}`}
++                   fill
++                   quality={95}
++                   className="object-cover transition-transform group-hover:scale-105"
++                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
++                 />
++                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity" />
++               </div>
++             ))}
++           </div>
++         </div>
++       </div>
++ 
++       {/* Image Viewer Modal */}
++       {isImageViewerOpen && (
++         <div 
++           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
++           onClick={() => setIsImageViewerOpen(false)}
++         >
++           <div className="relative w-full h-full flex items-center justify-center p-4">
++             <button 
++               onClick={() => setIsImageViewerOpen(false)}
++               className="absolute top-4 right-4 bg-white p-2 rounded-full hover:bg-[#f8d7e6] transition-colors"
++             >
++               <X className="w-6 h-6" />
++             </button>
++ 
++             <div className="relative w-full h-full max-w-7xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
++               <Image
++                 src={album.images[currentImageIndex]}
++                 alt={`${album.title} - Photo ${currentImageIndex + 1}`}
++                 fill
++                 quality={100}
++                 priority
++                 className="object-contain"
++               />
++ 
++               {album.images.length > 1 && (
++                 <>
++                   <button
++                     onClick={previousImage}
++                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full hover:bg-[#f8d7e6] transition-colors"
++                   >
++                     <ChevronLeft className="w-8 h-8" />
++                   </button>
++                   <button
++                     onClick={nextImage}
++                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full hover:bg-[#f8d7e6] transition-colors"
++                   >
++                     <ChevronRight className="w-8 h-8" />
++                   </button>
++                 </>
++               )}
++ 
++               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
++                 {album.images.map((_, index) => (
++                   <button
++                     key={index}
++                     onClick={() => setCurrentImageIndex(index)}
++                     className={`w-4 h-4 border-2 border-white rounded-full ${
++                       index === currentImageIndex ? "bg-white" : "bg-white/30"
++                     }`}
++                   />
++                 ))}
++               </div>
++             </div>
++           </div>
++         </div>
++       )}
++     </div>
++   )
++ } 
+```
+
+---
+
+J'ai créé une nouvelle page pour afficher les galeries photos individuelles avec les fonctionnalités suivantes :
+
+1. Affichage des informations de l'album :
+   - Titre en grand
+   - Catégorie avec badge coloré
+   - Date de création
+   - Description complète
+
+2. Grille de photos :
+   - Disposition en grille responsive (1, 2 ou 3 colonnes selon la taille d'écran)
+   - Effet de survol avec zoom et assombrissement
+   - Bordures et coins arrondis cohérents avec le design
+
+3. Visualiseur d'images en plein écran :
+   - Navigation avec flèches (clavier et boutons)
+   - Points de navigation en bas
+   - Bouton de fermeture
+   - Fond noir semi-transparent
+   - Haute qualité d'image (100%)
+   - Transitions fluides
+
+4. Navigation :
+   - Bouton de retour aux albums
+   - Gestion des erreurs (album non trouvé)
+   - Cohérence visuelle avec votre direction artistique
+
+Les couleurs et le style suivent votre charte graphique avec les roses-orangés (`#f4a990`, `#f8d7e6`) et le design néomorphique que vous utilisez ailleurs dans l'application.
+
+---
+
+_**User**_
+
+parfait quand je refresh pendant une demie seconde ca fait une nimations blanche vers le bas, retire la c pas beau
+
+---
+
+_**Assistant**_
+
+Je vois le problème. Cette animation blanche est causée par le délai artificiel dans le chargement. Je vais modifier la page pour retirer ce délai et rendre le chargement plus fluide.
+
+---
+
+```diff
+    const slug = params?.slug as string
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
+-   const [mounted, setMounted] = useState(false)
+    const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+    const router = useRouter()
+      setCurrentImageIndex((prev) => (prev - 1 + album.images.length) % album.images.length)
+    }, [album])
+- 
+-   useEffect(() => {
+-     setMounted(true)
+-   }, [])
+  
+    useEffect(() => {
+      }
+    }, [isImageViewerOpen, handleKeyDown])
+- 
+-   if (!mounted) return null
+  
+    if (!album) {
+                    fill
+                    quality={95}
++                   priority={index < 6}
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+```
+
+---
+
+```diff
+  
+  import GradientBackground from "@/components/ui/background"
+- import { useState, useEffect, useCallback, Suspense, lazy } from "react"
++ import { useState, useCallback } from "react"
+  import dynamic from 'next/dynamic'
+  import { PHOTO_ALBUMS } from "@/lib/constants"
+  
+  // Imports de base pour le premier rendu
+  import WorkNav from "@/components/work/WorkNav"
+- import LoadingSpinner from "@/components/work/LoadingSpinner"
+  import DecorativeElements from "@/components/work/DecorativeElements"
+  
+  
+  export default function WorkPage() {
+-   const [loading, setLoading] = useState(true)
+-   const [mounted, setMounted] = useState(false)
+- 
+-   useEffect(() => {
+-     setMounted(true)
+-     // Ajout d'un délai simulé pour permettre le chargement des composants dynamiques
+-     // Vous pouvez ajuster ou supprimer ce délai selon vos besoins
+-     const timer = setTimeout(() => {
+-       setLoading(false)
+-     }, 1000)
+-     
+-     return () => clearTimeout(timer)
+-   }, [])
+- 
+    const scrollTo = useCallback((sectionId: string) => {
+      window.scrollTo({ 
+      })
+    }, [])
+- 
+-   if (loading) {
+-     return <LoadingSpinner />
+-   }
+  
+    return (
+  
+        {/* Sections de contenu chargées de manière différée */}      
+-       {mounted && (
+-         <>
+        <ProjectsSection />
+        <PhotographySection albums={PHOTO_ALBUMS} />
+-         </>
+-       )}
+      </main>
+    )
+```
+
+---
+
+I've made changes to remove the artificial loading delay and simplify the page loading logic in `work/page.tsx`. Here's what I changed:
+
+1. Removed the `loading` and `mounted` state variables that were causing the white flash animation
+2. Removed the `useEffect` hook that was introducing the artificial delay
+3. Removed the `LoadingSpinner` component import and its conditional rendering
+4. Simplified the component structure by removing unnecessary conditional mounting checks
+5. Kept the dynamic imports with loading skeletons for a smoother experience
+
+Let me also check the `ProjectsSection` component to ensure there are no additional loading delays there.
+
+---
+
+Read file: client/src/components/work/ProjectsSection.tsx
+
+---
+
+I've reviewed the `ProjectsSection.tsx` file and I don't see any artificial loading delays or unnecessary loading states there. The component is already optimized with:
+
+1. Proper use of `memo` for both the main component and the `ProjectCard` component
+2. Efficient state management with a single `activeProject` state
+3. Lazy loading of images with the `loading="lazy"` attribute
+4. No artificial delays or unnecessary loading states
+
+The loading experience should now be much smoother with the changes we made to both files. The page will:
+
+1. Load instantly without artificial delays
+2. Show the projects immediately
+3. Load images progressively as they come into view
+4. Maintain smooth transitions and hover effects
+
+Is there anything specific about the loading behavior that you'd like me to optimize further?
+
+---
+
+_**User**_
+
+elle y ai encore remplace avec ce loading
+
+
+
+---
+
+_**Assistant**_
+
+Je vais remplacer le loading actuel par le loading néobrutalist que vous avez dans about/page.tsx.
+
+---
+
+```diff
+  import WorkNav from "@/components/work/WorkNav"
+  import DecorativeElements from "@/components/work/DecorativeElements"
++ 
++ const LoadingComponent = () => (
++   <div className="my-10 flex items-center justify-center">
++     <div className="relative">
++       <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
++         <div className="flex items-center space-x-4">
++           {[...Array(3)].map((_, i) => (
++             <div
++               key={i}
++               className="w-5 h-5 bg-[#f67a45] border-2 border-black"
++               style={{
++                 animation: `bounce 0.6s ${i * 0.2}s infinite`,
++               }}
++             />
++           ))}
++         </div>
++         <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
++       </div>
++     </div>
++     <style jsx global>{`
++       @keyframes bounce {
++         0%, 100% {
++           transform: translateY(0);
++         }
++         50% {
++           transform: translateY(-15px);
++         }
++       }
++     `}</style>
++   </div>
++ )
+  
+  const ProjectsSection = dynamic(() => import('@/components/work/ProjectsSection'), {
+-   loading: () => <div className="my-10 h-40 w-full bg-gray-100 animate-pulse rounded-lg"></div>,
++   loading: () => <LoadingComponent />,
+    ssr: false
+  })
+  
+  const PhotographySection = dynamic(() => import('@/components/work/PhotographySection'), {
+-   loading: () => <div className="my-10 h-40 w-full bg-gray-100 animate-pulse rounded-lg"></div>,
++   loading: () => <LoadingComponent />,
+    ssr: false
+  })
+```
+
+---
+
+J'ai fait les modifications suivantes :
+
+1. Créé un composant `LoadingComponent` qui reprend le style néobrutalist de votre loading avec :
+   - Les 3 carrés animés en orange (`#f67a45`)
+   - Le fond blanc cassé (`#FFFBF5`)
+   - Les bordures noires et l'effet d'ombre
+   - L'animation de rebond
+
+2. Remplacé les anciens loadings (simples rectangles gris avec animation pulse) par le nouveau `LoadingComponent` pour :
+   - `ProjectsSection`
+   - `PhotographySection`
+
+Le loading est maintenant cohérent avec votre identité visuelle et le style néobrutalist du reste de l'application. Les carrés rebondissants apparaîtront pendant le chargement de chaque section.
+
+---
+
+_**User**_
+
+@page.tsx le composant loading apparait deux fois
+
+---
+
+_**Assistant**_
+
 
 
 ---

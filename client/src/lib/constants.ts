@@ -1,11 +1,12 @@
 import { SchoolProject } from '../components/work/ProjectsSection';
+import { Album } from '../components/work/PhotographySection';
 
 export const SCHOOL_PROJECTS: SchoolProject[] = [
   {
     id: "cts",
     title: "CTS - Identité visuelle",
     description: "Refonte complète de l'identité visuelle de la Compagnie des Transports Strasbourgeois (CTS) pour moderniser son image et renforcer sa cohérence.",
-    year: "2023",
+    year: "2024",
     category: "Design Graphique",
     tags: ["Identité visuelle", "Branding", "Communication"],
     mainImage: "/images/projects/cos1.jpg",
@@ -35,7 +36,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "sera",
     title: "SERA - Refonte d'identité",
     description: "Refonte de l'identité visuelle de l'association SERA (anciennement Abbé Pierre) pour moderniser son image tout en restant fidèle à ses valeurs.",
-    year: "2023",
+    year: "2024",
     category: "Design Graphique",
     tags: ["Identité visuelle", "Association", "Branding"],
     mainImage: "/images/projects/sera1.jpg",
@@ -65,7 +66,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "moov-europa",
     title: "Moov Europa UI/UX",
     description: "Conception d'une application regroupant l'ensemble des trains en Europe, avec développement de son interface utilisateur.",
-    year: "2022",
+    year: "2024",
     category: "UI/UX Design",
     tags: ["UI/UX", "Application mobile", "Transport"],
     mainImage: "/images/projects/moov1.jpg",
@@ -91,7 +92,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "harmonia",
     title: "Harmonia - Interface web",
     description: "Création d'une interface de site web dédiée à la promotion de montres connectées pour la surveillance du stress et du rythme cardiaque en temps réel.",
-    year: "2022",
+    year: "2025",
     category: "Web Design",
     tags: ["Interface web", "E-commerce", "Santé connectée"],
     mainImage: "/images/projects/harm1.jpg",
@@ -145,7 +146,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "trenitalia",
     title: "Trenitalia - Milan Fashion Week",
     description: "Réalisation d'affiches imprimées et animations pour une campagne Trenitalia en tant que transporteur officiel de la Milan Fashion Week.",
-    year: "2022",
+    year: "2024",
     category: "Publicité",
     tags: ["Campagne publicitaire", "Mode", "Animation"],
     mainImage: "/images/projects/train1.jpg",
@@ -175,7 +176,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "amour-ouf",
     title: "Création visuelle Amour Ouf",
     description: "Réalisation d'illustrations pour le film L'Amour Ouf, entièrement dessinées sur Procreate.",
-    year: "2023",
+    year: "2024",
     category: "Illustration",
     tags: ["Cinéma", "Illustration", "Procreate"],
     mainImage: "/images/projects/amour.jpg",
@@ -200,7 +201,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     id: "apres-cocktails",
     title: "Apres Cocktails",
     description: "Création visuelle pour une marque de cocktails.",
-    year: "2022",
+    year: "2024",
     category: "Design Graphique",
     tags: ["Boisson", "Packaging", "Identité visuelle"],
     mainImage: "/images/projects/cock1.jpg",
@@ -221,5 +222,84 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     color: "#00BCD4",
     featured: false,
     slug: "apres-cocktails"
+  }
+];
+
+export const PHOTO_ALBUMS: Album[] = [
+  {
+    id: "rallye-coupe-france",
+    title: "Coupe de France de Rallye",
+    description: "Réalisation de photographies de plateau dans le cadre d'un reportage mené avec Cigless Film sur la Coupe de France de Rallye. Ce projet m'a permis de documenter l'événement de l'intérieur, en capturant à la fois les coulisses, l'intensité des courses et les moments clés de la compétition.",
+    category: "Rallye",
+    coverImage: "/images/projects/rallye1.jpg",
+    images: [
+      "/images/projects/rallye1.jpg",
+      "/images/projects/rallye2.jpg",
+      "/images/projects/rallye3.jpg",
+      "/images/projects/rallye4.jpg",
+    ],
+    imageCount: 4,
+    createdAt: "2023-10",
+    slug: "rallye-coupe-france"
+  },
+  {
+    id: "mode-portraits",
+    title: "Portraits Mode",
+    description: "Réalisation de photographies de mode mettant en valeur les mannequins à travers les poses, les expressions et la mise en scène, afin de refléter leur personnalité et leur style.",
+    category: "Mode",
+    coverImage: "/images/projects/mode2.jpg",
+    images: [
+      "/images/projects/mode1.jpg",
+      "/images/projects/mode2.jpg",
+      "/images/projects/mode3.jpg",
+    ],
+    imageCount: 3,
+    createdAt: "2023-11",
+    slug: "mode-portraits"
+  },
+  {
+    id: "sport-action",
+    title: "Sport en Action",
+    description: "Capturer l'énergie et la passion du sport à travers l'objectif. Une série de photographies mettant en valeur les athlètes dans leurs moments les plus intenses, révélant la force, l'agilité et la détermination.",
+    category: "Sport",
+    coverImage: "/images/projects/sport1.jpg",
+    images: [
+      "/images/projects/sport.jpg",
+      "/images/projects/sport1.jpg"
+    ],
+    imageCount: 4,
+    createdAt: "2023-09",
+    slug: "sport-action"
+  },
+  {
+    id: "laverie-nocturne",
+    title: "Laverie Nocturne",
+    description: "Une exploration visuelle de la vie nocturne dans les laveries automatiques. Cette série capture l'ambiance unique et presque surréaliste de ces espaces urbains la nuit, mélangeant lumières artificielles et moments de solitude.",
+    category: "Urban",
+    coverImage: "/images/projects/laverie1.jpg",
+    images: [
+      "/images/projects/laverie1.jpg",
+      "/images/projects/laverie2.jpg"
+    ],
+    imageCount: 3,
+    createdAt: "2023-12",
+    slug: "laverie-nocturne"
+  },
+  {
+    id: "evenement-prive",
+    title: "Evenement",
+    description: "Une immersion dans des événements comme des concerts",
+    category: "Evenement",
+    coverImage: "/images/projects/event1.jpg",
+    images: [
+      "/images/projects/event1.jpg",
+      "/images/projects/event2.jpg",
+      "/images/projects/event3.jpg",
+      "/images/projects/event4.jpg",
+      "/images/projects/event5.jpg",
+    ],
+    imageCount: 4,
+    createdAt: "2024-01",
+    slug: "evenement-prive"
   }
 ];
