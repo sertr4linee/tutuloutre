@@ -1,6 +1,69 @@
 import { NextResponse } from 'next/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { Payload } from 'payload'
+
+// Interface pour les objets média
+interface MediaObject {
+  filename?: string;
+  url?: string;
+}
+
+// Interfaces pour les objets retournés par Payload
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content?: string;
+  category: string;
+  publishDate: string;
+  status: string;
+  slug: string;
+  coverImage?: MediaObject;
+  featured: boolean;
+  tags?: { tag: string }[];
+}
+
+interface PhotoAlbum {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  coverImage?: MediaObject;
+  photos?: any[];
+  imageCount?: number;
+  createdAt: string;
+  slug?: string;
+}
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  year: string;
+  category: string;
+  tags?: { tag: string }[];
+  image?: MediaObject;
+  objectives?: { objective: string }[];
+  skills?: { skill: string }[];
+  color: string;
+  featured: boolean;
+  slug?: string;
+}
+
+// Type pour les résultats des collections
+interface CollectionResult<T> {
+  docs: T[];
+  [key: string]: any;
+}
+
+// Fonction utilitaire pour transformer les URL des médias
+function transformMediaUrl(mediaObject: MediaObject | undefined): string | null {
+  if (!mediaObject || !mediaObject.filename) return null;
+  
+  // Transformer l'URL pour utiliser notre route API de médias
+  return `/api/media/file/${encodeURIComponent(mediaObject.filename)}`;
+}
 
 export async function GET() {
   try {
@@ -10,21 +73,23 @@ export async function GET() {
     })
 
     // Fonction pour récupérer les données d'une collection de manière sécurisée
-    const fetchCollection = async (collectionName, options) => {
+    const fetchCollection = async <T>(collection: 'blog-posts' | 'photo-albums' | 'projects' | string, options: Record<string, any>): Promise<CollectionResult<T>> => {
       try {
-        return await payload.find({
-          collection: collectionName,
+        // Type cast pour éviter l'erreur TypeScript
+        const result = await (payload as any).find({
+          collection,
           ...options
-        })
+        });
+        return result as CollectionResult<T>;
       } catch (error) {
-        console.error(`Erreur lors de la récupération de ${collectionName}:`, error)
-        return { docs: [] } // Retourne un tableau vide si la collection n'existe pas
+        console.error(`Erreur lors de la récupération de ${collection}:`, error)
+        return { docs: [] } as CollectionResult<T>; // Retourne un tableau vide si la collection n'existe pas
       }
     }
 
     // Récupérer les différents types de contenu
     const [blogPosts, photoAlbums, projects] = await Promise.all([
-      fetchCollection('blog-posts', {
+      fetchCollection<BlogPost>('blog-posts', {
         limit: 10,
         sort: '-publishDate',
         where: {
@@ -35,13 +100,13 @@ export async function GET() {
         depth: 1, // Pour récupérer les médias associés
       }),
       
-      fetchCollection('photo-albums', {
+      fetchCollection<PhotoAlbum>('photo-albums', {
         limit: 10,
         sort: '-createdAt',
         depth: 1, // Pour récupérer les médias associés
       }),
       
-      fetchCollection('projects', {
+      fetchCollection<Project>('projects', {
         limit: 10,
         sort: '-year',
         depth: 1, // Pour récupérer les médias associés
@@ -60,7 +125,7 @@ export async function GET() {
 
     // Transformer les données pour correspondre à la structure utilisée dans le frontend
     const transformedData = {
-      blogs: (blogPosts.docs || []).map(post => ({
+      blogs: (blogPosts.docs || []).map((post) => ({
         id: post.id,
         title: post.title,
         excerpt: post.excerpt,
@@ -68,32 +133,32 @@ export async function GET() {
         publishDate: post.publishDate,
         status: post.status,
         slug: post.slug,
-        coverImage: post.coverImage?.url ? post.coverImage.url : null,
+        coverImage: transformMediaUrl(post.coverImage), // Utiliser la fonction de transformation
         featured: post.featured,
-        tags: post.tags?.map(tag => tag.tag) || [],
+        tags: post.tags?.map((tag) => tag.tag) || [],
       })),
       
-      albums: (photoAlbums.docs || []).map(album => ({
+      albums: (photoAlbums.docs || []).map((album) => ({
         id: album.id,
         title: album.title,
         description: album.description,
         category: album.category,
-        coverImage: album.coverImage?.url ? album.coverImage.url : null,
+        coverImage: transformMediaUrl(album.coverImage), // Utiliser la fonction de transformation
         imageCount: album.photos?.length || 0,
         createdAt: album.createdAt,
         slug: album.slug,
       })),
       
-      projects: (projects.docs || []).map(project => ({
+      projects: (projects.docs || []).map((project) => ({
         id: project.id,
         title: project.title,
         description: project.description,
         year: project.year,
         category: project.category,
-        tags: project.tags?.map(tag => tag.tag) || [],
-        image: project.image?.url ? project.image.url : null,
-        objectives: project.objectives?.map(obj => obj.objective) || [],
-        skills: project.skills?.map(skill => skill.skill) || [],
+        tags: project.tags?.map((tag) => tag.tag) || [],
+        image: transformMediaUrl(project.image), // Utiliser la fonction de transformation
+        objectives: project.objectives?.map((obj) => obj.objective) || [],
+        skills: project.skills?.map((skill) => skill.skill) || [],
         color: project.color,
         featured: project.featured,
         slug: project.slug,
@@ -112,4 +177,4 @@ export async function GET() {
       error: 'Erreur lors de la récupération des données de la base'
     }, { status: 500 }) // Retourne une erreur 500 pour indiquer un problème serveur
   }
-} 
+}
