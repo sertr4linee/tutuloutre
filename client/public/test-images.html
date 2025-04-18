@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .image-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .image-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .image-title {
+            margin-top: 10px;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test d'affichage des images</h1>
+    
+    <h2>Images depuis /media</h2>
+    <div class="image-grid">
+        <!-- Test avec quelques images -->
+        <div class="image-card">
+            <img src="/media/capture-dcran-2024-11-18-141323-1.png" alt="Capture d'écran 1">
+            <div class="image-title">capture-dcran-2024-11-18-141323-1.png</div>
+        </div>
+        <div class="image-card">
+            <img src="/media/photo_2025-04-18_10-45-26.jpg" alt="Photo">
+            <div class="image-title">photo_2025-04-18_10-45-26.jpg</div>
+        </div>
+    </div>
+
+    <h2>Images depuis /public/media</h2>
+    <div class="image-grid">
+        <!-- Test avec les mêmes images mais chemin public/media -->
+        <div class="image-card">
+            <img src="/public/media/capture-dcran-2024-11-18-141323-1.png" alt="Capture d'écran 1">
+            <div class="image-title">/public/media/capture-dcran-2024-11-18-141323-1.png</div>
+        </div>
+        <div class="image-card">
+            <img src="/public/media/photo_2025-04-18_10-45-26.jpg" alt="Photo">
+            <div class="image-title">/public/media/photo_2025-04-18_10-45-26.jpg</div>
+        </div>
+    </div>
+
+    <h2>Image avec chemin relatif</h2>
+    <div class="image-grid">
+        <div class="image-card">
+            <img src="media/capture-dcran-2024-11-18-141323-1.png" alt="Capture d'écran 1">
+            <div class="image-title">media/capture-dcran-2024-11-18-141323-1.png</div>
+        </div>
+    </div>
+</body>
+</html>
