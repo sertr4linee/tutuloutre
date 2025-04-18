@@ -50,10 +50,12 @@ const ProjectCard = memo(({ project, activeProject, toggleProject }: ProjectCard
               <Image
                 src={project.mainImage || "/placeholder.svg"}
                 alt={project.title}
-                width={100}
-                height={100}
-                className="w-full h-full object-cover"
+                width={800}
+                height={600}
+                quality={95}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 loading="lazy"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               <div className="absolute inset-0 bg-black opacity-0 hover:opacity-30 transition-opacity flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center">

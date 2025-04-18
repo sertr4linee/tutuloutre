@@ -133,8 +133,11 @@ export default function ProjectPage() {
                     src={project.images[currentImageIndex]}
                     alt={`${project.title} - Image ${currentImageIndex + 1}`}
                     fill
+                    quality={100}
+                    priority={true}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                    className="object-cover"
+                    className="object-cover transition-opacity duration-300 hover:opacity-95"
+                    style={{ objectFit: 'contain', backgroundColor: 'rgba(0,0,0,0.03)' }}
                   />
                   
                   {/* Navigation buttons */}
