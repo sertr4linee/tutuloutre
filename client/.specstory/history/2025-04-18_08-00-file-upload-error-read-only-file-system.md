@@ -602,6 +602,29 @@ _**Assistant**_
 
 ---
 
+Oui, ça devrait maintenant fonctionner. Les modifications apportées:
+
+1. Installation du plugin de stockage cloud pour PayloadCMS
+2. Configuration de l'adaptateur 'memory' pour éviter d'écrire sur le système de fichiers
+3. Simplification de la collection Media sans opérations sur le système de fichiers
+4. Mise à jour de la route API pour les fichiers média
+
+L'erreur EROFS (read-only file system) ne devrait plus apparaître car les fichiers seront maintenant conservés en mémoire plutôt que d'essayer d'écrire sur le système de fichiers en lecture seule de l'environnement serverless.
+
+---
+
+_**User**_
+
+ca build pas sur vercel 
+
+---
+
+_**Assistant**_
+
+
+
+---
+
 
 
 ---

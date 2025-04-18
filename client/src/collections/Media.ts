@@ -11,10 +11,19 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    // Pour les environnements serverless, nous pouvons ajouter un champ pour une URL externe
+    {
+      name: 'externalURL',
+      type: 'text',
+      label: 'URL externe (optionnel)',
+      admin: {
+        description: 'URL d\'une image stockée ailleurs (Cloudinary, etc.)',
+      },
+    }
   ],
   upload: {
-    // The plugin-cloud-storage will handle the actual storage
-    // so we don't need staticDir anymore
+    // Utilisez uniquement staticURL sans staticDir pour éviter les opérations de système de fichiers
+    staticURL: '/media',
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/*'],
   },

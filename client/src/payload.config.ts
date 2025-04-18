@@ -6,7 +6,6 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
-import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -44,15 +43,6 @@ const config = buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    cloudStorage({
-      collections: {
-        media: {
-          adapter: 'memory', // For local development
-          // In production environments like AWS Lambda, files will be kept in memory only
-          // No writes to the filesystem are attempted
-        },
-      },
-    }),
   ],
 })
 
