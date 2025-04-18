@@ -13,6 +13,7 @@
     "@payloadcms/db-postgres": "^3.34.0",
     "@payloadcms/next": "^3.34.0",
     "@payloadcms/payload-cloud": "^3.34.0",
+    "@payloadcms/plugin-cloud-storage": "^3.35.1",
     "@payloadcms/richtext-lexical": "^3.34.0",
     "@payloadcms/richtext-slate": "^3.35.0",
     "@radix-ui/react-slot": "^1.2.0",
