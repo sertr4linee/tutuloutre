@@ -61,8 +61,14 @@ interface CollectionResult<T> {
 function transformMediaUrl(mediaObject: MediaObject | undefined): string | null {
   if (!mediaObject || !mediaObject.filename) return null;
   
+  // Vérifier si on a déjà une URL complète (utile pour le développement local)
+  const filename = mediaObject.filename;
+  
+  // Ajouter un timestamp pour éviter les problèmes de cache dans Vercel
+  const cacheBreaker = new Date().getTime();
+  
   // Transformer l'URL pour utiliser notre route API de médias
-  return `/api/media/file/${encodeURIComponent(mediaObject.filename)}`;
+  return `/api/media/file/${encodeURIComponent(filename)}?v=${cacheBreaker}`;
 }
 
 export async function GET() {
