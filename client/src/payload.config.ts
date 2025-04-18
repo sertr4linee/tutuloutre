@@ -16,6 +16,11 @@ import { Projects } from './collections/Projects'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Déterminer l'URL de base en fonction de l'environnement
+const serverURL = process.env.VERCEL
+  ? 'https://une-momes.vercel.app'
+  : process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000'
+
 const config = buildConfig({
   admin: {
     user: Users.slug,
@@ -40,10 +45,13 @@ const config = buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
+  // Suppression de la configuration upload qui cause l'erreur TypeScript
   sharp,
   plugins: [
     payloadCloudPlugin(),
   ],
+  // Définir les URLs pour le serveur Payload
+  serverURL: serverURL,
 })
 
 export default config

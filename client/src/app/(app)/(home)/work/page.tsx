@@ -119,10 +119,7 @@ export default function WorkPage() {
         <WorkNav scrollTo={scrollTo} />
       </div>
 
-      {/* Sections de contenu chargées de manière différée */}
-      <BlogSection blogs={data.blogs} />
-      
-      <PhotographySection albums={data.albums} />
+      {/* Sections de contenu chargées de manière différée */}      
 
       <ProjectsSection projects={data.projects} />
     </main>

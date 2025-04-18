@@ -19,7 +19,7 @@ export const Media: CollectionConfig = {
     // Propriétés standards pour la version de Payload que vous utilisez
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/*'],
-    // Suppression de filesRequireAuth qui cause l'erreur
+    // Suppression de formatFilename qui n'existe pas dans votre version de Payload
     imageSizes: [
       {
         name: 'thumbnail',
@@ -44,15 +44,36 @@ export const Media: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ data }) => {
-        // Simplification du nom de fichier pour éviter les problèmes
         if (data.filename) {
-          // Remplacer les espaces par des tirets et supprimer les caractères spéciaux
+          // Nettoyer le nom de fichier ici au lieu d'utiliser formatFilename
           data.filename = data.filename
             .replace(/\s+/g, '-')
             .replace(/[^a-zA-Z0-9-_.]/g, '')
             .toLowerCase();
         }
         return data;
+      },
+    ],
+    afterRead: [
+      ({ doc }) => {
+        // Si nous sommes sur Vercel (production)
+        if (process.env.VERCEL) {
+          // Si le document a une URL et c'est une URL relative
+          if (doc.url && doc.url.startsWith('/')) {
+            // Remplacer l'URL relative par une URL absolue
+            doc.url = `https://une-momes.vercel.app${doc.url}`;
+          }
+          
+          // Faire de même pour les versions d'image si elles existent
+          if (doc.sizes) {
+            Object.keys(doc.sizes).forEach((size) => {
+              if (doc.sizes[size].url && doc.sizes[size].url.startsWith('/')) {
+                doc.sizes[size].url = `https://une-momes.vercel.app${doc.sizes[size].url}`;
+              }
+            });
+          }
+        }
+        return doc;
       },
     ],
   },

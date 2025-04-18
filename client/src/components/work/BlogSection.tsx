@@ -20,7 +20,7 @@ const BlogSection = memo(({ blogs }: BlogSectionProps) => {
           <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl -z-10"></div>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 mt-4">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Mes articles récents</h2>
+            {/* <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Mes articles récents</h2> */}
             
             <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
               
