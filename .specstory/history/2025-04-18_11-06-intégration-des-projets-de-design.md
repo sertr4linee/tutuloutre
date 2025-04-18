@@ -2003,6 +2003,104 @@ _**User**_
 
 _**Assistant**_
 
+Je vais corriger le problème en créant un seul composant de loading pour les deux sections.
+
+---
+
+```diff
+  
+  const ProjectsSection = dynamic(() => import('@/components/work/ProjectsSection'), {
+-   loading: () => <LoadingComponent />,
++   loading: () => null,
+    ssr: false
+  })
+  
+  const PhotographySection = dynamic(() => import('@/components/work/PhotographySection'), {
++   loading: () => null,
+    ssr: false
+  })
+  
+  export default function WorkPage() {
++   const [loading, setLoading] = useState(true)
++ 
+    const scrollTo = useCallback((sectionId: string) => {
+      window.scrollTo({ 
+          <WorkNav scrollTo={scrollTo} />
+        </div>
++ 
++       {/* Loading commun pour les deux sections */}
++       {loading && <LoadingComponent />}
+  
+        {/* Sections de contenu chargées de manière différée */}      
++       <div onLoad={() => setLoading(false)}>
+          <ProjectsSection />
+          <PhotographySection albums={PHOTO_ALBUMS} />
++       </div>
+      </main>
+    )
+```
+
+---
+
+Je vais ajuster encore un peu le code car l'événement `onLoad` ne fonctionnera pas comme prévu sur une div. Je vais utiliser un `useEffect` à la place.
+
+---
+
+```diff
+  
+  import GradientBackground from "@/components/ui/background"
+- import { useState, useCallback } from "react"
++ import { useState, useCallback, useEffect } from "react"
+  import dynamic from 'next/dynamic'
+  import { PHOTO_ALBUMS } from "@/lib/constants"
+  export default function WorkPage() {
+    const [loading, setLoading] = useState(true)
++ 
++   useEffect(() => {
++     // Désactiver le loading après un court délai pour laisser le temps aux composants de se charger
++     const timer = setTimeout(() => {
++       setLoading(false)
++     }, 800)
++     return () => clearTimeout(timer)
++   }, [])
+  
+    const scrollTo = useCallback((sectionId: string) => {
+  
+        {/* Sections de contenu chargées de manière différée */}      
+-       <div onLoad={() => setLoading(false)}>
++       <div className={loading ? 'hidden' : ''}>
+          <ProjectsSection />
+          <PhotographySection albums={PHOTO_ALBUMS} />
+```
+
+---
+
+J'ai apporté les modifications suivantes :
+
+1. Remplacé l'événement `onLoad` par un `useEffect` qui :
+   - Définit un timer de 800ms pour laisser le temps aux composants de se charger
+   - Désactive le loading une fois le timer écoulé
+   - Nettoie le timer si le composant est démonté
+
+2. Ajouté une classe `hidden` sur le conteneur des sections pendant le loading pour éviter tout flash de contenu
+
+3. Retiré les loadings individuels des composants dynamiques pour n'avoir qu'un seul loading central
+
+Maintenant, vous devriez voir :
+1. Le loading néobrutalist pendant 800ms
+2. Les sections apparaissent une fois le loading terminé
+3. Plus de double affichage du loading
+
+---
+
+_**User**_
+
+rend le responsive la page /work
+
+---
+
+_**Assistant**_
+
 
 
 ---
