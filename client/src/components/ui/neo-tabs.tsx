@@ -11,14 +11,15 @@ interface Tab {
 interface NeoTabsProps {
   tabs: Tab[]
   defaultTab?: string
+  className?: string
 }
 
-export function NeoTabs({ tabs, defaultTab }: NeoTabsProps) {
+export function NeoTabs({ tabs, defaultTab, className = "" }: NeoTabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0].id)
 
   return (
-    <div className="mb-8">
-      <div className="flex border-3 border-black overflow-hidden">
+    <div className={`mb-8 ${className}`}>
+      <div className="flex border-3 border-black overflow-hidden rounded-t-xl">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -36,7 +37,7 @@ export function NeoTabs({ tabs, defaultTab }: NeoTabsProps) {
           </button>
         ))}
       </div>
-      <div className="p-6 border-3 border-black border-t-0 bg-white">
+      <div className="p-6 border-3 border-black border-t-0 bg-white rounded-b-xl">
         {tabs.find((tab) => tab.id === activeTab)?.content}
       </div>
     </div>

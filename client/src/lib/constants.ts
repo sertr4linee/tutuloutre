@@ -15,6 +15,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
       "/images/projects/cos4.jpg",
       "/images/projects/cos5.jpg",
       "/images/projects/cos6.jpg",
+      "/images/projects/cos7.jpg",
     ],
     objectives: [
       "Moderniser l'image de la CTS",
@@ -150,7 +151,11 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     mainImage: "/images/projects/train1.jpg",
     images: [
       "/images/projects/train1.jpg",
-      "/images/projects/train2.jpg"
+      "/images/projects/train2.jpg",
+      "/images/projects/train.jpg",
+      "/images/projects/train3.jpg",
+
+
     ],
     objectives: [
       "Associer Trenitalia à la Milan Fashion Week",

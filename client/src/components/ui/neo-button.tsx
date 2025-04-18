@@ -4,11 +4,12 @@ interface NeoButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
   variant?: "primary" | "secondary" | "danger" | "success"
   size?: "sm" | "md" | "lg"
+  className?: string
 }
 
-export function NeoButton({ children, variant = "primary", size = "md", className, ...props }: NeoButtonProps) {
+export function NeoButton({ children, variant = "primary", size = "md", className = "", ...props }: NeoButtonProps) {
   const variantStyles = {
-    primary: "bg-pink-400 hover:bg-pink-500",
+    primary: "bg-blue-400 hover:bg-blue-500",
     secondary: "bg-gray-200 hover:bg-gray-300",
     danger: "bg-red-400 hover:bg-red-500",
     success: "bg-green-400 hover:bg-green-500",
