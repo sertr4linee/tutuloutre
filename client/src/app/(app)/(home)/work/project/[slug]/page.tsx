@@ -141,21 +141,7 @@ export default function ProjectPage() {
     <main className="relative min-h-screen overflow-x-hidden">
       <GradientBackground />
 
-      {/* Floating decorative elements */}
-      <div className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] animate-float">
-        <Image
-          src="/stars.svg"
-          alt="Decorative star"
-          width={120}
-          height={120}
-          sizes="(max-width: 768px) 80px, 120px"
-          className="w-full h-full"
-          style={{
-            filter: "drop-shadow(2px 4px 0px rgba(0,0,0,0.5))",
-            animationDuration: "8s",
-          }}
-        />
-      </div>
+      
 
       {/* Portfolio content with neobrutalism design */}
       <div className="relative z-30 flex flex-col items-center justify-start py-4 sm:py-6 md:py-8 lg:py-10 px-3 sm:px-4">
@@ -273,14 +259,14 @@ export default function ProjectPage() {
 
             {/* Project Article */}
             <article className="relative">
-              <div className="absolute -top-10 sm:-top-12 left-1 sm:left-2">
+              {/* <div className="absolute -top-10 sm:-top-12 left-1 sm:left-2">
                 <div 
                   className="text-black font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full border-2 sm:border-3 border-black transform -rotate-3 text-xs sm:text-sm whitespace-nowrap"
                   style={{ backgroundColor: project.color || '#F67A45' }}
                 >
                   {project.category}
                 </div>
-              </div>
+              </div> */}
 
               {/* Project header */}
               <div className="mb-8">

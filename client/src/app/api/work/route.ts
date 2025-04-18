@@ -59,16 +59,19 @@ interface CollectionResult<T> {
 
 // Fonction utilitaire pour transformer les URL des médias
 function transformMediaUrl(mediaObject: MediaObject | undefined): string | null {
-  if (!mediaObject || !mediaObject.filename) return null;
+  if (!mediaObject) return null;
   
-  // Vérifier si on a déjà une URL complète (utile pour le développement local)
-  const filename = mediaObject.filename;
+  // Si nous avons un filename, utiliser le chemin statique dans /public/media
+  if (mediaObject.filename) {
+    return `/media/${mediaObject.filename}`;
+  }
   
-  // Ajouter un timestamp pour éviter les problèmes de cache dans Vercel
-  const cacheBreaker = new Date().getTime();
+  // Fallback sur l'URL normale
+  if (mediaObject.url) {
+    return mediaObject.url;
+  }
   
-  // Transformer l'URL pour utiliser notre route API de médias
-  return `/api/media/file/${encodeURIComponent(filename)}?v=${cacheBreaker}`;
+  return null;
 }
 
 export async function GET() {
