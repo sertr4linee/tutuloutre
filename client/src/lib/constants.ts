@@ -8,7 +8,14 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2023",
     category: "Design Graphique",
     tags: ["Identité visuelle", "Branding", "Communication"],
-    image: "/images/projects/cos1.jpg",
+    mainImage: "/images/projects/cos1.jpg",
+    images: [
+      "/images/projects/cos2.jpg",
+      "/images/projects/cos3.jpg",
+      "/images/projects/cos4.jpg",
+      "/images/projects/cos5.jpg",
+      "/images/projects/cos6.jpg",
+    ],
     objectives: [
       "Moderniser l'image de la CTS",
       "Renforcer la visibilité de la marque",
@@ -30,7 +37,15 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2023",
     category: "Design Graphique",
     tags: ["Identité visuelle", "Association", "Branding"],
-    image: "/images/projects/sera1.jpg",
+    mainImage: "/images/projects/sera1.jpg",
+    images: [
+      "/images/projects/sera2.jpg",
+      "/images/projects/sera3.jpg",
+      "/images/projects/sera4.jpg",
+      "/images/projects/sera5.jpg",
+      "/images/projects/sera6.jpg",
+
+    ],
     objectives: [
       "Moderniser l'image de l'association",
       "Respecter les valeurs de solidarité et d'inclusion",
@@ -52,7 +67,11 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2022",
     category: "UI/UX Design",
     tags: ["UI/UX", "Application mobile", "Transport"],
-    image: "/images/projects/moov1.jpg",
+    mainImage: "/images/projects/moov1.jpg",
+    images: [
+        "/images/projects/moov1.jpg",
+        "/images/projects/moov2.jpg",
+    ],
     objectives: [
       "Regrouper l'information sur les trains européens",
       "Créer une interface intuitive et fonctionnelle",
@@ -74,7 +93,11 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2022",
     category: "Web Design",
     tags: ["Interface web", "E-commerce", "Santé connectée"],
-    image: "/images/projects/harm1.jpg",
+    mainImage: "/images/projects/harm1.jpg",
+    images: [
+      "/images/projects/harm1.jpg",
+      "/images/projects/harm2.jpg"
+    ],
     objectives: [
       "Mettre en valeur les fonctionnalités des montres connectées",
       "Offrir une expérience utilisateur fluide et moderne",
@@ -96,7 +119,13 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2023",
     category: "Publicité",
     tags: ["Campagne publicitaire", "Automobile", "Affiches"],
-    image: "/images/projects/topolino1.jpg",
+    mainImage: "/images/projects/topolino1.jpg",
+    images: [
+      "/images/projects/topolino1.jpg",
+      "/images/projects/topolino2.jpg",
+      "/images/projects/topolino3.jpg",
+      "/images/projects/topolino4.jpg"
+    ],
     objectives: [
       "Renforcer l'identité du véhicule",
       "Intégrer la voiture dans son environnement idéal",
@@ -118,7 +147,11 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2022",
     category: "Publicité",
     tags: ["Campagne publicitaire", "Mode", "Animation"],
-    image: "/images/projects/train1.jpg",
+    mainImage: "/images/projects/train1.jpg",
+    images: [
+      "/images/projects/train1.jpg",
+      "/images/projects/train2.jpg"
+    ],
     objectives: [
       "Associer Trenitalia à la Milan Fashion Week",
       "Allier élégance, mobilité et modernité",
@@ -140,7 +173,10 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2023",
     category: "Illustration",
     tags: ["Cinéma", "Illustration", "Procreate"],
-    image: "/images/projects/amour.jpg",
+    mainImage: "/images/projects/amour.jpg",
+    images: [
+      "/images/projects/amour.jpg"
+    ],
     objectives: [
       "Accompagner visuellement l'univers du film",
       "Explorer l'esthétique et les personnages",
@@ -162,7 +198,11 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2022",
     category: "Design Graphique",
     tags: ["Boisson", "Packaging", "Identité visuelle"],
-    image: "/images/projects/cock1.jpg",
+    mainImage: "/images/projects/cock1.jpg",
+    images: [
+      "/images/projects/cock1.jpg",
+      "/images/projects/cock2.jpg"
+    ],
     objectives: [
       "Créer une identité visuelle attrayante",
       "Développer un univers de marque cohérent",

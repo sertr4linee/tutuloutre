@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, Suspense, lazy } from "react"
 import dynamic from 'next/dynamic'
 
 // Imports de base pour le premier rendu
-// import WorkNav from "@/components/work/WorkNav"
+import WorkNav from "@/components/work/WorkNav"
 import LoadingSpinner from "@/components/work/LoadingSpinner"
 import DecorativeElements from "@/components/work/DecorativeElements"
 
@@ -45,10 +45,10 @@ export default function WorkPage() {
       <GradientBackground />
       <DecorativeElements />
 
-      {/* Navigation et en-tête
+      {/* Navigation et en-tête */}
       <div className="relative z-30 flex flex-col items-center justify-start py-4 sm:py-6 md:py-8 lg:py-10 px-3 sm:px-4">
         <WorkNav scrollTo={scrollTo} />
-      </div> */}
+      </div>
 
       {/* Sections de contenu chargées de manière différée */}      
       {mounted && (

@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SCHOOL_PROJECTS } from '../../lib/constants';
+import { SCHOOL_PROJECTS } from '@/lib/constants';
 
 export interface SchoolProject {
   id: string
@@ -11,7 +11,8 @@ export interface SchoolProject {
   year: string
   category: string
   tags: string[]
-  image: string | null
+  mainImage: string
+  images: string[]
   objectives: string[]
   skills: string[]
   color: string
@@ -47,7 +48,7 @@ const ProjectCard = memo(({ project, activeProject, toggleProject }: ProjectCard
               onClick={() => router.push(`/work/project/${project.slug || project.id}`)}
             >
               <Image
-                src={project.image || "/placeholder.svg"}
+                src={project.mainImage || "/placeholder.svg"}
                 alt={project.title}
                 width={100}
                 height={100}

@@ -1,94 +1,27 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import GradientBackground from "@/components/ui/background"
-import LoadingSpinner from "@/components/work/LoadingSpinner"
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  year: string
-  category: string
-  tags: string[]
-  image: string | null
-  objectives: string[]
-  skills: string[]
-  color: string
-  featured: boolean
-  slug?: string
-  content?: any
-}
-
-// Fonction pour récupérer un projet par son slug
-async function getProject(slug: string) {
-  try {
-    const response = await fetch(`/api/project/${slug}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération du projet')
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error('Erreur:', error)
-    return {
-      error: 'Échec de la récupération du projet',
-      data: null
-    }
-  }
-}
+import { SCHOOL_PROJECTS } from "@/lib/constants"
 
 export default function ProjectPage() {
-  // Get params using the useParams hook
   const params = useParams()
   const slug = params?.slug as string
-  
-  const [project, setProject] = useState<Project | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  // Trouver le projet correspondant dans SCHOOL_PROJECTS
+  const project = SCHOOL_PROJECTS.find(p => p.slug === slug || p.id === slug)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Utiliser useCallback pour récupérer le projet
-  const fetchProject = useCallback(async (slugValue: string) => {
-    try {
-      const result = await getProject(slugValue)
-      if (result && result.data) {
-        setProject(result.data)
-      }
-    } catch (error) {
-      console.error('Error fetching project:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (slug) {
-      fetchProject(slug)
-    }
-  }, [slug, fetchProject])
-
   if (!mounted) return null
-
-  if (loading) {
-    return (
-      <LoadingSpinner />
-    )
-  }
 
   if (!project) {
     return (
@@ -108,13 +41,18 @@ export default function ProjectPage() {
     )
   }
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % project.images.length)
+  }
+
+  const previousImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + project.images.length) % project.images.length)
+  }
+
   return (
     <main className="relative min-h-screen overflow-x-hidden">
       <GradientBackground />
 
-      
-
-      {/* Portfolio content with neobrutalism design */}
       <div className="relative z-30 flex flex-col items-center justify-start py-4 sm:py-6 md:py-8 lg:py-10 px-3 sm:px-4">
         <div className="relative w-[98%] sm:w-[95%] md:w-[92%] lg:w-[90%] max-w-6xl bg-[#FFFBF5] border-[4px] sm:border-[6px] md:border-[8px] lg:border-[10px] border-black mx-auto mb-6">
           {/* Corner elements - L-shaped design */}
@@ -187,21 +125,56 @@ export default function ProjectPage() {
                 </div>
               </div>
 
-              {/* Project main image */}
-              {project.image && (
-                <div className="mb-8 relative border-4 border-black overflow-hidden rounded-xl">
-                  <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl -z-10"></div>
-                  <div className="relative aspect-[16/9] overflow-hidden">
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                      className="object-cover"
-                    />
-                  </div>
+              {/* Image gallery */}
+              <div className="mb-8 relative border-4 border-black overflow-hidden rounded-xl">
+                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl -z-10"></div>
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <Image
+                    src={project.images[currentImageIndex]}
+                    alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                    className="object-cover"
+                  />
+                  
+                  {/* Navigation buttons */}
+                  {project.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={previousImage}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full border-2 border-black hover:bg-white transition-colors"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full border-2 border-black hover:bg-white transition-colors"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
                 </div>
-              )}
+                
+                {/* Image indicators */}
+                {project.images.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {project.images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-2 h-2 rounded-full border border-black ${
+                          index === currentImageIndex ? 'bg-white' : 'bg-black/30'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Project description */}
               <div className="text-lg sm:text-xl text-[#444] mb-8 font-medium">
@@ -229,23 +202,11 @@ export default function ProjectPage() {
                 </div>
               </div>
 
-              {/* Project content */}
-              <div className="prose prose-lg max-w-none">
-                {/* Si vous utilisez un contenu riche, vous devrez peut-être le parser selon votre format */}
-                {typeof project.content === 'string' 
-                  ? <div dangerouslySetInnerHTML={{ __html: project.content }} />
-                  : project.content && <div>
-                      {/* Affichage adapté selon la structure de vos données rich text */}
-                      <p>Contenu détaillé du projet...</p>
-                    </div>
-                }
-              </div>
-
               {/* Project footer */}
               <div className="mt-12 pt-6 border-t border-[#eaeaea]">
                 <div className="flex justify-end">
                   <Link
-                    href="/work/project"
+                    href="/work"
                     className="relative inline-block group"
                   >
                     <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
