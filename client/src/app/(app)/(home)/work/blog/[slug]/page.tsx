@@ -11,6 +11,7 @@ import { NeoButton } from "@/components/ui/neo-button"
 import { NeoCard } from "@/components/ui/neo-card"
 import { NeoTabs } from "@/components/ui/neo-tabs"
 import { NeoInput } from "@/components/ui/neo-input"
+import LoadingSpinner from '@/components/work/LoadingSpinner'
 
 // Define RichText node types for Lexical editor
 interface RichTextNode {
@@ -205,23 +206,7 @@ export default function BlogPostPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-              <GradientBackground />
-              <div className="border-3 border-black bg-white p-8 shadow-neo animate-bounce">
-                <div className="flex items-center space-x-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-5 h-5 bg-[#f67a45] border-2 border-black"
-                      style={{
-                        animationDelay: `${i * 0.2}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-                <h2 className="text-2xl font-black mt-4">CHARGEMENT...</h2>
-              </div>
-      </main>
+      <LoadingSpinner />
     )
   }
 

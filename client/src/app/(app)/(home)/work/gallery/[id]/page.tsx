@@ -9,6 +9,7 @@ import GradientBackground from "@/components/ui/background"
 import { NeoButton } from "@/components/ui/neo-button"
 import { NeoCard } from "@/components/ui/neo-card"
 import { NeoAlert } from "@/components/ui/neo-alert"
+import LoadingSpinner from "@/components/work/LoadingSpinner"
 
 interface Photo {
   id: string
@@ -115,23 +116,7 @@ export default function GalleryPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <GradientBackground />
-        <div className="border-3 border-black bg-white p-8 shadow-neo animate-bounce">
-          <div className="flex items-center space-x-4">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="w-5 h-5 bg-[#f67a45] border-2 border-black"
-                style={{
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              />
-            ))}
-          </div>
-          <h2 className="text-2xl font-black mt-4">CHARGEMENT...</h2>
-        </div>
-      </main>
+      <LoadingSpinner />
     )
   }
 
@@ -167,15 +152,30 @@ export default function GalleryPage() {
           </NeoButton>
         </Link>
 
-        <NeoAlert type="info" title="Galerie photo">
-          Parcourez cette collection de {album.photos.length} photos
-        </NeoAlert>
+        {/* Liens de navigation supplémentaires */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          <Link href="/work/gallery">
+            <NeoButton variant="secondary" size="sm">
+              Tous les albums
+            </NeoButton>
+          </Link>
+          <Link href="/gallery-view">
+            <NeoButton variant="secondary" size="sm">
+              <span className="inline-flex items-center">
+                Portfolio complet
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+              </span>
+            </NeoButton>
+          </Link>
+        </div>
 
         <div className="border-3 border-black bg-white p-6 md:p-10 mb-8 shadow-neo">
           {/* Album Header */}
           <div className="mb-8">
             {album.category && (
-              <div className="inline-block px-6 py-3 border-3 border-black font-black text-xl mb-4 bg-yellow-400">
+              <div className="inline-block px-6 py-3 border-3 border-black font-black text-xl mb-4 bg-orange-300">
                 {album.category}
               </div>
             )}
@@ -185,7 +185,7 @@ export default function GalleryPage() {
             {album.description && <p className="text-lg mb-6">{album.description}</p>}
 
             <div className="flex items-center text-sm mb-6">
-              <span className="bg-blue-400 border-3 border-black px-4 py-2 font-bold">
+              <span className="bg-white border-3 border-black px-4 py-2 font-bold">
                 {new Date(album.createdAt).toLocaleDateString("fr-FR", {
                   year: "numeric",
                   month: "long",
@@ -193,7 +193,7 @@ export default function GalleryPage() {
                 })}
               </span>
               <span className="mx-2">•</span>
-              <span className="bg-green-400 border-3 border-black px-4 py-2 font-bold">
+              <span className="bg-white border-3 border-black px-4 py-2 font-bold">
                 {album.photos.length} photos
               </span>
             </div>

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import GradientBackground from "@/components/ui/background"
+import LoadingSpinner from "@/components/work/LoadingSpinner"
 
 interface Project {
   id: string
@@ -85,37 +86,7 @@ export default function ProjectPage() {
 
   if (loading) {
     return (
-      <main className="relative min-h-screen overflow-hidden flex items-center justify-center">
-        <GradientBackground />
-        <div className="relative z-30">
-          <div className="relative">
-            <div className="bg-[#FFFBF5] border-4 border-black p-8 rounded-lg shadow-brutal relative">
-              <div className="flex items-center space-x-4">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-5 h-5 bg-[#f67a45] border-2 border-black"
-                    style={{
-                      animation: `bounce 0.6s ${i * 0.2}s infinite`,
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-full h-full border-4 border-black bg-black -z-10" />
-            </div>
-          </div>
-        </div>
-        <style jsx global>{`
-          @keyframes bounce {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-15px);
-            }
-          }
-        `}</style>
-      </main>
+      <LoadingSpinner />
     )
   }
 
@@ -169,82 +140,7 @@ export default function ProjectPage() {
             <div className="absolute bottom-0 right-0 w-[30px] md:w-[45px] h-[10px] md:h-[15px] bg-black"></div>
             <div className="absolute bottom-0 right-0 w-[10px] md:w-[15px] h-[30px] md:h-[45px] bg-black"></div>
           </div>
-
-          {/* Content container */}
           <div className="p-3 sm:p-4 md:p-6 lg:p-6">
-            {/* Navigation */}
-            <nav className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-4">
-              <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium text-[#2D2D2D] mb-3 sm:mb-0">
-                {/* Empty for now */}
-              </div>
-
-              {/* Mobile menu button */}
-              <button
-                className="sm:hidden fixed top-4 right-4 p-2 z-50 bg-white/80 backdrop-blur-sm rounded-md border-2 border-black"
-                onClick={() => setMenuOpen(!menuOpen)}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {menuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-
-              {/* Navigation links */}
-              <div
-                className={`
-                ${menuOpen ? "flex fixed inset-0 bg-white/95 z-40" : "hidden"} 
-                sm:flex sm:relative sm:bg-transparent
-                flex-col sm:flex-row 
-                items-center justify-center sm:justify-start
-                space-y-6 sm:space-y-0 sm:space-x-4 md:space-x-6 lg:space-x-8
-                text-lg sm:text-base md:text-lg
-                w-full sm:w-auto
-              `}
-              >
-                <Link href="/" className="hover:underline">
-                  Home
-                </Link>
-                <Link href="/about" className="hover:underline">
-                  About
-                </Link>
-                <Link href="/work" className="hover:underline font-medium">
-                  Work
-                </Link>
-                <Link href="/services" className="hover:underline">
-                  Services
-                </Link>
-                <Link href="/contact" className="hover:underline">
-                  Contact
-                </Link>
-
-                {/* Resume button */}
-                <div className="relative inline-block mt-4 sm:mt-0">
-                  <div className="absolute top-[3px] left-[3px] w-full h-full bg-black rounded-md"></div>
-                  <button className="relative bg-[#222] text-white px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-sm sm:text-base font-medium">
-                    CV
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5 ml-2"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 15L12 4M12 15L8 11M12 15L16 11M8 19H16C17.1046 19 18 18.1046 18 17V15"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </nav>
-
-            {/* Back button */}
             <div className="mb-6">
               <Link
                 href="/work"
