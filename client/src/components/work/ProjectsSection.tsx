@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { SCHOOL_PROJECTS } from '../../lib/constants';
 
 export interface SchoolProject {
   id: string
@@ -144,11 +145,7 @@ const ProjectCard = memo(({ project, activeProject, toggleProject }: ProjectCard
   );
 });
 
-interface ProjectsSectionProps {
-  projects: SchoolProject[];
-}
-
-const ProjectsSection = memo(({ projects }: ProjectsSectionProps) => {
+const ProjectsSection = memo(() => {
   const [activeProject, setActiveProject] = useState<string | null>(null);
   
   const toggleProject = (id: string) => {
@@ -188,13 +185,13 @@ const ProjectsSection = memo(({ projects }: ProjectsSectionProps) => {
 
           {/* Interactive project cards */}
           <div className="space-y-8">
-            {projects.length === 0 ? (
+            {SCHOOL_PROJECTS.length === 0 ? (
               <div className="text-center py-12">
                 <h3 className="text-xl font-bold mb-2">Aucun projet trouvé</h3>
                 <p className="text-gray-600">Les projets apparaîtront ici une fois ajoutés.</p>
               </div>
             ) : (
-              projects.map((project) => (
+              SCHOOL_PROJECTS.map((project) => (
                 <ProjectCard 
                   key={project.id} 
                   project={project} 
