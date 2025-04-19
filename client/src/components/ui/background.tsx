@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 export default function GradientBackground() {
   return (
-    <div className="fixed inset-0 w-full min-h-screen overflow-hidden -z-10">
+    <div className="fixed inset-0 w-full min-h-screen -z-10" style={{ overflow: 'clip' }}>
       <div
         className="absolute inset-0 w-full h-full"
         style={{
@@ -38,7 +38,7 @@ export default function GradientBackground() {
       {/* White flowers/stars with black outline and CSS animations */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Top left flower */}
-        <div className="absolute -left-12 -top-12" style={{ width: "150px", height: "150px" }}>
+        <div className="absolute -left-12 -top-12 hidden sm:block" style={{ width: "150px", height: "150px" }}>
           <div className="relative w-full h-full">
             <Image
               src="/stars.svg"
@@ -52,22 +52,6 @@ export default function GradientBackground() {
             />
           </div>
         </div>
-
-        {/* Top right small flower
-        <div className="absolute -right-2 -top-1" style={{ width: "220px", height: "180px" }}>
-          <div className="relative w-full h-full">
-            <Image
-              src="/icon.svg"
-              alt=""
-              fill
-              className="animate-[bounce_4s_ease-in-out_infinite]"
-              style={{ 
-                filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.9)) hue-rotate(355deg) saturate(1.4)",
-                opacity: 0.85
-              }}
-            />
-          </div>
-        </div> */}
 
         {/* Center top flower */}
         <div className="absolute left-1/2 -translate-x-1/2 top-4" style={{ width: "120px", height: "120px" }}>
@@ -86,7 +70,7 @@ export default function GradientBackground() {
         </div>
 
         {/* Bottom left flower */}
-        <div className="absolute -left-8 -bottom-8" style={{ width: "120px", height: "120px" }}>
+        <div className="absolute -left-8 -bottom-8 hidden sm:block" style={{ width: "120px", height: "120px" }}>
           <div className="relative w-full h-full">
             <Image
               src="/stars.svg"
@@ -135,7 +119,7 @@ export default function GradientBackground() {
         </div>
 
         {/* Bottom right corner flower */}
-        <div className="absolute -right-12 -bottom-12" style={{ width: "150px", height: "150px" }}>
+        <div className="absolute -right-12 -bottom-12 hidden sm:block" style={{ width: "150px", height: "150px" }}>
           <div className="relative w-full h-full">
             <Image
               src="/stars.svg"
@@ -151,7 +135,7 @@ export default function GradientBackground() {
         </div>
 
         {/* Large flower on right side extremity */}
-        <div className="absolute right-0 top-1/3" style={{ width: "180px", height: "180px" }}>
+        <div className="absolute right-0 top-1/3 hidden sm:block" style={{ width: "180px", height: "180px" }}>
           <div className="relative w-full h-full">
             <Image
               src="/stars.svg"
@@ -166,7 +150,7 @@ export default function GradientBackground() {
           </div>
         </div>
 
-        <div className="absolute -left-4 top-1/2" style={{ width: "110px", height: "110px" }}>
+        <div className="absolute -left-4 top-1/2 hidden sm:block" style={{ width: "110px", height: "110px" }}>
           <div className="relative w-full h-full">
             <Image
               src="/stars.svg"
@@ -184,5 +168,4 @@ export default function GradientBackground() {
     </div>
   )
 }
-  
-  
+

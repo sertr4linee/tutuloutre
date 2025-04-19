@@ -169,20 +169,6 @@ const ProjectsSection = memo(() => {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 mt-2 sm:mt-4">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">Mes projets académiques</h2>
-            
-            <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-0">
-              <Link href="/work/gallery">
-                <div className="relative inline-block group">
-                  <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
-                  <button className="relative px-3 sm:px-4 py-1.5 sm:py-2 bg-white border-2 border-black rounded-full text-sm font-medium transition-transform group-hover:-translate-y-0.5 inline-flex items-center">
-                    Albums photos
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </button>
-                </div>
-              </Link>
-            </div>
           </div>
 
           {/* Interactive project cards */}
@@ -202,19 +188,6 @@ const ProjectsSection = memo(() => {
                 />
               ))
             )}
-          </div>
-          
-          {/* View all projects and portfolio buttons */}
-          <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-3 sm:gap-4">
-            <Link href="/gallery-view" className="relative inline-block group">
-              <div className="absolute inset-0 bg-black translate-x-1 translate-y-1 rounded-full transition-transform group-hover:translate-x-1.5 group-hover:translate-y-1.5"></div>
-              <div className="relative px-4 sm:px-6 py-1.5 sm:py-2 bg-white border-2 border-black rounded-full font-medium flex items-center transition-transform group-hover:-translate-y-0.5 text-sm sm:text-base">
-                Portfolio complet
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                </svg>
-              </div>
-            </Link>
           </div>
         </div>
       </div>

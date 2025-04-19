@@ -486,7 +486,6 @@ export default function Services() {
               </p>
             </div>
             <div className="mb-10 sm:mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Configurez votre pack de services</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {services.map((service) => (
                   <motion.div 
@@ -735,45 +734,6 @@ export default function Services() {
               </div>
             </section>
 
-            <div className="mb-10 sm:mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Ce que disent mes clients</h2>
-              <div className="relative overflow-hidden" style={{ touchAction: 'pan-y' }}>
-                <motion.div 
-                  className="flex"
-                  animate={{ x: [0, -100, 0] }}
-                  transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                  style={{ touchAction: "pan-y" }}
-                >
-                  {[...servicesData.testimonials, ...servicesData.testimonials].map((testimonial, index) => (
-                    <div key={`${testimonial.id}-${index}`} className="flex-none w-80 mx-4">
-                      <motion.div 
-                        className="relative group"
-                        whileHover={{ y: -5 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 rounded-xl transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                        <div className="relative border-3 border-black rounded-xl p-6 bg-white">
-                          <div className="flex items-center mb-4">
-                            <Image  
-                              src={testimonial.avatar || "/placeholder.svg"} 
-                              alt={testimonial.name} 
-                              width={100}
-                              height={100}
-                              className="w-12 h-12 rounded-full border-2 border-black mr-4" 
-                            />
-                            <div>
-                              <h3 className="font-bold">{testimonial.name}</h3>
-                              <p className="text-sm text-[#3C3C3C]">{testimonial.company}</p>
-                            </div>
-                          </div>
-                          <p className="text-[#3C3C3C] italic">"{testimonial.quote}"</p>
-                        </div>
-                      </motion.div>
-                    </div>
-                  ))}
-                </motion.div>
-              </div>
-            </div>
             <motion.div 
               ref={intersectionRef}
               className="relative"

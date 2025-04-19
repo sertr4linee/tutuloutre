@@ -9,33 +9,19 @@ export default function About() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [aboutData, setAboutData] = useState({
-    myApproach: "Je crois que le design est bien plus qu'une simple esthétique. C'est une forme de communication qui raconte une histoire et crée une connexion émotionnelle. Mon approche intègre l'exploration créative, la recherche utilisateur et une attention méticuleuse aux détails pour créer des designs qui reflètent l'authenticité de chaque marque.",
-    education: {
-      degree: "Master en Design Graphique",
-      school: "École Nationale Supérieure des Arts Décoratifs",
-      years: "2015-2017"
-    },
+    myApproach: "Le design dépasse l'esthétique : c'est une communication qui raconte et connecte émotionnellement. Ma méthode combine créativité, recherche utilisateur et précision pour des designs qui capturent l'authenticité de chaque marque.",
     skills: [
       "Direction Artistique",
+      "Adobe Creative Suite",
+      "Design d'Identité",
+      "Photographie",
       "UI/UX Design",
       "Illustration",
-      "Typographie",
-      "Animation",
-      "Design d'Identité",
-      "Conception Web",
-      "Photographie",
-      "Dessin traditionnel",
-      "Adobe Creative Suite"
+      "Dessin"
     ]
   })
 
   useEffect(() => {
-    // Simulation d'un chargement de données
-    // Dans un environnement de production, on remplacerait ceci par un vrai appel API
-    // setLoading(true)
-    // setTimeout(() => {
-    //   setLoading(false)
-    // }, 800)
   }, [])
 
   if (loading) {
@@ -255,21 +241,16 @@ export default function About() {
                   </div>
                 </div>
               </div>
-
-              {/* Contenu texte À propos */}
               <div className="md:col-span-7">
                 <div className="space-y-4 sm:space-y-5 md:space-y-6">
                   <p className="text-lg sm:text-xl font-medium text-[#3C3C3C]">
                     Salut ! Je suis <span className="text-[#f67a45] font-bold">Maelle Crescence</span>, une designer passionnée
                     par la création d'expériences visuelles significatives.
                   </p>
-
                   <p className="text-base sm:text-lg text-[#3C3C3C]">
                     Avec plus de 5 ans d'expérience dans l'industrie du design, j'ai eu le plaisir de travailler avec des marques
                     dans divers secteurs, les aidant à communiquer leur vision à travers un design réfléchi et impactant.
                   </p>
-
-                  {/* Mon Approche */}
                   {aboutData?.myApproach && (
                     <div className="bg-[#FFE8DD] border-2 border-black p-4 sm:p-5 rounded-lg relative">
                       <div className="absolute -top-3 -left-3 bg-[#FFD2BF] text-black font-bold px-3 py-1 rounded-full border-2 border-black text-xs sm:text-sm">
@@ -280,22 +261,6 @@ export default function About() {
                       </p>
                     </div>
                   )}
-
-                  {/* Formation */}
-                  {aboutData?.education && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                      <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
-                        <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Formation</h3>
-                        <p className="text-sm sm:text-base text-[#3C3C3C]">
-                          {aboutData.education.degree}<br />
-                          {aboutData.education.school}<br />
-                          {aboutData.education.years}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Compétences */}
                   {aboutData?.skills?.length > 0 && (
                     <div className="border-2 border-black p-3 sm:p-4 rounded-lg bg-white">
                       <h3 className="font-bold text-lg sm:text-xl text-[#2D2D2D] mb-2">Compétences</h3>
@@ -312,8 +277,6 @@ export default function About() {
                     </div>
                   )}
                 </div>
-
-                {/* Appel à l'action */}
                 <div className="mt-8 sm:mt-10">
                   <Link href="/contact" className="inline-block">
                     <div className="relative">
@@ -333,11 +296,8 @@ export default function About() {
                   </Link>
                 </div>
               </div>
-
-              {/* Section Faits Amusants */}
               <div className="md:col-span-12 mt-8 sm:mt-10">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4 sm:mb-6">Faits Amusants</h2>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative overflow-hidden">
                     <div className="absolute -top-1 -right-1 w-[40px] h-[40px] opacity-20">
@@ -354,7 +314,6 @@ export default function About() {
                       J'ai goûté plus de 100 variétés de café du monde entier.
                     </p>
                   </div>
-
                   <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative overflow-hidden">
                     <div className="absolute -top-1 -right-1 w-[40px] h-[40px] opacity-20">
                       <Image
@@ -370,7 +329,6 @@ export default function About() {
                       Mon appartement abrite plus de 30 espèces de plantes différentes.
                     </p>
                   </div>
-
                   <div className="bg-[#FFE8DD] border-2 border-black p-4 rounded-lg relative overflow-hidden">
                     <div className="absolute -top-1 -right-1 w-[40px] h-[40px] opacity-20">
                       <Image

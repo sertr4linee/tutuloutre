@@ -4,8 +4,7 @@ import GradientBackground from "@/components/ui/background"
 import { useState, useCallback, useEffect } from "react"
 import dynamic from 'next/dynamic'
 import { PHOTO_ALBUMS } from "@/lib/constants"
-
-// Imports de base pour le premier rendu
+import { Metadata } from "next"
 import WorkNav from "@/components/work/WorkNav"
 import DecorativeElements from "@/components/work/DecorativeElements"
 
@@ -41,20 +40,23 @@ const LoadingComponent = () => (
 )
 
 const ProjectsSection = dynamic(() => import('@/components/work/ProjectsSection'), {
-  loading: () => null,
+  loading: () => <LoadingComponent />,
   ssr: false
 })
 
 const PhotographySection = dynamic(() => import('@/components/work/PhotographySection'), {
-  loading: () => null,
+  loading: () => <LoadingComponent />,
   ssr: false
 })
 
+const BlogSection = dynamic(() => import('@/components/work/BlogSection'), {
+  loading: () => <LoadingComponent />,
+  ssr: false
+})
 export default function WorkPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Désactiver le loading après un court délai pour laisser le temps aux composants de se charger
     const timer = setTimeout(() => {
       setLoading(false)
     }, 800)
@@ -73,25 +75,27 @@ export default function WorkPage() {
       <GradientBackground />
       <DecorativeElements />
 
-      {/* Navigation et en-tête */}
       <div className="relative z-30 flex flex-col items-center justify-start w-full px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-8 lg:py-10">
         <div className="w-full max-w-7xl">
           <WorkNav scrollTo={scrollTo} />
         </div>
       </div>
 
-      {/* Loading commun pour les deux sections */}
-      {loading && <LoadingComponent />}
-
-      {/* Sections de contenu chargées de manière différée */}      
-      <div className={`space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-20 ${loading ? 'hidden' : ''}`}>
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
-          <ProjectsSection />
+      {loading ? (
+        <LoadingComponent />
+      ) : (
+        <div className="space-y-8 sm:space-y-12 md:space-y-16 lg:space-y-20">
+          <div id="projects" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
+            <BlogSection />
+          </div>
+          <div id="photography" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
+            <PhotographySection albums={PHOTO_ALBUMS} />
+          </div>
+          <div id="blog" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
+            <ProjectsSection />
+          </div>
         </div>
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
-          <PhotographySection albums={PHOTO_ALBUMS} />
-        </div>
-      </div>
+      )}
     </main>
   )
 }

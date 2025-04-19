@@ -85,7 +85,7 @@ export default function Home() {
             </nav>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 md:gap-8">
               <div className="md:col-span-5 flex items-center justify-center order-1 md:order-2 mb-4 md:mb-0 pt-2">
-                <div className="w-[45%] sm:w-[35%] md:w-[75%] lg:w-[80%] max-w-[280px]">
+                <div className="w-[65%] sm:w-[55%] md:w-[85%] lg:w-[150%] max-w-[400px]">
                   <Image
                     src="/mascotte.png"
                     alt="Illustration du personnage"

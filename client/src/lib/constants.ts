@@ -121,7 +121,7 @@ export const SCHOOL_PROJECTS: SchoolProject[] = [
     year: "2023",
     category: "Publicité",
     tags: ["Campagne publicitaire", "Automobile", "Affiches"],
-    mainImage: "/images/projects/topolino1.jpg",
+    mainImage: "/images/projects/topolino4.jpg",
     images: [
       "/images/projects/topolino1.jpg",
       "/images/projects/topolino2.jpg",
@@ -301,5 +301,65 @@ export const PHOTO_ALBUMS: Album[] = [
     imageCount: 4,
     createdAt: "2024-01",
     slug: "evenement-prive"
+  }
+];
+
+export interface Blog {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  coverImage: string;
+  author: string;
+  readTime: string;
+  publishedAt: string;
+  tags: string[];
+  featured: boolean;
+  slug: string;
+}
+
+export const BLOG_POSTS: Blog[] = [
+  {
+    id: "design-thinking-2024",
+    title: "Le Design Thinking en 2024 : Évolution et Tendances",
+    description: "Une analyse approfondie des nouvelles approches du Design Thinking et son impact sur le design moderne.",
+    content: "Le Design Thinking continue d'évoluer et de s'adapter aux besoins changeants de notre société. En 2024, nous observons une transformation significative dans la manière dont les designers abordent les problèmes et créent des solutions...",
+    category: "Design",
+    coverImage: "/images/projects/topolino4.jpg",
+    author: "Une momes",
+    readTime: "5 min",
+    publishedAt: "2024-03-15",
+    tags: ["Design Thinking", "Innovation", "Méthodologie"],
+    featured: true,
+    slug: "design-thinking-2024"
+  },
+  {
+    id: "photographie-minimaliste",
+    title: "L'Art de la Photographie Minimaliste",
+    description: "Découvrez comment la simplicité peut créer des images puissantes et mémorables.",
+    content: "La photographie minimaliste est bien plus qu'une simple tendance esthétique. C'est une approche qui nous pousse à réfléchir sur l'essentiel et à communiquer avec moins...",
+    category: "Photographie",
+    coverImage: "/images/projects/mode3.jpg",
+    author: "Une momes",
+    readTime: "4 min",
+    publishedAt: "2024-03-10",
+    tags: ["Photographie", "Minimalisme", "Composition"],
+    featured: true,
+    slug: "photographie-minimaliste"
+  },
+  {
+    id: "ui-design-trends",
+    title: "Tendances UI Design 2024",
+    description: "Les dernières innovations en matière de design d'interface utilisateur qui façonnent l'avenir du web.",
+    content: "Le monde du design d'interface utilisateur est en constante évolution. En 2024, nous voyons émerger de nouvelles tendances qui redéfinissent notre façon d'interagir avec le numérique...",
+    category: "UI/UX",
+    coverImage: "/images/projects/cos3.jpg",
+    author: "Une momes",
+    readTime: "6 min",
+    publishedAt: "2024-03-05",
+    tags: ["UI Design", "Tendances", "Web Design"],
+    featured: true,
+    slug: "ui-design-trends"
   }
 ];
