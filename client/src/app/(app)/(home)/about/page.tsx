@@ -81,7 +81,7 @@ export default function About() {
       <GradientBackground />
 
       {/* Icône dans le coin supérieur gauche */}
-      <div className="fixed z-40 top-6 left-6 w-[60px] h-[60px] md:w-[80px] md:h-[80px] animate-float">
+      <div className="fixed z-0 top-6 left-6 w-[60px] h-[60px] md:w-[80px] md:h-[80px] animate-float">
         <Image
           src="/stars.svg"
           alt="Étoile décorative"

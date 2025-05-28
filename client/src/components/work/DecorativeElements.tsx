@@ -5,7 +5,7 @@ const DecorativeElements = memo(() => {
   return (
     <>
       {/* Floating decorative elements */}
-      <div className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] animate-float">
+      <div className="fixed z-0 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] animate-float">
         <Image
           src="/stars.svg"
           alt="Decorative star"
@@ -21,7 +21,7 @@ const DecorativeElements = memo(() => {
       </div>
 
       <div
-        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
+        className="fixed z-0 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
         style={{ animationDuration: "6s" }}
       >
         <Image

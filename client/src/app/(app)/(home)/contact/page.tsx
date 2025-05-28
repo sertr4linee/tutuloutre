@@ -6,12 +6,15 @@ import { useState } from "react"
 import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Contact() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("socials")
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 })
   const [isHovering, setIsHovering] = useState(false)
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     setHoverPosition({
@@ -19,6 +22,11 @@ export default function Contact() {
       y: e.clientY - rect.top,
     })
   }
+
+  const toggleFaq = (index: number) => {
+    setExpandedFaq(expandedFaq === index ? null : index)
+  }
+
   const socialLinks = [
     { 
       name: "Instagram", 
@@ -63,11 +71,35 @@ export default function Contact() {
       href: "https://tiktok.com/@tutuloutre"
     }
   ]
+
+  const faqData = [
+    {
+      question: "Quel est votre processus habituel ?",
+      answer:
+        "Mon processus comprend généralement les phases de découverte, recherche, idéation, conception et mise en œuvre. Je crois au travail collaboratif et à l'implication des clients tout au long du projet.",
+    },
+    {
+      question: "Combien de temps dure un projet ?", 
+      answer:
+        "Les délais des projets varient selon leur portée et leur complexité. Un projet de branding simple peut prendre 2-3 semaines, tandis qu'un site web complet peut prendre 1-2 mois.",
+    },
+    {
+      question: "Travaillez-vous avec des clients internationaux ?",
+      answer:
+        "Je travaille avec des clients du monde entier. Les outils modernes rendent la collaboration à distance fluide et efficace.",
+    },
+    {
+      question: "Quelles sont vos conditions de paiement ?",
+      answer:
+        "Je demande généralement un acompte de 50% pour commencer le travail, les 50% restants étant dus à la fin du projet. Pour les projets plus importants, nous pouvons organiser des paiements échelonnés.",
+    },
+  ]
+
   return (
     <main className="relative min-h-screen overflow-hidden">
       <GradientBackground />
       <div
-        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
+        className="fixed z-0 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] animate-bounce"
         style={{ animationDuration: "6s" }}
       >
         <Image
@@ -320,39 +352,54 @@ export default function Contact() {
               {/* FAQ Section */}
               <div className="mt-12 sm:mt-16">
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#2D2D2D] mb-6">Questions Fréquentes</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    {
-                      question: "Quel est votre processus habituel ?",
-                      answer:
-                        "Mon processus comprend généralement les phases de découverte, recherche, idéation, conception et mise en œuvre. Je crois au travail collaboratif et à l'implication des clients tout au long du projet.",
-                    },
-                    {
-                      question: "Combien de temps dure un projet ?", 
-                      answer:
-                        "Les délais des projets varient selon leur portée et leur complexité. Un projet de branding simple peut prendre 2-3 semaines, tandis qu'un site web complet peut prendre 1-2 mois.",
-                    },
-                    {
-                      question: "Travaillez-vous avec des clients internationaux ?",
-                      answer:
-                        "Je travaille avec des clients du monde entier. Les outils modernes rendent la collaboration à distance fluide et efficace.",
-                    },
-                    {
-                      question: "Quelles sont vos conditions de paiement ?",
-                      answer:
-                        "Je demande généralement un acompte de 50% pour commencer le travail, les 50% restants étant dus à la fin du projet. Pour les projets plus importants, nous pouvons organiser des paiements échelonnés.",
-                    },
-                  ].map((faq, index) => (
-                    <div
+                <div className="space-y-4">
+                  {faqData.map((faq, index) => (
+                    <motion.div
                       key={index}
-                      className="bg-white border-2 border-black p-4 rounded-lg relative group hover:bg-[#FFE8DD] transition-colors"
+                      className="bg-white border-2 border-black rounded-lg relative overflow-hidden"
+                      initial={false}
                     >
-                      <h3 className="font-bold text-lg text-[#2D2D2D] mb-2">{faq.question}</h3>
-                      <p className="text-sm text-[#3C3C3C]">{faq.answer}</p>
-                      <div className="absolute top-3 right-3 w-6 h-6 rounded-full border-2 border-black flex items-center justify-center bg-[#f67a45] text-white font-bold">
-                        ?
-                      </div>
-                    </div>
+                      <button
+                        onClick={() => toggleFaq(index)}
+                        className="w-full p-4 text-left flex items-center justify-between hover:bg-[#FFE8DD] transition-colors"
+                      >
+                        <h3 className="font-bold text-lg text-[#2D2D2D] pr-4">{faq.question}</h3>
+                        <motion.div
+                          animate={{ rotate: expandedFaq === index ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex-shrink-0"
+                        >
+                          <svg 
+                            className="w-6 h-6 text-[#f67a45]" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M19 9l-7 7-7-7" 
+                            />
+                          </svg>
+                        </motion.div>
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {expandedFaq === index && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-4 pb-4 border-t border-gray-200">
+                              <p className="text-sm sm:text-base text-[#3C3C3C] pt-3">{faq.answer}</p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
                   ))}
                 </div>
               </div>

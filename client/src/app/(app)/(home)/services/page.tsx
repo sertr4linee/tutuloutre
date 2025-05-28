@@ -323,7 +323,7 @@ export default function Services() {
       />
       <GradientBackground />
       <motion.div 
-        className="fixed z-10 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] hidden sm:block"
+        className="fixed z-0 top-[15%] right-[5%] w-[80px] h-[80px] md:w-[120px] md:h-[120px] hidden sm:block"
         animate={{
           y: [0, -20, 0],
           rotate: [0, 360],
@@ -344,7 +344,7 @@ export default function Services() {
         />
       </motion.div>
       <motion.div 
-        className="fixed z-10 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] hidden sm:block"
+        className="fixed z-0 bottom-[10%] left-[8%] w-[60px] h-[60px] md:w-[100px] md:h-[100px] hidden sm:block"
         animate={{
           y: [0, 20, 0],
           rotate: [0, -360],
