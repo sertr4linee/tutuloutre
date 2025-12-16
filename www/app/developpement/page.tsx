@@ -3,5 +3,5 @@
 import { CategoryPage } from "@/components/category-page"
 
 export default function Page() {
-  return <CategoryPage category="identite-visuelle" title="Identité Visuelle" />
+  return <CategoryPage category="developpement" title="Développement" />
 }
