@@ -32,17 +32,17 @@ export function GradientBackground() {
     >
       <GrainGradient
         style={{ height: "100%", width: "100%" }}
-        colorBack="hsl(0, 0%, 95%)"
-        softness={0.6}
-        intensity={0.8}
-        noise={0.4}
+        colorBack="hsl(0, 0%, 98%)"
+        softness={0.9}
+        intensity={0.45}
+        noise={0.2}
         shape="corners"
         offsetX={0}
         offsetY={0}
         scale={1}
         rotation={0}
         speed={0.5}
-        colors={["hsl(0, 0%, 80%)", "hsl(0, 0%, 75%)", "hsl(0, 0%, 85%)"]}
+        colors={["hsl(18, 100%, 88%)", "hsl(18, 89%, 62%)", "hsl(330, 100%, 85%)"]}
       />
     </div>
   )
