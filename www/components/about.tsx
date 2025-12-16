@@ -20,7 +20,7 @@ export default function About() {
             </h2>
             <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100">
               <img 
-                src="/maelle.jpg" 
+                src="/me.jpg" 
                 alt="Portrait" 
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" 
               />
@@ -29,49 +29,75 @@ export default function About() {
           
           <div className="md:w-2/3 space-y-8">
             <p className="text-xl md:text-2xl leading-relaxed text-black/80">
-              Passionné par le design et la technologie, je crée des expériences numériques qui marquent les esprits. Mon approche combine esthétique minimaliste et fonctionnalité intuitive.
+              Au croisement de l'art et de la stratégie, je sculpte des <span className={`${instrumentSerif.className} italic text-3xl text-black`}>univers singuliers</span>. Chaque projet est une opportunité de repousser les limites de la <span className={`${instrumentSerif.className} italic text-3xl text-black`}>créativité</span>.
             </p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 pt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 pt-12">
               <div>
                 <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-black/40 mb-8">Experience</h3>
-                <ul className="space-y-6 text-lg text-black/80 leading-relaxed">
-                  <li>Freelance Designer (2023-Present)</li>
-                  <li>
-                    Assistante DA{" "}
-                    <LinkPreview url="https://instagram.com/lucangeli" className="font-bold">
-                      @lucangeli
-                    </LinkPreview>{" "}
-                    (MAI-OCT 2025)
+                <ul className="space-y-8">
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Freelance Designer</span>
+                    <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2023-Present)</span>
                   </li>
-                  <li>
-                    Photographe de plateau{" "}
-                    <LinkPreview url="https://instagram.com/cigless" className="font-bold">
-                      @cigless
-                    </LinkPreview>{" "}
-                    (OCT 2024)
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Assistante DA</span>
+                    <div className="flex items-center gap-2 text-base">
+                      <LinkPreview 
+                        url="https://instagram.com/lucangeli" 
+                        className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
+                      >
+                        @lucangeli
+                      </LinkPreview>
+                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(MAI-OCT 2025)</span>
+                    </div>
                   </li>
-                  <li>
-                    Stage Graphiste/CM{" "}
-                    <LinkPreview url="https://instagram.com/alloverproductions" className="font-bold">
-                      @alloverproductions
-                    </LinkPreview>{" "}
-                    (JUN-AUG 2024)
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Photographe de plateau</span>
+                    <div className="flex items-center gap-2 text-base">
+                      <LinkPreview 
+                        url="https://instagram.com/cigless" 
+                        className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
+                      >
+                        @cigless
+                      </LinkPreview>
+                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(OCT 2024)</span>
+                    </div>
+                  </li>
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Stage Graphiste/CM</span>
+                    <div className="flex items-center gap-2 text-base">
+                      <LinkPreview 
+                        url="https://instagram.com/alloverproductions" 
+                        className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
+                      >
+                        @alloverproductions
+                      </LinkPreview>
+                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(JUN-AUG 2024)</span>
+                    </div>
                   </li>
                 </ul>
               </div>
               
               <div>
                 <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-black/40 mb-8">Education</h3>
-                <ul className="space-y-6 text-lg text-black/80 leading-relaxed">
-                  <li>
-                    Master en Direction Artistique{" "}
-                    <LinkPreview url="https://instagram.com/eartsup" className="font-bold">
-                      @eartsup
-                    </LinkPreview>{" "}
-                    (2022-2027)
+                <ul className="space-y-8">
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Master en Direction Artistique</span>
+                    <div className="flex items-center gap-2 text-base">
+                      <LinkPreview 
+                        url="https://instagram.com/eartsup" 
+                        className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
+                      >
+                        @eartsup
+                      </LinkPreview>
+                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2022-2027)</span>
+                    </div>
                   </li>
-                  <li>BAC STD2A (2020-2017)</li>
+                  <li className="flex flex-col items-start gap-1">
+                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>BAC STD2A</span>
+                    <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2020-2017)</span>
+                  </li>
                 </ul>
               </div>
             </div>

@@ -81,13 +81,30 @@ export default function Page() {
                   <div>
                     <h3 className="text-xs font-bold tracking-[0.2em] mb-6 text-black/40 uppercase">Navigation</h3>
                     <nav className="flex flex-col gap-2">
-                      {["Home", "Works", "Services", "About", "Contact"].map((item) => (
+                      {[
+                        { name: "Home", href: "#" },
+                        { name: "Works", href: "#works" },
+                        { name: "Services", href: "#services" },
+                        { name: "About", href: "#about" },
+                        { name: "Contact", href: "#contact" },
+                      ].map((item) => (
                         <a 
-                          key={item} 
-                          href="#" 
+                          key={item.name} 
+                          href={item.href}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            if (item.href === "#") {
+                              scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+                            } else {
+                              const element = document.querySelector(item.href)
+                              if (element) {
+                                element.scrollIntoView({ behavior: "smooth" })
+                              }
+                            }
+                          }}
                           className={`${instrumentSerif.className} text-4xl md:text-5xl text-black/80 hover:text-black hover:translate-x-4 transition-all duration-300`}
                         >
-                          {item}
+                          {item.name}
                         </a>
                       ))}
                     </nav>
@@ -112,10 +129,11 @@ export default function Page() {
                 <div className="flex flex-col justify-start pt-8">
                   <div className="space-y-6">
                     <h2 className={`${instrumentSerif.className} text-5xl md:text-7xl leading-[0.9] text-black`}>
-                      Du papier<br />au pixel.
+                      Créer<br />
+                      <span className="italic text-black/50">l'inattendu.</span>
                     </h2>
-                    <p className="text-lg text-black/60 max-w-md leading-relaxed">
-                      J'aide les marques à créer des designs uniques et mémorables.
+                    <p className="text-lg text-black/70 max-w-md leading-relaxed">
+                      Transformer des concepts abstraits en expériences tangibles et mémorables.
                     </p>
                   </div>
                 </div>
@@ -123,15 +141,23 @@ export default function Page() {
             </div>
 
             {/* Features Component */}
-            <ServicesWavy containerRef={scrollContainerRef} />
+            <div id="services">
+              <ServicesWavy containerRef={scrollContainerRef} />
+            </div>
             
-            <SelectedWorks />
+            <div id="works">
+              <SelectedWorks />
+            </div>
             
             <ServicesDetail />
 
-            <About />
+            <div id="about">
+              <About />
+            </div>
 
-            <Contact />
+            <div id="contact">
+              <Contact />
+            </div>
           </div>
         </div>
       </section>

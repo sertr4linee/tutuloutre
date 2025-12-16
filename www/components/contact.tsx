@@ -76,7 +76,7 @@ export default function Contact() {
         </div>
         
         <div className="mt-32 text-xs text-black/20 uppercase tracking-widest">
-          © 2024 Tutuloutre. All rights reserved.
+          © 2025 Tutuloutre. All rights reserved.
         </div>
       </div>
     </div>

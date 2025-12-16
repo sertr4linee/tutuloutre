@@ -10,12 +10,12 @@ const instrumentSerif = Instrument_Serif({
 })
 
 const services = [
-  'UI & UX Design',
-  'Direction Artistique',
-  'Identité Visuelle',
-  'Web Design',
-  'Motion Design',
-  'Développement',
+  { name: 'UI & UX Design', href: '/ui-ux-design' },
+  { name: 'Direction Artistique', href: '/direction-artistique' },
+  { name: 'Identité Visuelle', href: '/identite-visuelle' },
+  { name: 'Web Design', href: '/web-design' },
+  { name: 'Motion Design', href: '/motion-design' },
+  { name: 'Développement', href: '/developpement' },
 ]
 
 export default function ServicesWavy({ containerRef }: { containerRef?: React.RefObject<HTMLElement | null> }) {
@@ -24,10 +24,10 @@ export default function ServicesWavy({ containerRef }: { containerRef?: React.Re
       <div className="max-w-7xl mx-auto">
         <WavyBlock container={containerRef} className="flex flex-col justify-center items-center gap-8">
           {services.map((service, index) => (
-            <WavyBlockItem key={service} index={index}>
-              <a href="#" className="group flex items-center gap-6 text-black hover:opacity-80 transition-opacity">
+            <WavyBlockItem key={service.name} index={index}>
+              <a href={service.href} className="group flex items-center gap-6 text-black hover:opacity-80 transition-opacity">
                 <h2 className={`${instrumentSerif.className} text-[8vw] md:text-[7vw] leading-none tracking-tight text-black/90 whitespace-nowrap`}>
-                  {service}
+                  {service.name}
                 </h2>
                 <span className="opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
