@@ -2,7 +2,7 @@
 
 import { GradientBackground } from "@/components/gradient-background"
 import { useEffect, useState } from "react"
-import Features from "@/components/features"
+import { ScrollIndicator } from "@/components/scroll-indicator"
 import { Instrument_Serif } from "next/font/google"
 
 const instrumentSerif = Instrument_Serif({
