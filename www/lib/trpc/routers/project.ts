@@ -36,6 +36,8 @@ export const projectRouter = router({
         description: z.string().optional(),
         category: z.string().min(1),
         imageUrl: z.string().url(),
+        coverImage: z.string().url().optional(),
+        content: z.string().optional(),
         link: z.string().optional(),
       })
     )
@@ -52,6 +54,8 @@ export const projectRouter = router({
         description: z.string().optional(),
         category: z.string().min(1).optional(),
         imageUrl: z.string().url().optional(),
+        coverImage: z.string().url().optional(),
+        content: z.string().optional(),
         link: z.string().optional(),
       })
     )

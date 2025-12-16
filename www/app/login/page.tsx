@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Instrument_Serif } from "next/font/google"
 import { BeigeBackground } from "@/components/beige-background"
@@ -16,6 +16,22 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/auth/check")
+      const data = await res.json()
+      if (data.authenticated) {
+        router.push("/admin")
+      }
+    } catch (e) {
+      // Ignore error, just stay on login page
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
