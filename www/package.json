@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@paper-design/shaders-react": "^0.0.68",
+    "@vercel/analytics": "^1.6.1",
+    "geist": "^1.5.1",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1"
