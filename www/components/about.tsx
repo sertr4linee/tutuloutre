@@ -44,7 +44,7 @@ export default function About() {
                     <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Assistante DA</span>
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
-                        url="https://instagram.com/lucangeli" 
+                        url="https://instagram.com/lucangeli.it" 
                         className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
                       >
                         @lucangeli
