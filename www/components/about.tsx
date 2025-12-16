@@ -2,6 +2,7 @@
 
 import { Instrument_Serif } from "next/font/google"
 import { LinkPreview } from "@/components/ui/link-preview"
+import Image from "next/image"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -18,18 +19,19 @@ export default function About() {
             <h2 className={`${instrumentSerif.className} text-5xl md:text-7xl text-black mb-8`}>
               About<br />Me
             </h2>
-            <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100">
-              <img 
+            <div className="aspect-[3/4] w-full overflow-hidden bg-gray-100 relative">
+              <Image 
                 src="/me.jpg" 
-                alt="Portrait" 
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" 
+                alt="Portrait"
+                fill
+                className="object-cover grayscale hover:grayscale-0 transition-all duration-500" 
               />
             </div>
           </div>
           
           <div className="md:w-2/3 space-y-8">
             <p className="text-xl md:text-2xl leading-relaxed text-black/80">
-              Au croisement de l'art et de la stratégie, je sculpte des <span className={`${instrumentSerif.className} italic text-3xl text-black`}>univers singuliers</span>. Chaque projet est une opportunité de repousser les limites de la <span className={`${instrumentSerif.className} italic text-3xl text-black`}>créativité</span>.
+              Au croisement de l&apos;art et de la stratégie, je sculpte des <span className={`${instrumentSerif.className} italic text-3xl text-black`}>univers singuliers</span>. Chaque projet est une opportunité de repousser les limites de la <span className={`${instrumentSerif.className} italic text-3xl text-black`}>créativité</span>.
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 pt-12">

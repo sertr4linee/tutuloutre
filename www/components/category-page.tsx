@@ -3,6 +3,7 @@
 import { BeigeBackground } from "@/components/beige-background"
 import { Instrument_Serif } from "next/font/google"
 import Link from "next/link"
+import Image from "next/image"
 import { trpc } from "@/lib/trpc/client"
 
 const instrumentSerif = Instrument_Serif({
@@ -42,11 +43,12 @@ export function CategoryPage({ category, title }: CategoryPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {projects?.map((project) => (
               <div key={project.id} className="group relative">
-                <div className="aspect-video overflow-hidden rounded-lg bg-black/5">
-                  <img 
+                <div className="aspect-video overflow-hidden rounded-lg bg-black/5 relative">
+                  <Image 
                     src={project.imageUrl} 
                     alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="mt-4">

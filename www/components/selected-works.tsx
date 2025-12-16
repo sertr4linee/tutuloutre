@@ -1,8 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { image } from "framer-motion/client"
 import { Instrument_Serif } from "next/font/google"
+import Image from "next/image"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -48,10 +48,11 @@ export default function SelectedWorks() {
             >
               <div className={`aspect-[4/5] ${project.color || 'bg-transparent'} mb-6 overflow-hidden relative`}>
                 {project.image && (
-                  <img 
+                  <Image 
                     src={project.image} 
-                    alt={project.title} 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    alt={project.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105" 
                   />
                 )}
               </div>

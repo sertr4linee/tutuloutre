@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion"
 import { Instrument_Serif } from "next/font/google"
-import { useState } from "react"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -39,8 +38,6 @@ const services = [
 ]
 
 export default function ServicesDetail() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-
   return (
     <div className="py-32 border-t border-black/5">
       <div className="max-w-7xl mx-auto px-8 lg:px-16">
@@ -60,8 +57,7 @@ export default function ServicesDetail() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group border-b border-black/10 pb-12 last:border-0"
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
+
               >
                 <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-6 mb-6">
                   <h3 className={`${instrumentSerif.className} text-4xl text-black group-hover:translate-x-4 transition-transform duration-300`}>

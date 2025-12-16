@@ -3,9 +3,6 @@
 import * as React from "react"
 import {
   AlertCircleIcon,
-  CheckIcon,
-  CopyIcon,
-  DownloadIcon,
   ExternalLinkIcon,
   FileArchiveIcon,
   FileIcon,
@@ -16,8 +13,6 @@ import {
   ImageIcon,
   ListIcon,
   SearchIcon,
-  SortAscIcon,
-  SortDescIcon,
   Trash2Icon,
   UploadCloudIcon,
   UploadIcon,
@@ -541,8 +536,8 @@ export default function FileUpload({
 }) {
   const [view, setView] = React.useState<"list" | "grid">("list")
   const [query, setQuery] = React.useState("")
-  const [sortBy, setSortBy] = React.useState<"name" | "type" | "size">("name")
-  const [sortDir, setSortDir] = React.useState<"asc" | "desc">("asc")
+  const [sortBy] = React.useState<"name" | "type" | "size">("name")
+  const [sortDir] = React.useState<"asc" | "desc">("asc")
   const [selected, setSelected] = React.useState<Set<string>>(new Set())
   const [copied, setCopied] = React.useState<string | null>(null)
 
@@ -610,7 +605,11 @@ export default function FileUpload({
   const toggleOne = (id: string) =>
     setSelected((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
       return next
     })
 
@@ -627,29 +626,6 @@ export default function FileUpload({
       if (selected.has(f.id)) removeFile(f.id)
     })
     setSelected(new Set())
-  }
-
-  const downloadOne = (entry: UploadEntry) => {
-    const url = getPreviewUrl(entry)
-    if (!url) return
-    window.open(url, "_blank", "noopener,noreferrer")
-  }
-
-  const downloadSelected = () => {
-    filtered.forEach((f) => {
-      if (selected.has(f.id)) downloadOne(f as UploadEntry)
-    })
-  }
-
-  const copyLink = async (entry: UploadEntry) => {
-    const url = getPreviewUrl(entry)
-    if (!url) return
-    try {
-      await navigator.clipboard.writeText(url)
-      setCopied(entry.id)
-    } catch {
-      // noop
-    }
   }
 
   return (
@@ -672,7 +648,7 @@ export default function FileUpload({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search..."
-              className="bg-background ring-offset-background focus-visible:ring-ring placeholder:text-muted-foreground h-8 w-32 sm:w-56 rounded-md border px-7 text-[13px] outline-none focus-visible:ring-[2px]"
+              className="bg-background ring-offset-background focus-visible:ring-ring placeholder:text-muted-foreground h-8 w-32 sm:w-56 rounded-md border px-7 text-[13px] outline-none focus-visible:ring-2"
               aria-label="Search files"
             />
             <SearchIcon
@@ -812,7 +788,6 @@ export default function FileUpload({
                     const size = getSize(entry)
                     const url = getPreviewUrl(entry)
                     const isSelected = selected.has(entry.id)
-                    const percentOfMax = Math.min(100, Math.round((size / maxSize) * 100))
 
                     return (
                       <TableRow key={entry.id} data-selected={isSelected || undefined}>

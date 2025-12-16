@@ -13,7 +13,7 @@ export default function Contact() {
     <div className="py-32 border-t border-black/5">
       <div className="max-w-5xl mx-auto px-8 lg:px-16 text-center">
         <h2 className={`${instrumentSerif.className} text-5xl md:text-8xl text-black mb-12`}>
-          Let's work<br />together
+          Let&apos;s work<br />together
         </h2>
         
         <div className="mb-16">

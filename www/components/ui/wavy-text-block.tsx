@@ -123,15 +123,20 @@ export function WavyBlock({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }: React.ComponentPropsWithRef<'div'> & { offset?: any; container?: React.RefObject<HTMLElement | null> }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { current } = containerRef;
+  const [maxLen, setMaxLen] = React.useState(1);
 
-  const maxLen = React.useMemo(() => {
-    if (!current?.children || current.children.length === 0) return 1;
+  React.useEffect(() => {
+    const current = containerRef.current;
+    if (!current?.children || current.children.length === 0) {
+      setMaxLen(1);
+      return;
+    }
     const childrenArray = Array.from(current.children);
-    return Math.max(
+    const newMaxLen = Math.max(
       ...childrenArray.map((child) => (child ? String(child).length : 0)),
     );
-  }, [current?.children]);
+    setMaxLen(newMaxLen);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,

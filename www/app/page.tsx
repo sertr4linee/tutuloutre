@@ -130,7 +130,7 @@ export default function Page() {
                   <div className="space-y-6">
                     <h2 className={`${instrumentSerif.className} text-5xl md:text-7xl leading-[0.9] text-black`}>
                       Créer<br />
-                      <span className="italic text-black/50">l'inattendu.</span>
+                      <span className="italic text-black/50">l&apos;inattendu.</span>
                     </h2>
                     <p className="text-lg text-black/70 max-w-md leading-relaxed">
                       Transformer des concepts abstraits en expériences tangibles et mémorables.

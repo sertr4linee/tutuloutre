@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Instrument_Serif } from "next/font/google"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 import { BeigeBackground } from "@/components/beige-background"
 import { trpc } from "@/lib/trpc/client"
 import { UploadButton } from "@uploadthing/react"
@@ -295,11 +296,12 @@ export default function AdminPage() {
                             Image Principale
                           </label>
                           {formData.imageUrl ? (
-                            <div className="relative group rounded-xl overflow-hidden border border-black/10">
-                              <img
+                            <div className="relative group rounded-xl overflow-hidden border border-black/10 aspect-video">
+                              <Image
                                 src={formData.imageUrl}
                                 alt="Preview"
-                                className="w-full aspect-video object-cover"
+                                fill
+                                className="object-cover"
                               />
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <button
@@ -340,11 +342,12 @@ export default function AdminPage() {
                             Image de Couverture
                           </label>
                           {formData.coverImage ? (
-                            <div className="relative group rounded-xl overflow-hidden border border-black/10">
-                              <img
+                            <div className="relative group rounded-xl overflow-hidden border border-black/10 aspect-video">
+                              <Image
                                 src={formData.coverImage}
                                 alt="Cover Preview"
-                                className="w-full aspect-video object-cover"
+                                fill
+                                className="object-cover"
                               />
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <button
@@ -428,10 +431,11 @@ export default function AdminPage() {
                     className="group bg-white rounded-2xl overflow-hidden border border-black/5 hover:shadow-lg hover:shadow-black/5 transition-all"
                   >
                     <div className="aspect-4/3 relative overflow-hidden">
-                      <img
+                      <Image
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                       

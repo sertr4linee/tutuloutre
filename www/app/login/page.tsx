@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Instrument_Serif } from "next/font/google"
 import { BeigeBackground } from "@/components/beige-background"
+import Link from "next/link"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -18,20 +19,19 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/check")
-      const data = await res.json()
-      if (data.authenticated) {
-        router.push("/admin")
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/check")
+        const data = await res.json()
+        if (data.authenticated) {
+          router.push("/admin")
+        }
+      } catch {
+        // Ignore error, just stay on login page
       }
-    } catch (e) {
-      // Ignore error, just stay on login page
     }
-  }
+    checkAuth()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,12 +95,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <a 
+        <Link 
           href="/" 
           className="block text-center mt-8 text-black/40 hover:text-black transition-colors text-sm"
         >
           ← Retour au site
-        </a>
+        </Link>
       </div>
     </div>
   )
