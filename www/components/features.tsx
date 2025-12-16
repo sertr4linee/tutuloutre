@@ -2,7 +2,7 @@ import React from "react"
 
 export default function Features() {
   return (
-    <div className="bg-white py-24 px-8 lg:px-16">
+    <div className="py-24 px-8 lg:px-16">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl font-light tracking-tight mb-16">Selected Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

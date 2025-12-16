@@ -1,8 +1,9 @@
 "use client"
 
+import { BeigeBackground } from "@/components/beige-background"
 import { GradientBackground } from "@/components/gradient-background"
 import { useEffect, useState } from "react"
-import Features from "@/components/features"
+import ServicesWavy from "@/components/services-wavy"
 import { ScrollIndicator } from "@/components/scroll-indicator"
 import { Instrument_Serif } from "next/font/google"
 
@@ -40,6 +41,10 @@ export default function Page() {
             transition: "transform 0.1s ease-out",
           }}
         >
+          <div className="mb-4">
+            <img src="/icon.svg" alt="Logo" className="w-32 h-32 opacity-90" />
+          </div>
+
           <h1
             className={`${instrumentSerif.className} text-black text-center text-balance font-normal tracking-tight text-7xl`}
           >
@@ -55,66 +60,77 @@ export default function Page() {
       <div className="h-[200vh] relative" />
 
       <section
-        className="fixed inset-0 bg-white rounded-t-[40px] shadow-2xl overflow-y-auto"
+        className="fixed inset-0 rounded-t-[40px] shadow-2xl overflow-hidden"
         style={{
           transform: `translateY(${nextSectionY}%)`,
           transition: "transform 0.1s ease-out",
         }}
       >
-        <div className="bg-[#f5f5f5] px-8 lg:px-16 py-12">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Sitemap Section */}
-            <div>
-              <h3 className="text-sm font-bold tracking-wider mb-6 flex items-center gap-3">
-                <span className="text-gray-400">01/</span>
-                <span>SITEMAP</span>
-              </h3>
-              <nav className="flex flex-col gap-3">
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  Home
-                </a>
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  Works
-                </a>
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  About
-                </a>
-              </nav>
+        <BeigeBackground />
+        
+        <div className="relative h-full overflow-y-auto">
+          <div className="px-8 lg:px-16 py-24">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 mb-32">
+                <div className="space-y-16">
+                  <div>
+                    <h3 className="text-xs font-bold tracking-[0.2em] mb-8 text-black/40 uppercase">Navigation</h3>
+                    <nav className="flex flex-col gap-4">
+                      {["Home", "Works", "Services", "About", "Contact"].map((item) => (
+                        <a 
+                          key={item} 
+                          href="#" 
+                          className={`${instrumentSerif.className} text-5xl md:text-6xl text-black/80 hover:text-black hover:translate-x-4 transition-all duration-300`}
+                        >
+                          {item}
+                        </a>
+                      ))}
+                    </nav>
+                  </div>
+
+                  <div>
+                    <h3 className="text-xs font-bold tracking-[0.2em] mb-8 text-black/40 uppercase">Socials</h3>
+                    <div className="flex flex-wrap gap-x-8 gap-y-4">
+                      {["Github", "LinkedIn", "Twitter", "Instagram"].map((item) => (
+                        <a 
+                          key={item} 
+                          href="#" 
+                          className="text-lg text-black/60 hover:text-black underline decoration-1 underline-offset-4 transition-colors"
+                        >
+                          {item}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-between">
+                  <div className="space-y-6">
+                    <h2 className={`${instrumentSerif.className} text-6xl md:text-8xl leading-[0.9] text-black`}>
+                      Je griffonne<br />sur papier<br />& design.
+                    </h2>
+                    <p className="text-xl text-black/60 max-w-md leading-relaxed">
+                      J'aide les marques à créer des designs uniques et mémorables. Disponible pour de nouveaux projets.
+                    </p>
+                  </div>
+                  
+                  <a 
+                    href="mailto:hello@unemome.fr" 
+                    className="inline-flex items-center gap-4 text-xl font-medium mt-12 group"
+                  >
+                    <span className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
+                      →
+                    </span>
+                    <span>Get in touch</span>
+                  </a>
+                </div>
+              </div>
             </div>
 
-            {/* Social Section */}
-            <div>
-              <h3 className="text-sm font-bold tracking-wider mb-6 flex items-center gap-3">
-                <span className="text-gray-400">02/</span>
-                <span>SOCIAL</span>
-              </h3>
-              <nav className="flex flex-col gap-3">
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  Github
-                </a>
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  Linkedin
-                </a>
-                <a href="#" className="text-gray-600 hover:text-black transition-colors text-lg">
-                  Twitter
-                </a>
-              </nav>
-            </div>
-
-            {/* CTA Section */}
-            <div className="md:text-right">
-              <a
-                href="#"
-                className="inline-block text-2xl lg:text-3xl font-bold tracking-tight hover:underline decoration-2 underline-offset-4"
-              >
-                LET'S WORK TOGETHER
-              </a>
-            </div>
+            {/* Features Component */}
+            <ServicesWavy />
           </div>
         </div>
-
-        {/* Features Component */}
-        <Features />
       </section>
     </>
   )
