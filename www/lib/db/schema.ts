@@ -13,5 +13,12 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
+export const siteContent = pgTable("site_content", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(), // JSON string for complex objects, plain text for simple strings
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
 export type Project = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
+export type SiteContent = typeof siteContent.$inferSelect

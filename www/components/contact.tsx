@@ -10,7 +10,7 @@ const instrumentSerif = Instrument_Serif({
 
 export default function Contact() {
   return (
-    <div className="py-32 border-t border-black/5">
+    <div className="pt-20 pb-10 border-t border-black/5">
       <div className="max-w-5xl mx-auto px-8 lg:px-16 text-center">
         <h2 className={`${instrumentSerif.className} text-5xl md:text-8xl text-black mb-12`}>
           Let&apos;s work<br />together
@@ -66,18 +66,6 @@ export default function Contact() {
             </button>
           </div>
         </form>
-
-        <div className="flex justify-center gap-8">
-           {["Instagram", "LinkedIn", "Behance"].map((social) => (
-             <a key={social} href="#" className="text-sm font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors">
-               {social}
-             </a>
-           ))}
-        </div>
-        
-        <div className="mt-32 text-xs text-black/20 uppercase tracking-widest">
-          © 2025 Tutuloutre. All rights reserved.
-        </div>
       </div>
     </div>
   )

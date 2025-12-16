@@ -72,7 +72,7 @@ export default function SelectedWorks() {
         <div className="mt-32 text-center">
           <a 
             href="#" 
-            className="inline-block text-xl font-medium border-b border-black pb-1 hover:opacity-60 transition-opacity"
+            className="inline-block text-black text-xl font-medium border-b border-black pb-1 hover:opacity-60 transition-opacity"
           >
             View all projects
           </a>

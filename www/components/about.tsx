@@ -3,6 +3,7 @@
 import { Instrument_Serif } from "next/font/google"
 import { LinkPreview } from "@/components/ui/link-preview"
 import Image from "next/image"
+import { EditableContent } from "@/components/editable-content"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -30,20 +31,38 @@ export default function About() {
           </div>
           
           <div className="md:w-2/3 space-y-8">
-            <p className="text-xl md:text-2xl leading-relaxed text-black/80">
-              Au croisement de l&apos;art et de la stratégie, je sculpte des <span className={`${instrumentSerif.className} italic text-3xl text-black`}>univers singuliers</span>. Chaque projet est une opportunité de repousser les limites de la <span className={`${instrumentSerif.className} italic text-3xl text-black`}>créativité</span>.
-            </p>
+            <EditableContent
+              contentKey="about-description"
+              defaultValue={`Au croisement de l&apos;art et de la stratégie, je sculpte des <span class="${instrumentSerif.className} italic text-3xl text-black">univers singuliers</span>. Chaque projet est une opportunité de repousser les limites de la <span class="${instrumentSerif.className} italic text-3xl text-black">créativité</span>.`}
+              as="p"
+              className="text-xl md:text-2xl leading-relaxed text-black/80"
+            />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 pt-12">
               <div>
                 <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-black/40 mb-8">Experience</h3>
                 <ul className="space-y-8">
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Freelance Designer</span>
-                    <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2023-Present)</span>
+                    <EditableContent
+                      contentKey="exp-1-title"
+                      defaultValue="Freelance Designer"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
+                    <EditableContent
+                      contentKey="exp-1-date"
+                      defaultValue="(2023-Present)"
+                      as="span"
+                      className="text-xs font-medium tracking-widest uppercase text-black/40"
+                    />
                   </li>
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Assistante DA</span>
+                    <EditableContent
+                      contentKey="exp-2-title"
+                      defaultValue="Assistante DA"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
                         url="https://www.lucangeli.co/en" 
@@ -51,11 +70,21 @@ export default function About() {
                       >
                         @lucangeli
                       </LinkPreview>
-                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(MAI-OCT 2025)</span>
+                      <EditableContent
+                        contentKey="exp-2-date"
+                        defaultValue="(MAI-OCT 2025)"
+                        as="span"
+                        className="text-xs font-medium tracking-widest uppercase text-black/40"
+                      />
                     </div>
                   </li>
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Photographe de plateau</span>
+                    <EditableContent
+                      contentKey="exp-3-title"
+                      defaultValue="Photographe de plateau"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
                         url="https://www.ciglessfilms.com/" 
@@ -63,11 +92,21 @@ export default function About() {
                       >
                         @cigless
                       </LinkPreview>
-                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(OCT 2024)</span>
+                      <EditableContent
+                        contentKey="exp-3-date"
+                        defaultValue="(OCT 2024)"
+                        as="span"
+                        className="text-xs font-medium tracking-widest uppercase text-black/40"
+                      />
                     </div>
                   </li>
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Stage Graphiste/CM</span>
+                    <EditableContent
+                      contentKey="exp-4-title"
+                      defaultValue="Stage Graphiste/CM"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
                         url="https://www.alloverproduction.com/" 
@@ -75,7 +114,12 @@ export default function About() {
                       >
                         @alloverproductions
                       </LinkPreview>
-                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(JUN-AUG 2024)</span>
+                      <EditableContent
+                        contentKey="exp-4-date"
+                        defaultValue="(JUN-AUG 2024)"
+                        as="span"
+                        className="text-xs font-medium tracking-widest uppercase text-black/40"
+                      />
                     </div>
                   </li>
                 </ul>
@@ -85,7 +129,12 @@ export default function About() {
                 <h3 className="text-xs font-bold tracking-[0.2em] uppercase text-black/40 mb-8">Education</h3>
                 <ul className="space-y-8">
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Master en Direction Artistique</span>
+                    <EditableContent
+                      contentKey="edu-1-title"
+                      defaultValue="Master en Direction Artistique"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
                         url="https://www.e-artsup.net/" 
@@ -93,12 +142,27 @@ export default function About() {
                       >
                         @eartsup
                       </LinkPreview>
-                      <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2022-2027)</span>
+                      <EditableContent
+                        contentKey="edu-1-date"
+                        defaultValue="(2022-2027)"
+                        as="span"
+                        className="text-xs font-medium tracking-widest uppercase text-black/40"
+                      />
                     </div>
                   </li>
                   <li className="flex flex-col items-start gap-1">
-                    <span className={`${instrumentSerif.className} text-3xl italic text-black`}>BAC STD2A</span>
-                    <span className="text-xs font-medium tracking-widest uppercase text-black/40">(2020-2017)</span>
+                    <EditableContent
+                      contentKey="edu-2-title"
+                      defaultValue="BAC STD2A"
+                      as="span"
+                      className={`${instrumentSerif.className} text-3xl italic text-black`}
+                    />
+                    <EditableContent
+                      contentKey="edu-2-date"
+                      defaultValue="(2020-2017)"
+                      as="span"
+                      className="text-xs font-medium tracking-widest uppercase text-black/40"
+                    />
                   </li>
                 </ul>
               </div>
@@ -109,3 +173,4 @@ export default function About() {
     </div>
   )
 }
+

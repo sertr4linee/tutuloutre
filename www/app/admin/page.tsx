@@ -172,6 +172,14 @@ export default function AdminPage() {
               <ExternalLink className="w-4 h-4" />
               Voir le site
             </a>
+            <a 
+              href="/?edit=true" 
+              target="_blank"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black/60 hover:text-black transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              Edit Website
+            </a>
             <div className="h-6 w-px bg-black/10" />
             <button
               onClick={handleLogout}

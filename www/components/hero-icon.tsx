@@ -5,7 +5,7 @@ export function HeroIcon() {
       xmlns="http://www.w3.org/2000/svg" 
       version="1.1" 
       viewBox="0 0 2193.6 1382.9"
-      className="w-64 h-auto -mb-12"
+      className="w-48 md:w-64 h-auto -mb-8 md:-mb-12"
     >
       <style>
         {`.st0 { fill: #161616; }`}

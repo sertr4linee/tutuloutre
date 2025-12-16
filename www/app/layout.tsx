@@ -5,7 +5,7 @@ import { Instrument_Serif } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
 import { Suspense } from "react"
 import "./globals.css"
-import ScrollObserver from "@/components/scroll-observer"
+import { TRPCProvider } from "@/lib/trpc/client"
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -27,10 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={instrumentSerif.variable}>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <ScrollObserver>
+        <TRPCProvider>
           <Suspense fallback={null}>{children}</Suspense>
-        </ScrollObserver>
-        <Analytics />
+          <Analytics />
+        </TRPCProvider>
       </body>
     </html>
   )
