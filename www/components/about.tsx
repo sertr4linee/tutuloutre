@@ -46,7 +46,7 @@ export default function About() {
                     <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Assistante DA</span>
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
-                        url="https://instagram.com/lucangeli.it" 
+                        url="https://www.lucangeli.co/en" 
                         className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
                       >
                         @lucangeli
@@ -58,7 +58,7 @@ export default function About() {
                     <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Photographe de plateau</span>
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
-                        url="https://instagram.com/cigless" 
+                        url="https://www.ciglessfilms.com/" 
                         className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
                       >
                         @cigless
@@ -70,7 +70,7 @@ export default function About() {
                     <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Stage Graphiste/CM</span>
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
-                        url="https://instagram.com/alloverproductions" 
+                        url="https://www.alloverproduction.com/" 
                         className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
                       >
                         @alloverproductions
@@ -88,7 +88,7 @@ export default function About() {
                     <span className={`${instrumentSerif.className} text-3xl italic text-black`}>Master en Direction Artistique</span>
                     <div className="flex items-center gap-2 text-base">
                       <LinkPreview 
-                        url="https://instagram.com/eartsup" 
+                        url="https://www.e-artsup.net/" 
                         className="text-black/60 hover:text-black transition-colors border-b border-black/20 hover:border-black/100 pb-0.5"
                       >
                         @eartsup
