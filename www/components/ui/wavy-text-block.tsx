@@ -118,9 +118,10 @@ export function WavyBlockItem({
 
 export function WavyBlock({
   offset = ['start end', 'end start'],
+  container,
   ...props
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}: React.ComponentPropsWithRef<'div'> & { offset?: any }) {
+}: React.ComponentPropsWithRef<'div'> & { offset?: any; container?: React.RefObject<HTMLElement | null> }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const { current } = containerRef;
 
@@ -135,6 +136,7 @@ export function WavyBlock({
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: offset,
+    container: container as React.RefObject<HTMLElement>,
   });
   return (
     <WavyBlockContext.Provider value={{ scrollYProgress, maxLen }}>
