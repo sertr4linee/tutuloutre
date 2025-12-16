@@ -2,6 +2,7 @@
 
 import { GradientBackground } from "@/components/gradient-background"
 import { useEffect, useState } from "react"
+import Features from "@/components/features"
 import { ScrollIndicator } from "@/components/scroll-indicator"
 import { Instrument_Serif } from "next/font/google"
 
@@ -45,8 +46,8 @@ export default function Page() {
             imagination is limit
           </h1>
 
-          <div className="mt-8">
-            <img src="/effect-logo.svg" alt="Effect Logo" className="w-48 h-auto opacity-90" />
+          <div className="mt-12">
+            <ScrollIndicator />
           </div>
         </section>
       </main>
